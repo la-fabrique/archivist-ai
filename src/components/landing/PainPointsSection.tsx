@@ -1,42 +1,41 @@
 import { motion } from "framer-motion";
-import { FolderOpen, Clock, HelpCircle, Users, Phone, AlertTriangle } from "lucide-react";
 
 const painPoints = [
   {
-    icon: FolderOpen,
     emoji: "📂",
-    title: '"scan001.pdf"',
-    description: "Des fichiers aux noms incompréhensibles partout"
+    title: "Fichiers perdus",
+    description: '"Je perds 30 min par jour à chercher des fichiers éparpillés."',
+    bgColor: "bg-orange-50 dark:bg-orange-900/20"
   },
   {
-    icon: Clock,
     emoji: "⏰",
-    title: "30 à 90 minutes par semaine",
-    description: "Perdues à chercher des documents"
+    title: "Temps gaspillé",
+    description: '"30 à 90 minutes par semaine perdues en recherche de documents."',
+    bgColor: "bg-amber-50 dark:bg-amber-900/20"
   },
   {
-    icon: HelpCircle,
     emoji: "🤯",
-    title: '"Où j\'ai mis cette facture ?"',
-    description: "Le stress du document introuvable"
+    title: "Versions multiples",
+    description: '"Est-ce la v2_final.pdf ou la v3_review.docx ?"',
+    bgColor: "bg-red-50 dark:bg-red-900/20"
   },
   {
-    icon: Users,
     emoji: "👥",
-    title: '"Personne ne comprend mon classement"',
-    description: "Méthodes personnelles non partageables"
+    title: "Chaos d'équipe",
+    description: '"Mon équipe ne range jamais rien au bon endroit."',
+    bgColor: "bg-blue-50 dark:bg-blue-900/20"
   },
   {
-    icon: Phone,
     emoji: "📞",
-    title: '"Votre comptable a encore appelé"',
-    description: "Justificatifs manquants, relances infinies"
+    title: "Relances comptables",
+    description: '"Votre comptable a encore appelé pour les justificatifs manquants."',
+    bgColor: "bg-purple-50 dark:bg-purple-900/20"
   },
   {
-    icon: AlertTriangle,
     emoji: "😰",
-    title: '"Le contrôle fiscal est dans 2 jours"',
-    description: "Panique des documents perdus"
+    title: "Panique fiscale",
+    description: '"Le contrôle fiscal est dans 2 jours et je ne trouve rien."',
+    bgColor: "bg-rose-50 dark:bg-rose-900/20"
   }
 ];
 
@@ -44,31 +43,35 @@ const PainPointsSection = () => {
   return (
     <section className="py-16 md:py-24 bg-secondary/30">
       <div className="container-narrow">
-        <motion.div
+        <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-12"
+          className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight tracking-tight text-center text-foreground mb-12"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Vous reconnaissez-vous ?
-          </h2>
-        </motion.div>
+          Vous reconnaissez-vous ?
+        </motion.h2>
         
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
+        <div className="grid md:grid-cols-2 gap-4 mb-12">
           {painPoints.map((point, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.1, duration: 0.5 }}
-              className="group p-6 bg-card rounded-2xl border border-border hover:border-destructive/30 hover:shadow-lg transition-all"
+              transition={{ delay: index * 0.08, duration: 0.5 }}
+              className="flex items-center gap-4 rounded-xl bg-card p-5 shadow-sm border border-border hover:border-destructive/30 hover:shadow-md transition-all"
             >
-              <span className="text-3xl mb-4 block">{point.emoji}</span>
-              <h3 className="font-semibold text-foreground mb-2">{point.title}</h3>
-              <p className="text-sm text-muted-foreground">{point.description}</p>
+              <div className={`flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full ${point.bgColor} text-2xl`}>
+                {point.emoji}
+              </div>
+              <div className="flex flex-col gap-1">
+                <p className="text-foreground text-base font-bold leading-tight">{point.title}</p>
+                <p className="text-muted-foreground text-sm font-normal leading-normal">
+                  {point.description}
+                </p>
+              </div>
             </motion.div>
           ))}
         </div>
