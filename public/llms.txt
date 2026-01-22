@@ -1,0 +1,39 @@
+# Archiviste IA
+
+> Un archiviste virtuel pour tous vos fichiers professionnels.
+
+## Description
+
+Archiviste IA est un assistant intelligent qui organise automatiquement vos documents professionnels. Il se connecte à vos outils existants (Google Drive, Office 365, OneDrive, serveurs locaux) et classe vos fichiers sans que vous ayez à changer vos habitudes.
+
+## Fonctionnalités principales
+
+- **Classement automatique** : L'IA lit, comprend et range vos documents au bon endroit
+- **Nommage intelligent** : Fichiers renommés de façon cohérente et compréhensible
+- **Recherche naturelle** : Demandez "la facture de Jean en mars" en langage naturel
+- **Zéro nouvelle interface** : Se branche sur vos outils existants
+- **Human-in-the-loop** : Autonome sur le simple, vous consulte pour le complexe
+- **Traçabilité totale** : Chaque action est loggée, aucune suppression possible
+
+## Cas d'usage
+
+- Indépendants & Freelances : Fini le stress des justificatifs manquants
+- TPE & PME (2-50 personnes) : Une méthode de classement que toute l'équipe comprend
+- Experts-Comptables : Réconciliation automatique relevé bancaire ↔ justificatifs (coming soon)
+
+## Sécurité & Conformité
+
+- Données souveraines hébergées en Europe
+- 100% compatible RGPD
+- Chiffrement de bout en bout
+- Aucun stockage de vos fichiers - ils restent sur VOS systèmes
+
+## Contact
+
+- Site web : https://archiviste-ia.com
+- Email : contact@archiviste-ia.com
+- Localisation : France, Europe
+
+## Statut
+
+Produit en phase de lancement. Liste d'attente ouverte pour accès prioritaire.

@@ -1,3 +1,5 @@
+# Archiviste IA - Robots.txt
+
 User-agent: Googlebot
 Allow: /
 
@@ -10,5 +12,27 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
+# AI Crawlers
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Anthropic-AI
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
 User-agent: *
 Allow: /
+
+# Sitemap
+Sitemap: https://archiviste-ia.com/sitemap.xml
+
+# LLMs.txt
+# See: https://archiviste-ia.com/llms.txt
