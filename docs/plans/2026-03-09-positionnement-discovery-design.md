@@ -178,16 +178,19 @@ Les documents vivent dans des dossiers chronologiques par type. La vue "par clie
 ## Structure docs/ cible
 
 ```
+packages/
+├── landing/
+└── referentiel/
+    ├── _index.md
+    ├── plan-classement.md
+    ├── regles-nommage.md
+    ├── regles-archivage.md
+    └── raccourcis-liens.md
+
 docs/
 ├── plans/
 │   └── 2026-03-09-positionnement-discovery-design.md  ← ce fichier
 ├── lean-canvas.md
-├── referentiel/
-│   ├── _index.md
-│   ├── plan-classement.md
-│   ├── regles-nommage.md
-│   ├── regles-archivage.md
-│   └── raccourcis-liens.md
 ├── community/
 │   ├── strategie.md
 │   ├── contenus.md
@@ -205,7 +208,7 @@ docs/
 
 ## Prochaines étapes
 
-1. Créer la structure `docs/` complète
+1. Créer la structure `docs/` + `packages/referentiel/`
 2. Rédiger le référentiel v0 dans des fichiers séparés (plan-classement, nommage, archivage)
 3. Rédiger la stratégie communauté détaillée
 4. Préparer le premier post LinkedIn/Facebook
