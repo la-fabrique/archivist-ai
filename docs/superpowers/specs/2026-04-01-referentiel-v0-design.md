@@ -79,7 +79,6 @@ Mes Achats/
 **Quand adapter** :
 - Multi-société → un dossier racine par entité juridique
 - Projets longs → ajouter `Mes Projets/`
-- Si un dossier reste vide 3 mois → le supprimer
 
 ### `regles-nommage.md` — Règles de nommage
 
