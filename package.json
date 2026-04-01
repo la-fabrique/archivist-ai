@@ -6,6 +6,9 @@
     "landing:install": "npm install --prefix packages/landing",
     "landing:dev": "npm run dev --prefix packages/landing",
     "landing:build": "npm run build --prefix packages/landing",
-    "landing:preview": "npm run preview --prefix packages/landing"
+    "landing:preview": "npm run preview --prefix packages/landing",
+    "referentiel-cli:install": "npm install --prefix packages/referentiel-cli",
+    "referentiel-cli:build": "npm run build --prefix packages/referentiel-cli",
+    "referentiel-cli:test": "npm run test --prefix packages/referentiel-cli"
   }
 }
