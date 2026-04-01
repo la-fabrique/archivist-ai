@@ -16,7 +16,10 @@ function resolveClientSecretPath(opts: AuthOptions): string {
   const path = fromFlag || fromEnv;
   if (!path) {
     throw new Error(
-      "Indique --client-secret ou la variable REFERENTIEL_CLI_GOOGLE_CLIENT_SECRET",
+      "Indique --client-secret ou REFERENTIEL_CLI_GOOGLE_CLIENT_SECRET (chemin vers le JSON).\n\n" +
+        "Pour un compte perso sans ce fichier, utilise plutôt une fois :\n" +
+        "  gcloud auth application-default login --scopes=https://www.googleapis.com/auth/drive\n" +
+        "puis lance `push` sans `auth`.",
     );
   }
   if (!existsSync(path)) {

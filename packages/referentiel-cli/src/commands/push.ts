@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { OAuth2Client } from "google-auth-library";
 import { google } from "googleapis";
@@ -11,7 +11,25 @@ import {
   loadAppConfig,
   saveAppConfig,
 } from "../auth/token-store.js";
-import { readFileSync } from "node:fs";
+import { getDriveClientFromAdcOrExplain } from "../auth/adc-drive.js";
+
+function gcloudAdcHint(): string {
+  return (
+    "Sans fichier client_secret OAuth (compte perso), utilise une fois les identifiants gcloud — le navigateur s’ouvre :\n\n" +
+    "  gcloud auth application-default login --scopes=https://www.googleapis.com/auth/drive\n\n" +
+    "Prérequis : Google Cloud SDK (https://cloud.google.com/sdk) installé. Tu n’as pas besoin de créer un projet GCP ; " +
+    "cette commande enregistre seulement ton compte pour les outils locaux.\n\n" +
+    "Alternative : identifiant OAuth « Application de bureau » dans la console Google Cloud, " +
+    "puis --client-secret ou REFERENTIEL_CLI_GOOGLE_CLIENT_SECRET (chemin vers le JSON).\n"
+  );
+}
+
+function hasClientSecretConfigured(opts: PushOptions): boolean {
+  return Boolean(
+    opts.clientSecret?.trim() ||
+      process.env.REFERENTIEL_CLI_GOOGLE_CLIENT_SECRET?.trim(),
+  );
+}
 export type PushOptions = {
   parentFolderId?: string;
   referentielRoot?: string;
@@ -84,9 +102,38 @@ export async function runPush(opts: PushOptions): Promise<void> {
     return;
   }
 
-  const stored = loadTokens();
+  const adc = await getDriveClientFromAdcOrExplain();
+  if (adc.ok) {
+    const drive = google.drive({ version: "v3", auth: adc.client });
+    await mirrorReferentielToDrive({
+      drive,
+      parentFolderId,
+      referentielRoot,
+      dryRun: false,
+    });
+    const prev = loadAppConfig() ?? {};
+    saveAppConfig({ ...prev, parentFolderId });
+    return;
+  }
+
+  let stored = loadTokens();
   if (!stored?.refresh_token) {
-    throw new Error("Pas de refresh token. Lance d’abord : referentiel-cli auth …");
+    if (!hasClientSecretConfigured(opts)) {
+      const adcDetail = adc.ok ? "" : `${adc.detail}\n\n`;
+      throw new Error(
+        "Aucune session Google Drive utilisable.\n\n" +
+          adcDetail +
+          gcloudAdcHint(),
+      );
+    }
+    const { runAuth } = await import("./auth.js");
+    await runAuth({ clientSecret: opts.clientSecret });
+    stored = loadTokens();
+  }
+  if (!stored?.refresh_token) {
+    throw new Error(
+      "Authentification sans refresh token. Vérifie le JSON client secret et réessaie.",
+    );
   }
 
   const secretPath = resolveClientSecretPath(opts);
