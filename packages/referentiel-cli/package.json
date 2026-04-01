@@ -1,0 +1,34 @@
+{
+  "name": "@archivist/referentiel-cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "referentiel-cli": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc",
+    "postbuild": "node scripts/add-shebang.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "push": "node dist/cli.js push"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "google-auth-library": "^10.5.0",
+    "googleapis": "^170.0.0",
+    "open": "^11.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.8.3",
+    "vitest": "^4.0.18"
+  }
+}
