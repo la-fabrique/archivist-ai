@@ -208,8 +208,8 @@ docs/
 
 ## Prochaines étapes
 
-1. Créer la structure `docs/` + `packages/referentiel/`
-2. Rédiger le référentiel v0 dans des fichiers séparés (plan-classement, nommage, archivage, ...)
+1. ~~Créer la structure `docs/` + `packages/referentiel/`~~ ✓
+2. ~~Rédiger le référentiel v0 dans des fichiers séparés (plan-classement, nommage, archivage, ...)~~ ✓
 3. Rédiger la stratégie communauté détaillée
 4. Préparer le premier post LinkedIn/Facebook
 5. Mettre à jour la landing page avec le nouveau positionnement
