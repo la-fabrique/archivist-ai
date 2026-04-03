@@ -1,6 +1,6 @@
 # Règles de nommage
 
-> Partie du [Référentiel de gestion documentaire](_index.md) — v0
+> Partie du [Référentiel de gestion documentaire](./_index.md) — v0
 
 ---
 
@@ -16,9 +16,25 @@ Un bon nom de fichier est lisible par un humain ET triable automatiquement dans 
 
 ---
 
-## Socle commun
+## Dossiers de l'arborescence (snake case)
 
-Ces 4 règles s'appliquent à tous les dossiers sans exception.
+Les **noms de dossiers** (toute l’arborescence de classement) suivent la **notation serpent** (*snake case*) :
+
+| Règle | Détail |
+|-------|--------|
+| **Minuscules** | Pas d’accents, pas de majuscules, pas d’espaces |
+| **Séparateur** | Un underscore `_` entre chaque mot / abréviation |
+| **Pas de tiret** | Sauf pour les dossiers **uniquement chronologiques** au format `AAAA-MM` ou `AAAA` (lisibilité et tri dans l’explorateur) |
+
+**Exemples de dossiers :** `mes_ventes/`, `factures/`, `modeles/`, `factures_fournisseurs/`, `client_dupont/`, `archives/`, `2026-03/`.
+
+**Fichiers vs dossiers :** les règles du socle commun ci‑dessous concernent les **fichiers** (nom avec date, type, tiers…). Les dossiers ne reprennent pas ce format — uniquement le snake case décrit ici.
+
+---
+
+## Socle commun (fichiers)
+
+Ces 4 règles s’appliquent aux **fichiers** de tous les dossiers, sans exception.
 
 | Règle | Détail |
 |-------|--------|
@@ -39,7 +55,7 @@ Ces 4 règles s'appliquent à tous les dossiers sans exception.
 
 Chaque dossier définit ses propres segments selon la nature de ses documents. Le socle commun s'applique partout ; les segments pertinents varient.
 
-### `Mes Ventes/Factures/`
+### `mes_ventes/factures/`
 
 **Format :** `AAAA-MM_facture_tiers_numero.ext`
 
@@ -49,7 +65,7 @@ Le numéro séquentiel (`001`, `002`…) différencie plusieurs factures au mêm
 
 ---
 
-### `Mes Ventes/Devis/`
+### `mes_ventes/devis/`
 
 **Format :** `AAAA-MM_devis_tiers_numero.ext`
 
@@ -59,17 +75,38 @@ Même logique que les factures. Si un devis est révisé, utilise le suffixe de 
 
 ---
 
-### `Mes Ventes/Contrats/`
+### `mes_ventes/contrats_modeles/`
 
-**Format :** `AAAA-MM_contrat_tiers_objet.ext`
+**Rôle :** gabarits à dupliquer et adapter — pas les contrats signés clients (voir `mes_ventes/contrats/`).
 
-**Exemple :** `2026-03_contrat_client-dupont_maintenance.pdf`
+**Format :** `modele-contrat_{objet}_v{version}.ext`
 
-L'objet remplace le numéro séquentiel — un contrat se retrouve plus facilement par son objet que par un numéro. Garde l'objet court et explicite (`maintenance`, `formation`, `prestation-conseil`).
+**Exemple :** `modele-contrat_maintenance_annuelle_v2.docx`
+
+Pas de préfixe date client : ce sont des documents réutilisables. La version (`v1`, `v2`) sert à distinguer les révisions du modèle.
 
 ---
 
-### `Mes Ventes/Offres/`
+### `mes_ventes/contrats/`
+
+**Format (contrat ou avenant client, fichier définitif ou de référence) :** `AAAA-MM-JJ_tiers_contrat_ou_avenant_CAAAA-XX.ext`
+
+**Exemples :** `2026-04-03_societe-acme_contrat_C2026-01.pdf` / `2026-04-03_societe-acme_avenant_C2026-02.pdf`
+
+| Segment | Rôle |
+|--------|------|
+| `AAAA-MM-JJ` | Date de référence (souvent signature) ; règle unique pour toute l'entreprise |
+| `tiers` | Client en minuscules sans accents, tirets entre mots (`societe-acme`) |
+| `contrat` ou `avenant` | Type d'acte |
+| `CAAAA-XX` | Référence maison : `C` + année + numéro d'ordre à deux chiffres (`C2026-01`, …) |
+
+**Dossier parent :** classer sous `contrats/AAAA-MM/` en utilisant le même mois que dans ton arborescence (souvent le mois de `AAAA-MM-JJ` ou du dépôt utile — à figer).
+
+**Alternative (objet au lieu de code `CAAAA-XX`) :** si tu préfères retrouver le contrat par **thème** plutôt que par référence séquentielle, tu peux utiliser `AAAA-MM_contrat_tiers_objet.ext` (ex. `2026-03_contrat_client-dupont_maintenance.pdf`). Ne mélange pas les deux systèmes dans le même dossier sans les documenter.
+
+---
+
+### `mes_ventes/offres/`
 
 **Format :** `nom-offre_version.ext`
 
@@ -79,7 +116,7 @@ Pas de date mensuelle ici : les offres et brochures sont intemporelles. La versi
 
 ---
 
-### `Mes Achats/Factures fournisseurs/`
+### `mes_achats/factures_fournisseurs/`
 
 **Format :** `AAAA-MM_facture_fournisseur_numero.ext`
 
@@ -89,7 +126,7 @@ Le numéro est celui porté sur la facture du fournisseur (ou un numéro séquen
 
 ---
 
-### `Mes Achats/Assurances/`
+### `mes_achats/assurances/`
 
 **Format :** `AAAA_type_assureur_objet.ext`
 
@@ -99,7 +136,7 @@ Date à l'année (les polices couvrent généralement une année entière). Le t
 
 ---
 
-### `Mon Social/`
+### `mon_social/`
 
 **Format :** `AAAA-MM_type_nom-salarie.ext`
 
@@ -109,7 +146,7 @@ Le nom du salarié en dernier : dans ce dossier, tous les documents concernent d
 
 ---
 
-### `Ma Fiscalité/`
+### `ma_fiscalite/`
 
 **Format :** `AAAA-MM_type_impot.ext`
 
@@ -119,17 +156,17 @@ Pas de numéro séquentiel : il y a rarement deux déclarations TVA le même moi
 
 ---
 
-### `Ma Banque et Caisse/`
+### `ma_banque_et_caisse/`
 
 **Format :** `AAAA-MM_releve_banque.ext`
 
 **Exemple :** `2026-03_releve_banque-populaire.pdf`
 
-Si tu as plusieurs comptes, le nom de la banque les différencie. Pour les remises de chèques : `2026-03_remise-cheques_banque-populaire_001.pdf`.
+Si tu as plusieurs comptes, le nom de la banque les différencie. Pour les remises de chèques : `2026-03_remise-cheques_banque-populaire_001.pdf` (nom de fichier inchangé ; le dossier parent éventuel reste en snake case, ex. `remises_cheques/`).
 
 ---
 
-### `Mon Juridique/`
+### `mon_juridique/`
 
 **Format :** `AAAA_type_objet.ext`
 
@@ -139,7 +176,7 @@ Date à l'année — les documents juridiques ne se rapportent généralement pa
 
 ---
 
-### `Ma Gestion Administrative/`
+### `ma_gestion_administrative/`
 
 **Format :** `AAAA-MM_type_expediteur_objet.ext`
 
@@ -153,9 +190,10 @@ L'expéditeur (ou destinataire pour les courriers sortants) est important ici ca
 
 | Convention | Règle | Exemple |
 |-----------|-------|---------|
-| Casse | Tout en minuscules | `facture` pas `Facture` |
-| Mots dans un segment | Séparés par des tirets `-` | `client-dupont`, `mise-en-demeure` |
-| Segments entre eux | Séparés par des underscores `_` | `2026-03_facture_client-dupont` |
+| **Dossiers** | Snake case, voir section [Dossiers de l'arborescence](#dossiers-de-larborescence-snake-case) | `mes_ventes/factures/2026-03/` |
+| Casse (fichiers) | Tout en minuscules | `facture` pas `Facture` |
+| Mots dans un segment (fichiers) | Séparés par des tirets `-` | `client-dupont`, `mise-en-demeure` |
+| Segments entre eux (fichiers) | Séparés par des underscores `_` | `2026-03_facture_client-dupont` |
 | Espaces | Jamais | `client-dupont` pas `client dupont` |
 | Accents | Jamais | `fiscalite` pas `fiscalité` |
 | Abréviations | Seulement si universelles | `tva`, `rh` — éviter le reste |

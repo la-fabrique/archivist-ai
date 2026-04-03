@@ -1,6 +1,6 @@
 # Raccourcis et liens
 
-> Partie du [Référentiel de gestion documentaire](_index.md) — v0
+> Partie du [Référentiel de gestion documentaire](./_index.md) — v0
 
 ---
 
@@ -18,23 +18,23 @@ La duplication crée des incohérences. Laquelle des deux versions est la bonne 
 
 Le problème : les documents d'un client sont dispersés dans l'arborescence par nature.
 
-- Sa facture est dans `Mes Ventes/Factures/2026-03/`
-- Son devis est dans `Mes Ventes/Devis/2026-02/`
-- Son contrat est dans `Mes Ventes/Contrats/2026-01/`
+- Sa facture est dans `mes_ventes/factures/2026-03/`
+- Son devis est dans `mes_ventes/devis/2026-02/`
+- Son contrat est dans `mes_ventes/contrats/2026-01/`
 
 C'est logique pour le classement global, mais difficile quand tu veux voir **tout ce qui concerne ce client** en un seul endroit.
 
-La solution : le dossier `Mes Ventes/Gestion/Client Dupont/` rassemble des raccourcis vers tous ces documents.
+La solution : le dossier `mes_ventes/gestion/client_dupont/` rassemble des raccourcis vers tous ces documents.
 
 ```
-Mes Ventes/Gestion/
-├── Client Dupont/
-│   ├── → Factures/2026-03/2026-03_facture_client-dupont_001.pdf
-│   ├── → Devis/2026-02/2026-02_devis_client-dupont_001.pdf
-│   └── → Contrats/2026-01/2026-01_contrat_client-dupont_maintenance.pdf
-└── Client Martin/
-    ├── → Factures/2026-02/2026-02_facture_client-martin_001.pdf
-    └── → Devis/2026-01/2026-01_devis_client-martin_002.pdf
+mes_ventes/gestion/
+├── client_dupont/
+│   ├── → factures/2026-03/2026-03_facture_client-dupont_001.pdf
+│   ├── → devis/2026-02/2026-02_devis_client-dupont_001.pdf
+│   └── → contrats/2026-01/2026-01-15_client-dupont_contrat_C2026-01.pdf
+└── client_martin/
+    ├── → factures/2026-02/2026-02_facture_client-martin_001.pdf
+    └── → devis/2026-01/2026-01_devis_client-martin_002.pdf
 ```
 
 Tu vois l'ensemble du dossier client en un coup d'œil, sans avoir dupliqué un seul fichier.
@@ -45,7 +45,7 @@ Tu vois l'ensemble du dossier client en un coup d'œil, sans avoir dupliqué un 
 
 | Système | Mécanisme | Comment faire |
 |---------|-----------|--------------|
-| **Windows** | Raccourci `.lnk` | Clic droit sur le fichier → "Créer un raccourci", déplacer le raccourci dans `Gestion/Client/` |
+| **Windows** | Raccourci `.lnk` | Clic droit sur le fichier → "Créer un raccourci", déplacer le raccourci dans `gestion/client/` |
 | **macOS** | Alias | Option+Cmd+drag du fichier vers le dossier cible, ou clic droit → "Créer un alias" |
 | **Linux** | Lien symbolique | `ln -s /chemin/original /chemin/raccourci` |
 | **Google Drive** | Raccourci Drive | Clic droit sur le fichier → "Ajouter un raccourci vers Drive" → choisir le dossier |
@@ -61,9 +61,9 @@ Tu vois l'ensemble du dossier client en un coup d'œil, sans avoir dupliqué un 
 
 **Pas de raccourci vers un raccourci.** Toujours pointer vers le fichier original. Sinon, si l'original bouge, la chaîne se casse en plusieurs endroits.
 
-**Même nom que l'original.** Le dossier parent (ex: `Client Dupont/`) donne le contexte. Le raccourci garde le nom du fichier original pour éviter toute ambiguïté.
+**Même nom que l'original.** Le dossier parent (ex: `client_dupont/`) donne le contexte. Le raccourci garde le nom du fichier original pour éviter toute ambiguïté.
 
-**Nettoyage lors de l'archivage annuel.** Quand les documents d'une année passent dans `Archives/`, les raccourcis correspondants dans `Gestion/` doivent être supprimés. Un raccourci mort dans `Gestion/Client Dupont/` ne fait que créer de la confusion.
+**Nettoyage lors de l'archivage annuel.** Quand les documents d'une année passent dans `archives/`, les raccourcis correspondants dans `gestion/` doivent être supprimés. Un raccourci mort dans `gestion/client_dupont/` ne fait que créer de la confusion.
 
 ---
 
@@ -71,8 +71,8 @@ Tu vois l'ensemble du dossier client en un coup d'œil, sans avoir dupliqué un 
 
 | Situation | À faire |
 |-----------|---------|
-| Voir tous les documents d'un client | Raccourci dans `Mes Ventes/Gestion/{Nom Client}/` |
-| Accéder rapidement à un document consulté souvent | Raccourci dans un dossier `Raccourcis/` personnel à la racine |
+| Voir tous les documents d'un client | Raccourci dans `mes_ventes/gestion/{nom_client}/` |
+| Accéder rapidement à un document consulté souvent | Raccourci dans un dossier `raccourcis/` personnel à la racine |
 | Un document concerne deux clients | Un raccourci dans le dossier de chaque client |
 | Vouloir "copier" un document dans deux dossiers | **Toujours un raccourci, jamais une copie** |
 | Document d'archive à garder sous la main temporairement | Raccourci temporaire — à supprimer quand ce n'est plus utile |

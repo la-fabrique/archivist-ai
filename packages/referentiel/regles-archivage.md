@@ -1,6 +1,6 @@
 # Règles d'archivage
 
-> Partie du [Référentiel de gestion documentaire](_index.md) — v0
+> Partie du [Référentiel de gestion documentaire](./_index.md) — v0
 
 ---
 
@@ -23,9 +23,9 @@ Actif (N et N-1)  →  Archivé (N-2 et plus)  →  Purgeable (après durée lé
 
 | État | Définition | Emplacement |
 |------|-----------|-------------|
-| **Actif** | Documents des 2 dernières années — consultation fréquente | Dans l'arborescence courante (`Mes Ventes/`, `Mes Achats/`…) |
-| **Archivé** | Documents de N-2 et plus — consultation rare mais conservés | Dans `Archives/AAAA/`, compressés |
-| **Purgeable** | Durée légale expirée — peuvent être supprimés | Dans `Archives/`, signalés dans le manifest |
+| **Actif** | Documents des 2 dernières années — consultation fréquente | Dans l'arborescence courante (`mes_ventes/`, `mes_achats/`…) |
+| **Archivé** | Documents de N-2 et plus — consultation rare mais conservés | Dans `archives/AAAA/`, compressés |
+| **Purgeable** | Durée légale expirée — peuvent être supprimés | Dans `archives/`, signalés dans le manifest |
 
 **Exemple :** en 2026, les documents de 2024 et 2025 restent actifs. Les documents de 2023 et avant passent en archive.
 
@@ -52,36 +52,36 @@ Actif (N et N-1)  →  Archivé (N-2 et plus)  →  Purgeable (après durée lé
 
 | Dossier | Accès direct | Archivage | Purge possible |
 |---------|-------------|-----------|----------------|
-| `Mes Ventes/` | N et N-1 | N-2 → `Archives/` | 10 ans (factures), 5 ans (contrats) |
-| `Mes Achats/` | N et N-1 | N-2 → `Archives/` | 10 ans (factures fournisseurs), 2 ans après fin (assurances) |
-| `Ma Fiscalité/` | N et N-1 | N-2 → `Archives/` | 6 ans |
-| `Mon Social/` | N et N-1 | N-2 → `Archives/` | 5 ans |
-| `Ma Banque et Caisse/` | N et N-1 | N-2 → `Archives/` | 5 ans |
-| `Mon Juridique/` | Toujours actif | Jamais tant que l'entreprise existe | 5 ans après radiation |
-| `Ma Gestion Administrative/` | N et N-1 | N-2 → `Archives/` | Au cas par cas selon le document |
+| `mes_ventes/` | N et N-1 | N-2 → `archives/` | 10 ans (factures), 5 ans (contrats) |
+| `mes_achats/` | N et N-1 | N-2 → `archives/` | 10 ans (factures fournisseurs), 2 ans après fin (assurances) |
+| `ma_fiscalite/` | N et N-1 | N-2 → `archives/` | 6 ans |
+| `mon_social/` | N et N-1 | N-2 → `archives/` | 5 ans |
+| `ma_banque_et_caisse/` | N et N-1 | N-2 → `archives/` | 5 ans |
+| `mon_juridique/` | Toujours actif | Jamais tant que l'entreprise existe | 5 ans après radiation |
+| `ma_gestion_administrative/` | N et N-1 | N-2 → `archives/` | Au cas par cas selon le document |
 
-**Cas particulier de `Mon Juridique/`** : les statuts, K-bis et PV d'AG ne s'archivent pas. Ces documents définissent l'existence légale de ta structure — ils doivent rester accessibles en permanence.
+**Cas particulier de `mon_juridique/`** : les statuts, K-bis et PV d'AG ne s'archivent pas. Ces documents définissent l'existence légale de ta structure — ils doivent rester accessibles en permanence.
 
 ---
 
 ## Structure des archives
 
 ```
-Archives/
+archives/
 ├── 2024/
-│   ├── mes-ventes-2024.zip
-│   ├── mes-achats-2024.zip
-│   ├── ma-fiscalite-2024.zip
-│   ├── mon-social-2024.zip
-│   ├── ma-banque-et-caisse-2024.zip
-│   ├── ma-gestion-administrative-2024.zip
+│   ├── mes_ventes_2024.zip
+│   ├── mes_achats_2024.zip
+│   ├── ma_fiscalite_2024.zip
+│   ├── mon_social_2024.zip
+│   ├── ma_banque_et_caisse_2024.zip
+│   ├── ma_gestion_administrative_2024.zip
 │   └── manifest.md
 └── 2023/
     ├── ...
     └── manifest.md
 ```
 
-**Une archive par dossier racine et par année.** Chaque fichier zip correspond exactement à un dossier racine pour une année donnée — `mes-ventes-2024.zip` contient tout le contenu de `Mes Ventes/` pour l'année 2024.
+**Une archive par dossier racine et par année.** Chaque fichier zip correspond exactement à un dossier racine pour une année donnée — `mes_ventes_2024.zip` contient tout le contenu de `mes_ventes/` pour l'année 2024.
 
 ### Le manifest
 
@@ -96,22 +96,22 @@ Créée le : 2025-02-01
 
 | Archive | Nombre de documents |
 |---------|-------------------|
-| mes-ventes-2024.zip | 47 |
-| mes-achats-2024.zip | 23 |
-| ma-fiscalite-2024.zip | 12 |
-| mon-social-2024.zip | 36 |
-| ma-banque-et-caisse-2024.zip | 12 |
-| ma-gestion-administrative-2024.zip | 8 |
+| mes_ventes_2024.zip | 47 |
+| mes_achats_2024.zip | 23 |
+| ma_fiscalite_2024.zip | 12 |
+| mon_social_2024.zip | 36 |
+| ma_banque_et_caisse_2024.zip | 12 |
+| ma_gestion_administrative_2024.zip | 8 |
 
 ## Dates de purge
 
 | Archive | Purge possible à partir de |
 |---------|--------------------------|
-| mes-ventes-2024.zip (factures) | 2034 |
-| mes-achats-2024.zip (factures) | 2034 |
-| ma-fiscalite-2024.zip | 2030 |
-| mon-social-2024.zip | 2029 |
-| ma-banque-et-caisse-2024.zip | 2029 |
+| mes_ventes_2024.zip (factures) | 2034 |
+| mes_achats_2024.zip (factures) | 2034 |
+| ma_fiscalite_2024.zip | 2030 |
+| mon_social_2024.zip | 2029 |
+| ma_banque_et_caisse_2024.zip | 2029 |
 ```
 
 ---
