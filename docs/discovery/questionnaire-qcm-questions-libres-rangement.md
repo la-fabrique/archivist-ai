@@ -13,13 +13,13 @@ Temps estime : 10 a 15 minutes. Reponses anonymes si possible.
 
 ---
 
-## Bloc A - Profil
+## Bloc A - Vos documents : organisation de rêve ou champ de mines ? 
 
 1. Quel est votre statut ? (QCM)
   - Independant / freelance
-  - TPE (1 a 10 personnes)
   - Profession liberale
-  - Autre
+  - TPE (1 a 10 personnes)
+  - Cadre dirigeant (C-level 10 à 50 personnes) 
 2. Combien de personnes contribuent au rangement / a la gestion des documents ? (QCM)
   - 1 (moi seul)
   - 2 a 3
@@ -97,11 +97,7 @@ Temps estime : 10 a 15 minutes. Reponses anonymes si possible.
   - Sur un cloud de confiance (peu importe le pays, tant que c'est securise)
   - Ca m'est egal
   - Je ne sais pas
-5. Quelle affirmation vous correspond le mieux ? (QCM, 1 seule reponse)
-  - Mes documents, c'est mon affaire : personne d'autre ne devrait y avoir acces
-  - J'accepte de deleguer, mais je veux savoir exactement ce qui est fait
-  - La confidentialite m'importe, mais la praticite prime
-  - Je ne me suis jamais vraiment pose la question
+
 
 ---
 
@@ -109,12 +105,7 @@ Temps estime : 10 a 15 minutes. Reponses anonymes si possible.
 
 > Imaginez que vous disposiez d'un double parfait de vous-meme : il connait vos habitudes, vos regles, votre logique de classement. Il gere tous vos documents a votre place, 24h/24.
 
-1. Face a cette idee, quelle est votre premiere reaction ? (QCM, 1 seule reponse)
-  - Soulagement : enfin debarrasse(e) de cette charge
-  - Interet prudent : ca depend de comment ca marche
-  - Mefiance : meme un double de moi pourrait faire des erreurs
-  - Rejet : personne (meme moi) ne devrait tout gerer sans supervision
-2. Quelles seraient vos principales craintes si ce double gerait vos documents ? (QCM, multi-selection max 3)
+1. Quelles seraient vos principales craintes si ce double gerait vos documents ? (QCM, multi-selection max 3)
   - Qu'il deplace ou renomme un fichier sans que je le sache
   - Qu'il supprime un document par erreur
   - Qu'il accede a des documents trop sensibles
@@ -123,7 +114,7 @@ Temps estime : 10 a 15 minutes. Reponses anonymes si possible.
   - Que je ne sache plus ou sont mes documents (dependance)
   - Qu'il fasse une erreur sur un document important (fiscal, legal...)
   - Aucune crainte particuliere
-3. Quelles seraient vos principales attentes envers ce double ? (QCM, multi-selection max 3)
+2. Quelles seraient vos principales attentes envers ce double ? (QCM, multi-selection max 3)
   - Qu'il classe automatiquement les nouveaux documents entrants
   - Qu'il me propose un classement que je valide avant application
   - Qu'il soit capable d'envoyer les bons documents aux bon partenaires (comptable, salariés, autres)
@@ -132,7 +123,7 @@ Temps estime : 10 a 15 minutes. Reponses anonymes si possible.
   - Qu'il respecte mes regles existantes (meme imparfaites)
   - Qu'il m'explique pourquoi il classe de telle facon
   - Autre
-4. Quel niveau de controle souhaiteriez-vous garder ? (QCM, 1 seule reponse)
+3. Quel niveau de controle souhaiteriez-vous garder ? (QCM, 1 seule reponse)
   - Total : il propose, je valide chaque action
   - Eleve : il agit, mais je recois un resume et je peux annuler
   - Modere : il gere le courant, je n'interviens que sur les cas sensibles
@@ -150,12 +141,6 @@ Temps estime : 10 a 15 minutes. Reponses anonymes si possible.
   - Des temoignages / retours d'autres utilisateurs similaires
   - Un mode "simulation" pour tester avant d'appliquer
   - Autre
-2. A quel point etes-vous pret(e) a deleguer la gestion de vos documents a un outil automatise ? (QCM)
-  - Totalement pret(e)
-  - Pret(e) pour les taches repetitives (tri, nommage, classement courant)
-  - Pret(e) seulement si je garde un controle total
-  - Pas pret(e) pour l'instant
-  - Jamais
 
 ---
 
