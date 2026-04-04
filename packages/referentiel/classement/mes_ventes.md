@@ -15,7 +15,7 @@ Mes ventes/
 │   └── ...
 ├── Contrats modèles/
 │   └── ...
-├── Offres/
+├── Mes offres/
 │   ├── formation_react/
 │   └── audit_seo/
 └── Mes clients/
@@ -32,7 +32,7 @@ Mes ventes/
 - Les documents à fort volume (`Factures/`, `Devis/`) vivent dans des **dossiers chronologiques par type** (`Factures/2026-03/`, `Devis/2026-02/`…). Ce sont les emplacements de référence — pratiques pour un export groupé (ex. envoi au comptable).
 - `Contrats modèles/` regroupe les **fichiers mères** à dupliquer et adapter (modèles types, clauses fixes) — pas les contrats signés. Une fois adapté et finalisé pour un client, le contrat va dans `Mes clients/[client]/Contrats/`.
 - `Mes clients/` offre une **vue par client** : chaque sous-dossier contient les contrats réels du client (peu nombreux) ainsi que les documents de suivi (notes, CR…). Seul `Contrats/` est imposé ; le reste de l'organisation est libre par client.
-- `Offres/` contient un dossier par offre ou service — ces documents sont intemporels, pas liés à un mois.
+- `Mes offres/` contient un dossier par offre ou service — ces documents sont intemporels, pas liés à un mois.
 
 ---
 
@@ -78,7 +78,7 @@ Pas de date « client » dans le nom : ce sont des gabarits réutilisables. Le s
 
 ---
 
-## `Offres/`
+## `Mes offres/`
 
 **Rôle :** documents **commerciaux structurants** et réutilisables : plaquettes, descriptifs de formation, grilles prestations, argumentaires — **sans être** une facture ni un devis client nominatif. Un sous-dossier par offre ou ligne de service (`formation_react/`, `audit_seo/`) évite de mélanger les contextes.
 
