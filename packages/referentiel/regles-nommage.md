@@ -20,11 +20,13 @@ Un bon nom de fichier est lisible par un humain ET triable automatiquement dans 
 
 Les **noms de dossiers** (toute l’arborescence de classement) suivent la **notation serpent** (*snake case*) :
 
-| Règle | Détail |
-|-------|--------|
-| **Minuscules** | Pas d’accents, pas de majuscules, pas d’espaces |
-| **Séparateur** | Un underscore `_` entre chaque mot / abréviation |
+
+| Règle            | Détail                                                                                                                    |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| **Minuscules**   | Pas d’accents, pas de majuscules, pas d’espaces                                                                           |
+| **Séparateur**   | Un underscore `_` entre chaque mot / abréviation                                                                          |
 | **Pas de tiret** | Sauf pour les dossiers **uniquement chronologiques** au format `AAAA-MM` ou `AAAA` (lisibilité et tri dans l’explorateur) |
+
 
 **Exemples de dossiers :** `mes_ventes/`, `factures/`, `modeles/`, `factures_fournisseurs/`, `client_dupont/`, `archives/`, `2026-03/`.
 
@@ -36,12 +38,14 @@ Les **noms de dossiers** (toute l’arborescence de classement) suivent la **not
 
 Ces 4 règles s’appliquent aux **fichiers** de tous les dossiers, sans exception.
 
-| Règle | Détail |
-|-------|--------|
-| **Date en préfixe** | Toujours en début de nom, format `AAAA-MM` ou `AAAA` |
-| **Minuscules** | Pas d'accents, pas de majuscules, pas d'espaces |
-| **Séparateurs** | Tiret `-` dans un segment, underscore `_` entre les segments |
-| **Extension explicite** | `.pdf`, `.xlsx`, `.jpg` — toujours présente |
+
+| Règle                   | Détail                                                       |
+| ----------------------- | ------------------------------------------------------------ |
+| **Date en préfixe**     | Toujours en début de nom, format `AAAA-MM` ou `AAAA`         |
+| **Minuscules**          | Pas d'accents, pas de majuscules, pas d'espaces              |
+| **Séparateurs**         | Tiret `-` dans un segment, underscore `_` entre les segments |
+| **Extension explicite** | `.pdf`, `.xlsx`, `.jpg` — toujours présente                  |
+
 
 **Pourquoi ces choix :**
 
@@ -93,12 +97,14 @@ Pas de préfixe date client : ce sont des documents réutilisables. La version (
 
 **Exemples :** `2026-04-03_societe-acme_contrat_C2026-01.pdf` / `2026-04-03_societe-acme_avenant_C2026-02.pdf`
 
-| Segment | Rôle |
-|--------|------|
-| `AAAA-MM-JJ` | Date de référence (souvent signature) ; règle unique pour toute l'entreprise |
-| `tiers` | Client en minuscules sans accents, tirets entre mots (`societe-acme`) |
-| `contrat` ou `avenant` | Type d'acte |
-| `CAAAA-XX` | Référence maison : `C` + année + numéro d'ordre à deux chiffres (`C2026-01`, …) |
+
+| Segment                | Rôle                                                                            |
+| ---------------------- | ------------------------------------------------------------------------------- |
+| `AAAA-MM-JJ`           | Date de référence (souvent signature) ; règle unique pour toute l'entreprise    |
+| `tiers`                | Client en minuscules sans accents, tirets entre mots (`societe-acme`)           |
+| `contrat` ou `avenant` | Type d'acte                                                                     |
+| `CAAAA-XX`             | Référence maison : `C` + année + numéro d'ordre à deux chiffres (`C2026-01`, …) |
+
 
 **Dossier parent :** classer sous `contrats/AAAA-MM/` en utilisant le même mois que dans ton arborescence (souvent le mois de `AAAA-MM-JJ` ou du dépôt utile — à figer).
 
@@ -188,24 +194,29 @@ L'expéditeur (ou destinataire pour les courriers sortants) est important ici ca
 
 ## Conventions d'écriture
 
-| Convention | Règle | Exemple |
-|-----------|-------|---------|
-| **Dossiers** | Snake case, voir section [Dossiers de l'arborescence](#dossiers-de-larborescence-snake-case) | `mes_ventes/factures/2026-03/` |
-| Casse (fichiers) | Tout en minuscules | `facture` pas `Facture` |
-| Mots dans un segment (fichiers) | Séparés par des tirets `-` | `client-dupont`, `mise-en-demeure` |
-| Segments entre eux (fichiers) | Séparés par des underscores `_` | `2026-03_facture_client-dupont` |
-| Espaces | Jamais | `client-dupont` pas `client dupont` |
-| Accents | Jamais | `fiscalite` pas `fiscalité` |
-| Abréviations | Seulement si universelles | `tva`, `rh` — éviter le reste |
+
+| Convention                      | Règle                                                                                        | Exemple                             |
+| ------------------------------- | -------------------------------------------------------------------------------------------- | ----------------------------------- |
+| **Dossiers**                    | Snake case, voir section [Dossiers de l'arborescence](#dossiers-de-larborescence-snake-case) | `mes_ventes/factures/2026-03/`      |
+| Casse (fichiers)                | Tout en minuscules                                                                           | `facture` pas `Facture`             |
+| Mots dans un segment (fichiers) | Séparés par des tirets `-`                                                                   | `client-dupont`, `mise-en-demeure`  |
+| Segments entre eux (fichiers)   | Séparés par des underscores `_`                                                              | `2026-03_facture_client-dupont`     |
+| Espaces                         | Jamais                                                                                       | `client-dupont` pas `client dupont` |
+| Accents                         | Jamais                                                                                       | `fiscalite` pas `fiscalité`         |
+| Abréviations                    | Seulement si universelles                                                                    | `tva`, `rh` — éviter le reste       |
+
 
 ---
 
 ## Cas particuliers
 
-| Cas | Règle | Exemple |
-|-----|-------|---------|
-| Pas de tiers | Omettre ce segment | `2026-01_declaration_tva.pdf` |
-| Pas de date mensuelle | Date à l'année seule | `2025_statuts_sas-monentreprise.pdf` |
-| Plusieurs versions | Suffixe `-v2`, `-v3` avant l'extension | `2026-03_devis_client-dupont_001-v2.pdf` |
-| Scan ou photo d'un document papier | Préfixer le type avec `scan-` | `2026-03_scan-facture_fournisseur-brico_001.pdf` |
-| Deux clients sur un même document | Choisir le client principal, noter l'autre dans les métadonnées ou dans un fichier `.md` associé | `2026-03_contrat_client-dupont_collaboration.pdf` |
+
+| Cas                                | Règle                                                                                            | Exemple                                           |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
+| Pas de tiers                       | Omettre ce segment                                                                               | `2026-01_declaration_tva.pdf`                     |
+| Pas de date mensuelle              | Date à l'année seule                                                                             | `2025_statuts_sas-monentreprise.pdf`              |
+| Plusieurs versions                 | Suffixe `-v2`, `-v3` avant l'extension                                                           | `2026-03_devis_client-dupont_001-v2.pdf`          |
+| Scan ou photo d'un document papier | Préfixer le type avec `scan-`                                                                    | `2026-03_scan-facture_fournisseur-brico_001.pdf`  |
+| Deux clients sur un même document  | Choisir le client principal, noter l'autre dans les métadonnées ou dans un fichier `.md` associé | `2026-03_contrat_client-dupont_collaboration.pdf` |
+
+

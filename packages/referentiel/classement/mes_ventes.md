@@ -42,7 +42,11 @@ mes_ventes/
 
 **Organisation :** un sous-dossier par mois d’émission utile, format `AAAA-MM` (`factures/2026-03/`).
 
-**Nommage des fichiers :** voir [Règles de nommage — `mes_ventes/factures`](../regles-nommage.md#mes_ventesfactures). L’essentiel : date → type `facture` → client normalisé → numéro (souvent aligné sur la compta).
+**Format des fichiers:** `AAAA-MM_facture_tiers_numero.ext`
+
+**Exemple :** `2026-03_facture_client-dupont_003.pdf`
+
+Le numéro séquentiel (`001`, `002`…) différencie plusieurs factures au même client le même mois. Il correspond idéalement au numéro de facture de ta comptabilité.
 
 ---
 
@@ -52,7 +56,11 @@ mes_ventes/
 
 **Organisation :** sous-dossiers mensuels `AAAA-MM`, comme pour les factures.
 
-**Nommage :** [Règles — `mes_ventes/devis`](../regles-nommage.md#mes_ventesdevis). Un suffixe `-v2`, `-v3`, etc. distingue les révisions du même devis.
+**Format des fichiers:** `AAAA-MM_devis_tiers_numero.ext`
+
+**Exemple :** `2026-03_devis_client-martin_001.pdf`
+
+Même logique que les factures : date → type `devis` → tiers normalisé → numéro d’ordre. Pour une révision du **même** devis, ajoute un suffixe `-v2`, `-v3`, etc. avant l’extension (ex. `2026-03_devis_client-martin_001-v2.pdf`) sans changer le numéro de base.
 
 ---
 
@@ -60,43 +68,27 @@ mes_ventes/
 
 **Rôle :** **modèles** de contrat ou d’avenant à dupliquer, compléter puis adapter pour chaque client. Pas de document signé ni de PDF « définitif client » dans ce dossier — uniquement les gabarits réutilisables (`.docx`, `.odt`, parfois PDF guide).
 
-**Nommage des modèles :** sans date client ; versionner le gabarit (`modele-contrat_maintenance-v2.docx`). Détail : [Règles — modèles](../regles-nommage.md#mes_ventescontrats_modeles).
+**Quand tu sors un contrat ou un avenant pour un client** (fichier adapté, puis signé ou archivé comme référence client), enregistre-le sous `contrats/AAAA-MM/` — pas dans `contrats_modeles/`. Voir la section **`contrats/`** pour le nommage des fichiers client.
 
-**Quand tu sors un contrat ou un avenant pour un client** (fichier adapté, puis signé ou archivé comme référence client), enregistre-le sous `contrats/AAAA-MM/` avec le format ci‑dessous — pas dans `contrats_modeles/`.
+**Format des fichiers:** `modele-contrat_objet_vN.ext`
 
-### Convention pour un contrat ou avenant **client** (dans `contrats/AAAA-MM/`)
+**Exemple :** `modele-contrat_maintenance_annuelle_v2.docx`
 
-Les crochets `[ ]` ci‑dessous indiquent des **composantes du nom**, pas des caractères à mettre dans le fichier.
-
-| Composante | Signification |
-|------------|----------------|
-| **`AAAA-MM-JJ`** | Date de référence du document : en général **date de signature** ; si tu préfères la date de **dernière version signée** ou d’enregistrement interne, garde la même règle pour toute l’entreprise. Format jour entier pour lever l’ambiguïté entre deux actes le même mois. |
-| **`_` (underscore)** | Séparateur entre **grands blocs** du nom (aligné sur le [socle commun](../regles-nommage.md#socle-commun-fichiers)). |
-| **`nom-client`** | Tiers identifié, en **minuscules, sans accents, sans espaces**, mots liés par des tirets (ex. `societe-acme`, `dupont-jean`). Même logique que pour factures et devis. |
-| **`contrat` ou `avenant`** | Nature du document : contrat initial vs avenant qui modifie ou complète un contrat existant. |
-| **`_`** | Encore un underscore avant le code métier. |
-| **`CAAAA-XX`** | **Référence contrat** maison : `C` = préfixe fixe « contrat » (homogénéise les tris et les recherches) ; `AAAA` = année de **numérotation** ou d’engagement (souvent l’année civile du dossier) ; `XX` = numéro d’ordre sur **deux chiffres** (`01` … `99`) pour ce millésime. Ex. `C2026-01` = premier contrat référencé en 2026. Les avenants peuvent réutiliser la base du contrat + suffixe de version si tu le documentes ailleurs, ou une ligne `C2026-02` — à figer en interne. |
-| **`.extension`** | Toujours explicite : `.pdf` pour l’exemplaire signé, `.docx` pour la version éditable si tu la conserves à côté. |
-
-**Forme résumée :**
-
-```text
-AAAA-MM-JJ_nom-du-client_contrat_CAAAA-XX.ext
-AAAA-MM-JJ_nom-du-client_avenant_CAAAA-XX.ext
-```
-
-**Exemples :**
-
-- `2026-04-03_societe-acme_contrat_C2026-01.pdf`
-- `2026-04-03_societe-acme_avenant_C2026-02.pdf`
+Pas de date « client » dans le nom : ce sont des gabarits réutilisables. Le segment **objet** décrit le type de modèle (souvent plusieurs mots liés par des underscores ou des tirets, ex. `maintenance_annuelle`). **vN** est la version du gabarit (`v1`, `v2`…), pas une version « client ».
 
 ---
 
 ## `contrats/`
 
-**Rôle :** tout **contrat ou avenant client** une fois sorti du statut « simple brouillon générique » : négociation, versions partagées, **PDF signé**, scans. Un sous-dossier **`AAAA-MM`** regroupe les dossiers clos ou actifs selon le mois de référence que tu choisis (souvent mois de signature ou de dépôt du fichier définitif — identique à la date du préfixe du nom si tu appliques la convention ci‑dessus).
+**Rôle :** tout **contrat ou avenant client** une fois sorti du statut « simple brouillon générique » : négociation, versions partagées, **PDF signé**, scans. Un sous-dossier **`AAAA-MM`** regroupe les dossiers clos ou actifs selon le mois de référence que tu choisis (souvent mois de signature ou de dépôt du fichier définitif — identique au mois du préfixe `AAAA-MM-JJ` si tu suis la convention ci‑dessous).
 
-**Nommage :** [Règles — `mes_ventes/contrats`](../regles-nommage.md#mes_ventescontrats). La **table segment par segment** pour un contrat ou un avenant client figure dans la section **`contrats_modeles/`** ci‑dessus (même convention ; les fichiers signés vivent ici, dans `contrats/`, pas dans les modèles).
+**Format des fichiers:** `AAAA-MM-JJ_tiers_contrat_CAAAA-XX.ext` ou `AAAA-MM-JJ_tiers_avenant_CAAAA-XX.ext`
+
+**Exemple :** `2026-04-03_societe-acme_contrat_C2026-01.pdf` (avenant : `2026-04-03_societe-acme_avenant_C2026-02.pdf`)
+
+`AAAA-MM-JJ` est en général la **date de signature** (ou une règle unique pour toute l’entreprise : dernière version signée, enregistrement interne, etc.). Le **tiers** est le client en minuscules, sans accents ni espaces, mots liés par des tirets (`societe-acme`). **`CAAAA-XX`** est une référence maison : `C` + année de numérotation + numéro d’ordre sur deux chiffres (`C2026-01`, …). Les avenants peuvent porter une nouvelle référence ou une convention documentée à part.
+
+**Alternative (un seul système par dossier) :** `AAAA-MM_contrat_tiers_objet.ext` — ex. `2026-03_contrat_client-dupont_maintenance.pdf` — si tu préfères un **objet** lisible à la place du code `CAAAA-XX`. Ne pas mélanger les deux conventions sans les documenter. Extension toujours explicite (`.pdf` pour l’exemplaire signé, `.docx` si tu conserves aussi la version éditable).
 
 ---
 
@@ -104,7 +96,11 @@ AAAA-MM-JJ_nom-du-client_avenant_CAAAA-XX.ext
 
 **Rôle :** documents **commerciaux structurants** et réutilisables : plaquettes, descriptifs de formation, grilles prestations, argumentaires — **sans être** une facture ni un devis client nominatif. Un sous-dossier par offre ou ligne de service (`formation_react/`, `audit_seo/`) évite de mélanger les contextes.
 
-**Nommage :** souvent **sans date dans le nom** ; version logique (`v2`). Voir [Règles — offres](../regles-nommage.md#mes_ventesoffres).
+**Format des fichiers:** `nom-offre_version.ext`
+
+**Exemple :** `formation-react_v2.pdf`
+
+Documents intemporels : pas de date mensuelle obligatoire dans le nom. La version (`v1`, `v2`) différencie les révisions ; la date de modification du fichier peut compléter si besoin. Le sous-dossier (`formation_react/`, etc.) situe déjà l’offre : le nom de fichier reste court et stable.
 
 ---
 
