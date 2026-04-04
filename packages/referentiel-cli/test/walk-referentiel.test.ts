@@ -8,12 +8,12 @@ describe("walkReferentielFiles", () => {
   it("lists all files with relative paths excluding dotfiles", () => {
     const root = mkdtempSync(join(tmpdir(), "ref-"));
     writeFileSync(join(root, "a.md"), "# a");
-    mkdirSync(join(root, "mes_ventes"));
-    writeFileSync(join(root, "mes_ventes", "b.md"), "# b");
-    writeFileSync(join(root, "mes_ventes", "readme.txt"), "hi");
+    mkdirSync(join(root, "Mes ventes"));
+    writeFileSync(join(root, "Mes ventes", "b.md"), "# b");
+    writeFileSync(join(root, "Mes ventes", "readme.txt"), "hi");
     writeFileSync(join(root, ".hidden.md"), "x");
 
     const got = walkReferentielFiles(root);
-    expect(got).toEqual(["a.md", "mes_ventes/b.md", "mes_ventes/readme.txt"]);
+    expect(got).toEqual(["Mes ventes/b.md", "Mes ventes/readme.txt", "a.md"]);
   });
 });
