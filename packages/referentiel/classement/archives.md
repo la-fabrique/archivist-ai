@@ -1,11 +1,11 @@
-# `archives/`
+# `Archives/`
 
 > [Plan de classement](__index.md) — [Référentiel](../_index.md) — v0
 
 Années closes : archives annuelles compressées avec manifest.
 
 ```
-archives/
+Archives/
 ├── 2024/
 │   ├── mes_ventes_2024.zip
 │   ├── mes_achats_2024.zip

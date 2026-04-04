@@ -1,4 +1,4 @@
-# `ma_gestion_administrative/`
+# `Ma gestion administrative/`
 
 > [Plan de classement](__index.md) — [Référentiel](../_index.md) — v0
 

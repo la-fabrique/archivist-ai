@@ -1,4 +1,4 @@
-# `mes_ventes/`
+# `Mes ventes/`
 
 > [Plan de classement](__index.md) — [Référentiel](../_index.md) — v0
 
@@ -6,7 +6,7 @@ Relation commerciale sortante : factures émises, devis, contrats clients, offre
 
 
 ```
-mes_ventes/
+Mes ventes/
 ├── factures/
 │   ├── 2026-01/
 │   └── ...
@@ -22,8 +22,8 @@ mes_ventes/
 │   ├── formation_react/
 │   └── audit_seo/
 └── gestion/
-    ├── client_dupont/    ← raccourcis uniquement
-    └── client_martin/    ← raccourcis uniquement
+    ├── Client dupont/    ← raccourcis uniquement
+    └── Client martin/    ← raccourcis uniquement
 ```
 
 **Ce qu'il faut retenir :**
@@ -108,4 +108,4 @@ Documents intemporels : pas de date mensuelle obligatoire dans le nom. La versio
 
 **Rôle :** **vues transverses par client** : uniquement des **raccourcis** (liens symboliques, raccourcis OS, ou renvois documentés) vers les vrais fichiers dans `factures/`, `devis/`, `contrats/`. Aucune copie définitive ici : une seule source de vérité dans les dossiers typés.
 
-**Organisation :** un sous-dossier par client, nom snake case (`client_dupont/`). Détail dans [Raccourcis et liens](../raccourcis-liens.md).
+**Organisation :** un sous-dossier par client, nom en français lisible (`Client dupont/`). Détail dans [Raccourcis et liens](../raccourcis-liens.md).
