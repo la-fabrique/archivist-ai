@@ -30,11 +30,13 @@ Mes ventes/Mes clients/
 ├── Client dupont/
 │   ├── Contrats/
 │   ├── Devis/
+│   ├── Offres/
 │   ├── → Mes factures clients/2026-03/2026-03_facture_client-dupont_001.pdf
 │   └── → Mes factures clients/2026-02/2026-02_facture_client-dupont_002.pdf
 └── Client martin/
     ├── Contrats/
     ├── Devis/
+    ├── Offres/
     └── → Mes factures clients/2026-02/2026-02_facture_client-martin_001.pdf
 ```
 
