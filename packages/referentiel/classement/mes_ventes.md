@@ -2,7 +2,7 @@
 
 > [Plan de classement](__index.md) — [Référentiel](../_index.md) — v0
 
-Relation commerciale sortante : factures clients, modèles de contrat et de devis, offres, suivi client.
+Relation commerciale sortante : factures clients, modèles de contrat, de devis et d'offre, offres clients, suivi client.
 
 
 ```
@@ -14,26 +14,26 @@ Mes ventes/
 │   └── ...
 ├── Mes modèles de devis/
 │   └── ...
-├── Mes offres/
-│   ├── formation_react/
-│   └── audit_seo/
+├── Mes modèles d'offre/
+│   └── ...
 └── Mes clients/
     ├── Client Dupont/
     │   ├── Contrats/
     │   ├── Devis/
+    │   ├── Offres/
     │   └── ...     ← notes, CR, suivi libre
     └── Client Martin/
         ├── Contrats/
         ├── Devis/
+        ├── Offres/
         └── ...     ← notes, CR, suivi libre
 ```
 
 **Ce qu'il faut retenir :**
 
 - `Mes factures clients/` contient les factures **émises**, classées dans des **sous-dossiers chronologiques** par mois (`Mes factures clients/2026-03/`). C'est l'emplacement de référence — pratique pour un export groupé (ex. envoi au comptable).
-- `Mes modèles de contrat/` et `Mes modèles de devis/` regroupent les **gabarits réutilisables** à dupliquer et adapter. Pas de documents signés ni finalisés ici — uniquement des modèles types.
-- `Mes clients/` offre une **vue par client** : chaque sous-dossier contient les contrats et devis réels du client ainsi que les documents de suivi (notes, CR…). `Contrats/` et `Devis/` sont imposés ; le reste de l'organisation est libre par client.
-- `Mes offres/` contient un dossier par offre ou service — ces documents sont intemporels, pas liés à un mois.
+- `Mes modèles de contrat/`, `Mes modèles de devis/` et `Mes modèles d'offre/` regroupent les **gabarits réutilisables** à dupliquer et adapter. Pas de documents signés ni finalisés ici — uniquement des modèles types.
+- `Mes clients/` offre une **vue par client** : chaque sous-dossier contient les contrats, devis et offres réels du client ainsi que les documents de suivi (notes, CR…). `Contrats/`, `Devis/` et `Offres/` sont imposés ; le reste de l'organisation est libre par client.
 
 ---
 
@@ -79,29 +79,32 @@ Même logique que les modèles de contrat : pas de date client, version du gabar
 
 ---
 
-## `Mes offres/`
+## `Mes modèles d'offre/`
 
-**Rôle :** documents **commerciaux structurants** et réutilisables : plaquettes, descriptifs de formation, grilles prestations, argumentaires — **sans être** une facture ni un devis client nominatif. Un sous-dossier par offre ou ligne de service (`formation_react/`, `audit_seo/`) évite de mélanger les contextes.
+**Rôle :** **modèles** d'offre commerciale à dupliquer, compléter puis adapter pour chaque client. Pas d'offre finalisée ni envoyée dans ce dossier — uniquement les gabarits réutilisables : plaquettes types, descriptifs de formation, grilles prestations, argumentaires génériques (`.docx`, `.odt`, parfois PDF guide).
 
-**Format des fichiers:** `nom-offre_version.ext`
+**Quand tu finalises une offre pour un client** (fichier adapté et envoyé), enregistre-le dans `Mes clients/[client]/Offres/` — pas dans `Mes modèles d'offre/`. Voir la section **`Mes clients/`** pour le nommage des fichiers offre.
 
-**Exemple :** `formation-react_v2.pdf`
+**Format des fichiers:** `modele-offre_objet_vN.ext`
 
-Documents intemporels : pas de date mensuelle obligatoire dans le nom. La version (`v1`, `v2`) différencie les révisions ; la date de modification du fichier peut compléter si besoin. Le sous-dossier (`formation_react/`, etc.) situe déjà l'offre : le nom de fichier reste court et stable.
+**Exemple :** `modele-offre_formation-react_v2.docx`
+
+Même logique que les modèles de contrat et de devis : pas de date client, version du gabarit uniquement.
 
 ---
 
 ## `Mes clients/`
 
-**Rôle :** **vue par client** regroupant les documents directement liés à la relation avec un client : contrats signés, devis envoyés, notes de suivi, comptes-rendus, échanges de référence. Chaque client dispose de son propre sous-dossier.
+**Rôle :** **vue par client** regroupant les documents directement liés à la relation avec un client : contrats signés, devis envoyés, offres personnalisées, notes de suivi, comptes-rendus, échanges de référence. Chaque client dispose de son propre sous-dossier.
 
-**Organisation :** un sous-dossier par client, nom en français lisible (`Client Dupont/`). Les sous-dossiers `Contrats/` et `Devis/` sont imposés dans chaque client ; le reste de l'organisation est libre.
+**Organisation :** un sous-dossier par client, nom en français lisible (`Client Dupont/`). Les sous-dossiers `Contrats/`, `Devis/` et `Offres/` sont imposés dans chaque client ; le reste de l'organisation est libre.
 
 ```
 Mes clients/
 └── Client Dupont/
     ├── Contrats/    ← contrats et avenants réels du client
     ├── Devis/       ← devis envoyés au client
+    ├── Offres/      ← offres personnalisées envoyées au client
     └── ...          ← notes, CR, suivi (libre)
 ```
 
@@ -126,3 +129,13 @@ Mes clients/
 **Exemple :** `2026-03-15_client-martin_devis_001.pdf`
 
 Même logique que les contrats : date de référence, tiers normalisé, numéro d'ordre. Pour une révision du **même** devis, ajoute un suffixe `-v2`, `-v3` avant l'extension (ex. `2026-03-15_client-martin_devis_001-v2.pdf`) sans changer le numéro de base.
+
+### `Offres/` (dans chaque client)
+
+**Rôle :** offres commerciales **personnalisées** envoyées au client (propositions adaptées à partir des modèles d'offre). Structure plate — pas de sous-dossiers mensuels, le volume par client reste faible.
+
+**Format des fichiers:** `AAAA-MM-JJ_tiers_offre_numero.ext`
+
+**Exemple :** `2026-03-15_client-dupont_offre_001.pdf`
+
+Même logique que les contrats et devis : date de référence, tiers normalisé, numéro d'ordre. Pour une révision, ajoute un suffixe `-v2`, `-v3` avant l'extension.
