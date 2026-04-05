@@ -23,7 +23,7 @@ Ces dossiers se placent à la racine de ton espace de stockage (Drive, OneDrive,
 
 | Dossier                                                      | Rôle                          | Contenu type                                                   |
 | ------------------------------------------------------------ | ----------------------------- | -------------------------------------------------------------- |
-| `[Mes ventes/](mes_ventes.md)`                               | Relation commerciale sortante | Factures émises, devis, contrats clients, offres, suivi client |
+| `[Mes ventes/](mes_ventes.md)`                               | Relation commerciale sortante | Factures clients, modèles de contrat, devis et offre, offres clients, suivi client |
 | `[Mes achats/](mes_achats.md)`                               | Dépenses de l'entreprise      | Factures fournisseurs, assurances                              |
 | `[Mon juridique/](mon_juridique.md)`                         | Entité juridique              | Statuts, K-bis, PV d'AG, contrats importants                   |
 | `[Mon social/](mon_social.md)`                               | Gestion du personnel          | Contrats de travail, fiches de paie, DPAE                      |
@@ -57,6 +57,6 @@ Ce plan de classement est conçu pour la majorité des TPE et indépendants, mai
 | Plusieurs sociétés                   | Un dossier racine par entité juridique, chacun avec cette même structure                |
 | Projets longs (BTP, conseil, agence) | Ajouter un dossier `Mes projets/` avec un sous-dossier par projet                       |
 | Pas de salariés                      | `Mon social/` peut être réduit à la gestion de ta propre rémunération (TNS, dividendes) |
-| Activité sans devis formels          | Simplifier `Mes ventes/` en retirant `devis/`                                           |
+| Activité sans devis formels          | Simplifier `Mes ventes/` en retirant `Mes modèles de devis/`, `Devis/` et `Offres/` des clients |
 
 

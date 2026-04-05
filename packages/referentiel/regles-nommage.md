@@ -29,7 +29,7 @@ Les **noms de dossiers** (toute l’arborescence de classement) suivent une conv
 | **Pas de tiret**       | Sauf pour les dossiers **uniquement chronologiques** au format `AAAA-MM` ou `AAAA` (lisibilité et tri dans l’explorateur) |
 
 
-**Exemples de dossiers :** `Mes ventes/`, `Factures/`, `Modèles/`, `Factures fournisseurs/`, `Client dupont/`, `Archives/`, `2026-03/`.
+**Exemples de dossiers :** `Mes ventes/`, `Mes factures clients/`, `Mes modèles de contrat/`, `Factures fournisseurs/`, `Client dupont/`, `Archives/`, `2026-03/`.
 
 **Fichiers vs dossiers :** les règles du socle commun ci‑dessous concernent les **fichiers** (nom avec date, type, tiers…). Les dossiers ne reprennent pas ce format — uniquement la convention décrite ici.
 
@@ -60,7 +60,7 @@ Ces 4 règles s’appliquent aux **fichiers** de tous les dossiers, sans excepti
 
 Chaque dossier définit ses propres segments selon la nature de ses documents. Le socle commun s'applique partout ; les segments pertinents varient.
 
-### `Mes ventes/factures/`
+### `Mes ventes/mes_factures_clients/`
 
 **Format :** `AAAA-MM_facture_tiers_numero.ext`
 
@@ -70,19 +70,21 @@ Le numéro séquentiel (`001`, `002`…) différencie plusieurs factures au mêm
 
 ---
 
-### `Mes ventes/devis/`
+### `Mes ventes/mes_modeles_de_devis/`
 
-**Format :** `AAAA-MM_devis_tiers_numero.ext`
+**Rôle :** gabarits de devis à dupliquer et adapter — pas les devis envoyés aux clients (voir `Mes ventes/mes_clients/[client]/devis/`).
 
-**Exemple :** `2026-03_devis_client-martin_001.pdf`
+**Format :** `modele-devis_objet_vN.ext`
 
-Même logique que les factures. Si un devis est révisé, utilise le suffixe de version : `2026-03_devis_client-martin_001-v2.pdf`.
+**Exemple :** `modele-devis_prestation_conseil_v1.docx`
+
+Même logique que les modèles de contrat : pas de date client, version du gabarit uniquement.
 
 ---
 
-### `Mes ventes/contrats_modeles/`
+### `Mes ventes/mes_modeles_de_contrat/`
 
-**Rôle :** gabarits à dupliquer et adapter — pas les contrats signés clients (voir `Mes ventes/contrats/`).
+**Rôle :** gabarits à dupliquer et adapter — pas les contrats signés clients (voir `Mes ventes/mes_clients/[client]/contrats/`).
 
 **Format :** `modele-contrat_{objet}_v{version}.ext`
 
@@ -92,7 +94,7 @@ Pas de préfixe date client : ce sont des documents réutilisables. La version (
 
 ---
 
-### `Mes ventes/contrats/`
+### `Mes ventes/mes_clients/[client]/contrats/`
 
 **Format (contrat ou avenant client, fichier définitif ou de référence) :** `AAAA-MM-JJ_tiers_contrat_ou_avenant_CAAAA-XX.ext`
 
@@ -113,13 +115,35 @@ Pas de préfixe date client : ce sont des documents réutilisables. La version (
 
 ---
 
-### `Mes ventes/offres/`
+### `Mes ventes/mes_clients/[client]/devis/`
 
-**Format :** `nom-offre_version.ext`
+**Format :** `AAAA-MM-JJ_tiers_devis_numero.ext`
 
-**Exemple :** `formation-react_v2.pdf`
+**Exemple :** `2026-03-15_client-martin_devis_001.pdf`
 
-Pas de date mensuelle ici : les offres et brochures sont intemporelles. La version (`v1`, `v2`) suffit à les différencier. La date de modification du fichier fait foi si nécessaire.
+Même logique que les contrats client. Pour une révision du même devis, ajoute un suffixe `-v2`, `-v3` avant l'extension.
+
+---
+
+### `Mes ventes/mes_modeles_d_offre/`
+
+**Rôle :** gabarits d'offre à dupliquer et adapter — pas les offres envoyées aux clients (voir `Mes ventes/mes_clients/[client]/offres/`).
+
+**Format :** `modele-offre_objet_vN.ext`
+
+**Exemple :** `modele-offre_formation-react_v2.docx`
+
+Même logique que les modèles de contrat et de devis : pas de date client, version du gabarit uniquement.
+
+---
+
+### `Mes ventes/mes_clients/[client]/offres/`
+
+**Format :** `AAAA-MM-JJ_tiers_offre_numero.ext`
+
+**Exemple :** `2026-03-15_client-dupont_offre_001.pdf`
+
+Même logique que les contrats et devis client. Pour une révision, ajoute un suffixe `-v2`, `-v3` avant l'extension.
 
 ---
 
@@ -198,7 +222,7 @@ L'expéditeur (ou destinataire pour les courriers sortants) est important ici ca
 
 | Convention                      | Règle                                                                                        | Exemple                             |
 | ------------------------------- | -------------------------------------------------------------------------------------------- | ----------------------------------- |
-| **Dossiers**                    | Français lisible, voir section [Dossiers de l'arborescence](#dossiers-de-larborescence) | `Mes ventes/factures/2026-03/`      |
+| **Dossiers**                    | Français lisible, voir section [Dossiers de l'arborescence](#dossiers-de-larborescence) | `Mes ventes/Mes factures clients/2026-03/` |
 | Casse (fichiers)                | Tout en minuscules                                                                           | `facture` pas `Facture`             |
 | Mots dans un segment (fichiers) | Séparés par des tirets `-`                                                                   | `client-dupont`, `mise-en-demeure`  |
 | Segments entre eux (fichiers)   | Séparés par des underscores `_`                                                              | `2026-03_facture_client-dupont`     |

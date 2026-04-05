@@ -16,25 +16,28 @@ La duplication crée des incohérences. Laquelle des deux versions est la bonne 
 
 ## Cas d'usage principal : la vue par client
 
-Le problème : les documents d'un client sont dispersés dans l'arborescence par nature.
+Le problème : les factures d'un client sont dans un dossier chronologique séparé de son dossier client.
 
-- Sa facture est dans `Mes ventes/factures/2026-03/`
-- Son devis est dans `Mes ventes/devis/2026-02/`
-- Son contrat est dans `Mes ventes/contrats/2026-01/`
+- Sa facture est dans `Mes ventes/Mes factures clients/2026-03/`
+- Son contrat et ses devis sont dans `Mes ventes/Mes clients/Client dupont/`
 
-C'est logique pour le classement global, mais difficile quand tu veux voir **tout ce qui concerne ce client** en un seul endroit.
+C'est logique pour le classement global, mais difficile quand tu veux voir **toutes les factures de ce client** depuis son dossier.
 
-La solution : le dossier `Mes ventes/gestion/Client dupont/` rassemble des raccourcis vers tous ces documents.
+La solution : le dossier `Mes ventes/Mes clients/Client dupont/` contient des raccourcis vers les factures du client.
 
 ```
-Mes ventes/gestion/
+Mes ventes/Mes clients/
 ├── Client dupont/
-│   ├── → factures/2026-03/2026-03_facture_client-dupont_001.pdf
-│   ├── → devis/2026-02/2026-02_devis_client-dupont_001.pdf
-│   └── → contrats/2026-01/2026-01-15_client-dupont_contrat_C2026-01.pdf
+│   ├── Contrats/
+│   ├── Devis/
+│   ├── Offres/
+│   ├── → Mes factures clients/2026-03/2026-03_facture_client-dupont_001.pdf
+│   └── → Mes factures clients/2026-02/2026-02_facture_client-dupont_002.pdf
 └── Client martin/
-    ├── → factures/2026-02/2026-02_facture_client-martin_001.pdf
-    └── → devis/2026-01/2026-01_devis_client-martin_002.pdf
+    ├── Contrats/
+    ├── Devis/
+    ├── Offres/
+    └── → Mes factures clients/2026-02/2026-02_facture_client-martin_001.pdf
 ```
 
 Tu vois l'ensemble du dossier client en un coup d'œil, sans avoir dupliqué un seul fichier.
@@ -45,7 +48,7 @@ Tu vois l'ensemble du dossier client en un coup d'œil, sans avoir dupliqué un 
 
 | Système | Mécanisme | Comment faire |
 |---------|-----------|--------------|
-| **Windows** | Raccourci `.lnk` | Clic droit sur le fichier → "Créer un raccourci", déplacer le raccourci dans `gestion/client/` |
+| **Windows** | Raccourci `.lnk` | Clic droit sur le fichier → "Créer un raccourci", déplacer le raccourci dans `Mes clients/Client dupont/` |
 | **macOS** | Alias | Option+Cmd+drag du fichier vers le dossier cible, ou clic droit → "Créer un alias" |
 | **Linux** | Lien symbolique | `ln -s /chemin/original /chemin/raccourci` |
 | **Google Drive** | Raccourci Drive | Clic droit sur le fichier → "Ajouter un raccourci vers Drive" → choisir le dossier |
@@ -63,7 +66,7 @@ Tu vois l'ensemble du dossier client en un coup d'œil, sans avoir dupliqué un 
 
 **Même nom que l'original.** Le dossier parent (ex: `Client dupont/`) donne le contexte. Le raccourci garde le nom du fichier original pour éviter toute ambiguïté.
 
-**Nettoyage lors de l'archivage annuel.** Quand les documents d'une année passent dans `Archives/`, les raccourcis correspondants dans `gestion/` doivent être supprimés. Un raccourci mort dans `gestion/Client dupont/` ne fait que créer de la confusion.
+**Nettoyage lors de l'archivage annuel.** Quand les documents d'une année passent dans `Archives/`, les raccourcis correspondants dans `Mes clients/` doivent être supprimés. Un raccourci mort dans `Mes clients/Client dupont/` ne fait que créer de la confusion.
 
 ---
 
@@ -71,7 +74,7 @@ Tu vois l'ensemble du dossier client en un coup d'œil, sans avoir dupliqué un 
 
 | Situation | À faire |
 |-----------|---------|
-| Voir tous les documents d'un client | Raccourci dans `Mes ventes/gestion/{nom_client}/` |
+| Voir les factures d'un client depuis son dossier | Raccourci dans `Mes ventes/Mes clients/{nom_client}/` |
 | Accéder rapidement à un document consulté souvent | Raccourci dans un dossier `raccourcis/` personnel à la racine |
 | Un document concerne deux clients | Un raccourci dans le dossier de chaque client |
 | Vouloir "copier" un document dans deux dossiers | **Toujours un raccourci, jamais une copie** |
