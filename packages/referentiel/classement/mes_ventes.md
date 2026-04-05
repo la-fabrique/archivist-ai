@@ -2,18 +2,17 @@
 
 > [Plan de classement](__index.md) — [Référentiel](../_index.md) — v0
 
-Relation commerciale sortante : factures émises, devis, contrats clients, offres, suivi client.
+Relation commerciale sortante : factures clients, modèles de contrat et de devis, offres, suivi client.
 
 
 ```
 Mes ventes/
-├── Factures/
+├── Mes factures clients/
 │   ├── 2026-01/
 │   └── ...
-├── Devis/
-│   ├── 2026-01/
+├── Mes modèles de contrat/
 │   └── ...
-├── Contrats modèles/
+├── Mes modèles de devis/
 │   └── ...
 ├── Mes offres/
 │   ├── formation_react/
@@ -21,26 +20,28 @@ Mes ventes/
 └── Mes clients/
     ├── Client Dupont/
     │   ├── Contrats/
+    │   ├── Devis/
     │   └── ...     ← notes, CR, suivi libre
     └── Client Martin/
         ├── Contrats/
+        ├── Devis/
         └── ...     ← notes, CR, suivi libre
 ```
 
 **Ce qu'il faut retenir :**
 
-- Les documents à fort volume (`Factures/`, `Devis/`) vivent dans des **dossiers chronologiques par type** (`Factures/2026-03/`, `Devis/2026-02/`…). Ce sont les emplacements de référence — pratiques pour un export groupé (ex. envoi au comptable).
-- `Contrats modèles/` regroupe les **fichiers mères** à dupliquer et adapter (modèles types, clauses fixes) — pas les contrats signés. Une fois adapté et finalisé pour un client, le contrat va dans `Mes clients/[client]/Contrats/`.
-- `Mes clients/` offre une **vue par client** : chaque sous-dossier contient les contrats réels du client (peu nombreux) ainsi que les documents de suivi (notes, CR…). Seul `Contrats/` est imposé ; le reste de l'organisation est libre par client.
+- `Mes factures clients/` contient les factures **émises**, classées dans des **sous-dossiers chronologiques** par mois (`Mes factures clients/2026-03/`). C'est l'emplacement de référence — pratique pour un export groupé (ex. envoi au comptable).
+- `Mes modèles de contrat/` et `Mes modèles de devis/` regroupent les **gabarits réutilisables** à dupliquer et adapter. Pas de documents signés ni finalisés ici — uniquement des modèles types.
+- `Mes clients/` offre une **vue par client** : chaque sous-dossier contient les contrats et devis réels du client ainsi que les documents de suivi (notes, CR…). `Contrats/` et `Devis/` sont imposés ; le reste de l'organisation est libre par client.
 - `Mes offres/` contient un dossier par offre ou service — ces documents sont intemporels, pas liés à un mois.
 
 ---
 
-## `Factures/`
+## `Mes factures clients/`
 
-**Rôle :** factures **émises** par ton entreprise (pas les brouillons définitifs ailleurs : une fois validée et envoyée, le PDF ou l'export comptable vit ici).
+**Rôle :** factures **émises** par ton entreprise (pas les brouillons : une fois validée et envoyée, le PDF ou l'export comptable vit ici).
 
-**Organisation :** un sous-dossier par mois d'émission utile, format `AAAA-MM` (`Factures/2026-03/`).
+**Organisation :** un sous-dossier par mois d'émission utile, format `AAAA-MM` (`Mes factures clients/2026-03/`).
 
 **Format des fichiers:** `AAAA-MM_facture_tiers_numero.ext`
 
@@ -50,31 +51,31 @@ Le numéro séquentiel (`001`, `002`…) différencie plusieurs factures au mêm
 
 ---
 
-## `Devis/`
-
-**Rôle :** propositions chiffrées envoyées aux clients (devis, propositions commerciales assimilées), y compris les versions révisées tant qu'elles restent des **devis** (pas encore une facture).
-
-**Organisation :** sous-dossiers mensuels `AAAA-MM`, comme pour les factures.
-
-**Format des fichiers:** `AAAA-MM_devis_tiers_numero.ext`
-
-**Exemple :** `2026-03_devis_client-martin_001.pdf`
-
-Même logique que les factures : date → type `devis` → tiers normalisé → numéro d'ordre. Pour une révision du **même** devis, ajoute un suffixe `-v2`, `-v3`, etc. avant l'extension (ex. `2026-03_devis_client-martin_001-v2.pdf`) sans changer le numéro de base.
-
----
-
-## `Contrats modèles/`
+## `Mes modèles de contrat/`
 
 **Rôle :** **modèles** de contrat ou d'avenant à dupliquer, compléter puis adapter pour chaque client. Pas de document signé ni de PDF « définitif client » dans ce dossier — uniquement les gabarits réutilisables (`.docx`, `.odt`, parfois PDF guide).
 
-**Quand tu sors un contrat ou un avenant pour un client** (fichier adapté, puis signé ou archivé comme référence client), enregistre-le dans `Mes clients/[client]/Contrats/` — pas dans `Contrats modèles/`. Voir la section **`Mes clients/`** pour le nommage des fichiers contrat.
+**Quand tu sors un contrat pour un client** (fichier adapté, puis signé ou archivé comme référence client), enregistre-le dans `Mes clients/[client]/Contrats/` — pas dans `Mes modèles de contrat/`. Voir la section **`Mes clients/`** pour le nommage des fichiers contrat.
 
 **Format des fichiers:** `modele-contrat_objet_vN.ext`
 
 **Exemple :** `modele-contrat_maintenance_annuelle_v2.docx`
 
 Pas de date « client » dans le nom : ce sont des gabarits réutilisables. Le segment **objet** décrit le type de modèle (souvent plusieurs mots liés par des underscores ou des tirets, ex. `maintenance_annuelle`). **vN** est la version du gabarit (`v1`, `v2`…), pas une version « client ».
+
+---
+
+## `Mes modèles de devis/`
+
+**Rôle :** **modèles** de devis à dupliquer, compléter puis adapter pour chaque client. Pas de devis finalisé ni envoyé dans ce dossier — uniquement les gabarits réutilisables (`.docx`, `.odt`, parfois PDF guide).
+
+**Quand tu finalises un devis pour un client** (fichier adapté et envoyé), enregistre-le dans `Mes clients/[client]/Devis/` — pas dans `Mes modèles de devis/`. Voir la section **`Mes clients/`** pour le nommage des fichiers devis.
+
+**Format des fichiers:** `modele-devis_objet_vN.ext`
+
+**Exemple :** `modele-devis_prestation_conseil_v1.docx`
+
+Même logique que les modèles de contrat : pas de date client, version du gabarit uniquement.
 
 ---
 
@@ -92,14 +93,15 @@ Documents intemporels : pas de date mensuelle obligatoire dans le nom. La versio
 
 ## `Mes clients/`
 
-**Rôle :** **vue par client** regroupant les documents peu nombreux et directement liés à la relation avec un client : contrats signés, notes de suivi, comptes-rendus, échanges de référence. Chaque client dispose de son propre sous-dossier.
+**Rôle :** **vue par client** regroupant les documents directement liés à la relation avec un client : contrats signés, devis envoyés, notes de suivi, comptes-rendus, échanges de référence. Chaque client dispose de son propre sous-dossier.
 
-**Organisation :** un sous-dossier par client, nom en français lisible (`Client Dupont/`). Seul le sous-dossier `Contrats/` est imposé dans chaque client ; le reste de l'organisation est libre.
+**Organisation :** un sous-dossier par client, nom en français lisible (`Client Dupont/`). Les sous-dossiers `Contrats/` et `Devis/` sont imposés dans chaque client ; le reste de l'organisation est libre.
 
 ```
 Mes clients/
 └── Client Dupont/
     ├── Contrats/    ← contrats et avenants réels du client
+    ├── Devis/       ← devis envoyés au client
     └── ...          ← notes, CR, suivi (libre)
 ```
 
@@ -114,3 +116,13 @@ Mes clients/
 `AAAA-MM-JJ` est en général la **date de signature**. Le **tiers** est le client en minuscules, sans accents ni espaces, mots liés par des tirets (`societe-acme`). **`CAAAA-XX`** est une référence maison : `C` + année de numérotation + numéro d'ordre sur deux chiffres (`C2026-01`, …).
 
 **Alternative :** `AAAA-MM_contrat_tiers_objet.ext` — ex. `2026-03_contrat_client-dupont_maintenance.pdf` — si tu préfères un **objet** lisible à la place du code `CAAAA-XX`. Ne pas mélanger les deux conventions sans les documenter.
+
+### `Devis/` (dans chaque client)
+
+**Rôle :** propositions chiffrées envoyées au client (devis, propositions commerciales assimilées), y compris les versions révisées tant qu'elles restent des **devis** (pas encore une facture). Structure plate — pas de sous-dossiers mensuels, le volume par client reste faible.
+
+**Format des fichiers:** `AAAA-MM-JJ_tiers_devis_numero.ext`
+
+**Exemple :** `2026-03-15_client-martin_devis_001.pdf`
+
+Même logique que les contrats : date de référence, tiers normalisé, numéro d'ordre. Pour une révision du **même** devis, ajoute un suffixe `-v2`, `-v3` avant l'extension (ex. `2026-03-15_client-martin_devis_001-v2.pdf`) sans changer le numéro de base.
