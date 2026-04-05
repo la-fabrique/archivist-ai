@@ -46,7 +46,7 @@ Tu vois l'ensemble du dossier client en un coup d'œil, sans avoir dupliqué un 
 
 | Système | Mécanisme | Comment faire |
 |---------|-----------|--------------|
-| **Windows** | Raccourci `.lnk` | Clic droit sur le fichier → "Créer un raccourci", déplacer le raccourci dans `gestion/client/` |
+| **Windows** | Raccourci `.lnk` | Clic droit sur le fichier → "Créer un raccourci", déplacer le raccourci dans `Mes clients/Client dupont/` |
 | **macOS** | Alias | Option+Cmd+drag du fichier vers le dossier cible, ou clic droit → "Créer un alias" |
 | **Linux** | Lien symbolique | `ln -s /chemin/original /chemin/raccourci` |
 | **Google Drive** | Raccourci Drive | Clic droit sur le fichier → "Ajouter un raccourci vers Drive" → choisir le dossier |
@@ -64,7 +64,7 @@ Tu vois l'ensemble du dossier client en un coup d'œil, sans avoir dupliqué un 
 
 **Même nom que l'original.** Le dossier parent (ex: `Client dupont/`) donne le contexte. Le raccourci garde le nom du fichier original pour éviter toute ambiguïté.
 
-**Nettoyage lors de l'archivage annuel.** Quand les documents d'une année passent dans `Archives/`, les raccourcis correspondants dans `gestion/` doivent être supprimés. Un raccourci mort dans `gestion/Client dupont/` ne fait que créer de la confusion.
+**Nettoyage lors de l'archivage annuel.** Quand les documents d'une année passent dans `Archives/`, les raccourcis correspondants dans `Mes clients/` doivent être supprimés. Un raccourci mort dans `Mes clients/Client dupont/` ne fait que créer de la confusion.
 
 ---
 
