@@ -125,13 +125,25 @@ Même logique que les contrats client. Pour une révision du même devis, ajoute
 
 ---
 
-### `Mes ventes/mes_offres/`
+### `Mes ventes/mes_modeles_d_offre/`
 
-**Format :** `nom-offre_version.ext`
+**Rôle :** gabarits d'offre à dupliquer et adapter — pas les offres envoyées aux clients (voir `Mes ventes/mes_clients/[client]/offres/`).
 
-**Exemple :** `formation-react_v2.pdf`
+**Format :** `modele-offre_objet_vN.ext`
 
-Pas de date mensuelle ici : les offres et brochures sont intemporelles. La version (`v1`, `v2`) suffit à les différencier. La date de modification du fichier fait foi si nécessaire.
+**Exemple :** `modele-offre_formation-react_v2.docx`
+
+Même logique que les modèles de contrat et de devis : pas de date client, version du gabarit uniquement.
+
+---
+
+### `Mes ventes/mes_clients/[client]/offres/`
+
+**Format :** `AAAA-MM-JJ_tiers_offre_numero.ext`
+
+**Exemple :** `2026-03-15_client-dupont_offre_001.pdf`
+
+Même logique que les contrats et devis client. Pour une révision, ajoute un suffixe `-v2`, `-v3` avant l'extension.
 
 ---
 
