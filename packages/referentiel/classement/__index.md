@@ -24,7 +24,7 @@ Ces dossiers se placent à la racine de ton espace de stockage (Drive, OneDrive,
 | Dossier                                                      | Rôle                          | Contenu type                                                   |
 | ------------------------------------------------------------ | ----------------------------- | -------------------------------------------------------------- |
 | `[Mes ventes/](mes_ventes.md)`                               | Relation commerciale sortante | Factures clients, modèles de contrat, devis et offre, offres clients, suivi client |
-| `[Mes achats/](mes_achats.md)`                               | Dépenses de l'entreprise      | Factures fournisseurs, assurances                              |
+| `[Mes achats/](mes_achats.md)`                               | Relation commerciale entrante | Factures fournisseurs, suivi fournisseurs                      |
 | `[Mon juridique/](mon_juridique.md)`                         | Entité juridique              | Statuts, K-bis, PV d'AG, contrats importants                   |
 | `[Mon social/](mon_social.md)`                               | Gestion du personnel          | Contrats de travail, fiches de paie, DPAE                      |
 | `[Ma fiscalité/](ma_fiscalite.md)`                           | Obligations fiscales          | Déclarations TVA, CFE, avis d'imposition, liasses fiscales     |

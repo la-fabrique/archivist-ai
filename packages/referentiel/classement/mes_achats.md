@@ -2,23 +2,51 @@
 
 > [Plan de classement](__index.md) — [Référentiel](../_index.md) — v0
 
-Dépenses de l'entreprise : factures fournisseurs, assurances.
+Relation commerciale entrante : factures fournisseurs, suivi fournisseurs.
+
 
 ```
 Mes achats/
-├── factures_fournisseurs/
-│   ├── 2026/
-│   │   ├── 2026-01/
-│   │   ├── 2026-02/
-│   │   └── 2026-03/
-│   └── 2025/
-│       ├── 2025-01/
-│       └── ...
-└── assurances/
-    ├── polices/
-    └── attestations/
+├── Mes factures fournisseurs/
+│   ├── 2026-01/
+│   └── ...
+└── Mes fournisseurs/
+    └── [Nom du fournisseur]/
+        └── ...     ← organisation libre
 ```
 
-**Pourquoi un niveau "année" en plus ?** Les factures fournisseurs sont souvent consultées par exercice comptable. Ton comptable te demande "les achats 2025" — le dossier `2025/` répond directement. Pour `Mes ventes/Mes factures clients/`, les mois sont suffisants car les factures émises sont consultées individuellement.
+**Ce qu'il faut retenir :**
 
-**Pourquoi les assurances dans `Mes achats/` ?** En comptabilité, une prime d'assurance est une charge. Les polices et attestations sont les justificatifs de cette charge. Ton comptable ira chercher ça au même endroit que les factures fournisseurs.
+- `Mes factures fournisseurs/` contient les factures **reçues**, classées dans des **sous-dossiers chronologiques** par mois (`Mes factures fournisseurs/2026-03/`). C'est l'emplacement de référence — pratique pour un export groupé (ex. envoi au comptable).
+- `Mes fournisseurs/` offre une **vue par fournisseur** : chaque sous-dossier contient les documents liés à la relation avec ce fournisseur (contrats, échanges, polices d'assurance…). L'organisation à l'intérieur de chaque fournisseur est libre.
+
+---
+
+## `Mes factures fournisseurs/`
+
+**Rôle :** factures **reçues** par ton entreprise (une fois validée et comptabilisée, le PDF ou le scan vit ici).
+
+**Organisation :** un sous-dossier par mois de réception utile, format `AAAA-MM` (`Mes factures fournisseurs/2026-03/`).
+
+**Format des fichiers:** `[AAAA-MM]_Facture_[Nom fournisseur]_[Numero].[ext]`
+
+- `[AAAA-MM]` — date d'émission de la facture
+- `[Nom fournisseur]` — nom du fournisseur, forme lisible
+- `[Numero]` — numéro de la facture tel qu'il apparaît sur le document
+- `[ext]` — extension du fichier (`pdf`, `docx`…)
+
+**Exemple :** `2026-03_Facture_OVH_F2600042.pdf`
+
+---
+
+## `Mes fournisseurs/`
+
+**Rôle :** **vue par fournisseur** regroupant les documents directement liés à la relation avec un fournisseur : contrats, polices d'assurance, attestations, échanges de référence. Chaque fournisseur dispose de son propre sous-dossier.
+
+**Organisation :** un sous-dossier par fournisseur, nom en français lisible (`[Nom du fournisseur]/`). L'organisation à l'intérieur de chaque fournisseur est libre.
+
+```
+Mes fournisseurs/
+└── [Nom du fournisseur]/
+    └── ...          ← organisation libre
+```
