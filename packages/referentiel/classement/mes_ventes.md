@@ -17,12 +17,7 @@ Mes ventes/
 ├── Mes modèles d'offre/
 │   └── ...
 └── Mes clients/
-    ├── Client Dupont/
-    │   ├── Contrats/
-    │   ├── Devis/
-    │   ├── Offres/
-    │   └── ...     ← notes, CR, suivi libre
-    └── Client Martin/
+    └── [Nom du client]/
         ├── Contrats/
         ├── Devis/
         ├── Offres/
@@ -43,11 +38,14 @@ Mes ventes/
 
 **Organisation :** un sous-dossier par mois d'émission utile, format `AAAA-MM` (`Mes factures clients/2026-03/`).
 
-**Format des fichiers:** `AAAA-MM_facture_tiers_numero.ext`
+**Format des fichiers:** `[AAAA-MM]_Facture_[Nom client]_[Numero].[ext]`
 
-**Exemple :** `2026-03_facture_client-dupont_003.pdf`
+- `[AAAA-MM]` — date d'émission de la facture
+- `[Nom client]` — nom du client, forme lisible
+- `[Numero]` — numéro de la facture tel qu'il apparaît dans le logiciel de facturation
+- `[ext]` — extension du fichier (`pdf`, `docx`…)
 
-Le numéro séquentiel (`001`, `002`…) différencie plusieurs factures au même client le même mois. Il correspond idéalement au numéro de facture de ta comptabilité.
+**Exemple :** `2026-03_Facture_Dupont_F2600003.pdf`
 
 ---
 
@@ -97,11 +95,11 @@ Même logique que les modèles de contrat et de devis : pas de date client, vers
 
 **Rôle :** **vue par client** regroupant les documents directement liés à la relation avec un client : contrats signés, devis envoyés, offres personnalisées, notes de suivi, comptes-rendus, échanges de référence. Chaque client dispose de son propre sous-dossier.
 
-**Organisation :** un sous-dossier par client, nom en français lisible (`Client Dupont/`). Les sous-dossiers `Contrats/`, `Devis/` et `Offres/` sont imposés dans chaque client ; le reste de l'organisation est libre.
+**Organisation :** un sous-dossier par client, nom en français lisible (`[Nom du client]/`). Les sous-dossiers `Contrats/`, `Devis/` et `Offres/` sont imposés dans chaque client ; le reste de l'organisation est libre.
 
 ```
 Mes clients/
-└── Client Dupont/
+└── [Nom du client]/
     ├── Contrats/    ← contrats et avenants réels du client
     ├── Devis/       ← devis envoyés au client
     ├── Offres/      ← offres personnalisées envoyées au client
@@ -112,30 +110,37 @@ Mes clients/
 
 **Rôle :** tout **contrat ou avenant** une fois sorti du statut « simple brouillon générique » : négociation, versions partagées, **PDF signé**, scans. Structure plate — pas de sous-dossiers mensuels, le volume par client reste faible.
 
-**Format des fichiers:** `AAAA-MM-JJ_tiers_contrat_CAAAA-XX.ext` ou `AAAA-MM-JJ_tiers_avenant_CAAAA-XX.ext`
+**Format des fichiers:** `[AAAA-MM]_Contrat_[Nom client]_[Numéro-Révision].[ext]` ou `[AAAA-MM]_Avenant_[Nom client]_[Numéro-Révision].[ext]`
 
-**Exemple :** `2026-04-03_societe-acme_contrat_C2026-01.pdf` (avenant : `2026-04-03_societe-acme_avenant_C2026-02.pdf`)
+- `[AAAA-MM]` — date d'émission du contrat ou de l'avenant
+- `[Nom client]` — nom du client, forme lisible
+- `[Numéro-Révision]` — référence libre (numéro de contrat, objet, version… selon ta convention)
+- `[ext]` — extension du fichier (`pdf`, `docx`…)
 
-`AAAA-MM-JJ` est en général la **date de signature**. Le **tiers** est le client en minuscules, sans accents ni espaces, mots liés par des tirets (`societe-acme`). **`CAAAA-XX`** est une référence maison : `C` + année de numérotation + numéro d'ordre sur deux chiffres (`C2026-01`, …).
-
-**Alternative :** `AAAA-MM_contrat_tiers_objet.ext` — ex. `2026-03_contrat_client-dupont_maintenance.pdf` — si tu préfères un **objet** lisible à la place du code `CAAAA-XX`. Ne pas mélanger les deux conventions sans les documenter.
+**Exemple :** `2026-04_Contrat_Acme_C2026-01.pdf` (avenant : `2026-04_Avenant_Acme_C2026-02.pdf`)
 
 ### `Devis/` (dans chaque client)
 
 **Rôle :** propositions chiffrées envoyées au client (devis, propositions commerciales assimilées), y compris les versions révisées tant qu'elles restent des **devis** (pas encore une facture). Structure plate — pas de sous-dossiers mensuels, le volume par client reste faible.
 
-**Format des fichiers:** `AAAA-MM-JJ_tiers_devis_numero.ext`
+**Format des fichiers:** `[AAAA-MM]_Devis_[Nom client]_[Numero].[ext]`
 
-**Exemple :** `2026-03-15_client-martin_devis_001.pdf`
+- `[AAAA-MM]` — date d'émission du devis
+- `[Nom client]` — nom du client, forme lisible
+- `[Numero]` — numéro du devis tel qu'il apparaît dans le logiciel
+- `[ext]` — extension du fichier (`pdf`, `docx`…)
 
-Même logique que les contrats : date de référence, tiers normalisé, numéro d'ordre. Pour une révision du **même** devis, ajoute un suffixe `-v2`, `-v3` avant l'extension (ex. `2026-03-15_client-martin_devis_001-v2.pdf`) sans changer le numéro de base.
+**Exemple :** `2026-03_Devis_Martin_D2600001.pdf`
 
 ### `Offres/` (dans chaque client)
 
 **Rôle :** offres commerciales **personnalisées** envoyées au client (propositions adaptées à partir des modèles d'offre). Structure plate — pas de sous-dossiers mensuels, le volume par client reste faible.
 
-**Format des fichiers:** `AAAA-MM-JJ_tiers_offre_numero.ext`
+**Format des fichiers:** `[AAAA-MM]_Offre_[Nom client]_[Numero].[ext]`
 
-**Exemple :** `2026-03-15_client-dupont_offre_001.pdf`
+- `[AAAA-MM]` — date d'émission de l'offre
+- `[Nom client]` — nom du client, forme lisible
+- `[Numero]` — numéro de l'offre tel qu'il apparaît dans le logiciel
+- `[ext]` — extension du fichier (`pdf`, `docx`…)
 
-Même logique que les contrats et devis : date de référence, tiers normalisé, numéro d'ordre. Pour une révision, ajoute un suffixe `-v2`, `-v3` avant l'extension.
+**Exemple :** `2026-03_Offre_Dupont_O2600001.pdf`
