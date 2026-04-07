@@ -8,7 +8,7 @@ Relation commerciale entrante : factures fournisseurs, suivi fournisseurs.
 ```
 Mes achats/
 ├── Mes factures fournisseurs/
-│   ├── 2026-01/
+│   ├── [AAAA-MM]/
 │   └── ...
 └── Mes fournisseurs/
     └── [Nom du fournisseur]/

@@ -8,7 +8,7 @@ Relation commerciale sortante : factures clients, modèles de contrat, de devis 
 ```
 Mes ventes/
 ├── Mes factures clients/
-│   ├── 2026-01/
+│   ├── [AAAA-MM]/
 │   └── ...
 ├── Mes modèles de contrat/
 │   └── ...
