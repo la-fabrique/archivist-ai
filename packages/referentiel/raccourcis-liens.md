@@ -19,25 +19,25 @@ La duplication crée des incohérences. Laquelle des deux versions est la bonne 
 Le problème : les factures d'un client sont dans un dossier chronologique séparé de son dossier client.
 
 - Sa facture est dans `Mes ventes/Mes factures clients/2026-03/`
-- Son contrat et ses devis sont dans `Mes ventes/Mes clients/Client dupont/`
+- Son contrat et ses devis sont dans `Mes ventes/Mes clients/Dupont/`
 
 C'est logique pour le classement global, mais difficile quand tu veux voir **toutes les factures de ce client** depuis son dossier.
 
-La solution : le dossier `Mes ventes/Mes clients/Client dupont/` contient des raccourcis vers les factures du client.
+La solution : le dossier `Mes ventes/Mes clients/Dupont/` contient des raccourcis vers les factures du client.
 
 ```
 Mes ventes/Mes clients/
-├── Client dupont/
+├── Dupont/
 │   ├── Contrats/
 │   ├── Devis/
 │   ├── Offres/
-│   ├── → Mes factures clients/2026-03/2026-03_facture_client-dupont_001.pdf
-│   └── → Mes factures clients/2026-02/2026-02_facture_client-dupont_002.pdf
-└── Client martin/
+│   ├── → Mes factures clients/2026-03/2026-03_Facture_Dupont_F2600003.pdf
+│   └── → Mes factures clients/2026-02/2026-02_Facture_Dupont_F2600002.pdf
+└── Martin/
     ├── Contrats/
     ├── Devis/
     ├── Offres/
-    └── → Mes factures clients/2026-02/2026-02_facture_client-martin_001.pdf
+    └── → Mes factures clients/2026-02/2026-02_Facture_Martin_F2600001.pdf
 ```
 
 Tu vois l'ensemble du dossier client en un coup d'œil, sans avoir dupliqué un seul fichier.
@@ -48,7 +48,7 @@ Tu vois l'ensemble du dossier client en un coup d'œil, sans avoir dupliqué un 
 
 | Système | Mécanisme | Comment faire |
 |---------|-----------|--------------|
-| **Windows** | Raccourci `.lnk` | Clic droit sur le fichier → "Créer un raccourci", déplacer le raccourci dans `Mes clients/Client dupont/` |
+| **Windows** | Raccourci `.lnk` | Clic droit sur le fichier → "Créer un raccourci", déplacer le raccourci dans `Mes clients/Dupont/` |
 | **macOS** | Alias | Option+Cmd+drag du fichier vers le dossier cible, ou clic droit → "Créer un alias" |
 | **Linux** | Lien symbolique | `ln -s /chemin/original /chemin/raccourci` |
 | **Google Drive** | Raccourci Drive | Clic droit sur le fichier → "Ajouter un raccourci vers Drive" → choisir le dossier |
@@ -64,9 +64,9 @@ Tu vois l'ensemble du dossier client en un coup d'œil, sans avoir dupliqué un 
 
 **Pas de raccourci vers un raccourci.** Toujours pointer vers le fichier original. Sinon, si l'original bouge, la chaîne se casse en plusieurs endroits.
 
-**Même nom que l'original.** Le dossier parent (ex: `Client dupont/`) donne le contexte. Le raccourci garde le nom du fichier original pour éviter toute ambiguïté.
+**Même nom que l'original.** Le dossier parent (ex: `Dupont/`) donne le contexte. Le raccourci garde le nom du fichier original pour éviter toute ambiguïté.
 
-**Nettoyage lors de l'archivage annuel.** Quand les documents d'une année passent dans `Archives/`, les raccourcis correspondants dans `Mes clients/` doivent être supprimés. Un raccourci mort dans `Mes clients/Client dupont/` ne fait que créer de la confusion.
+**Nettoyage lors de l'archivage annuel.** Quand les documents d'une année passent dans `Archives/`, les raccourcis correspondants dans `Mes clients/` doivent être supprimés. Un raccourci mort dans `Mes clients/Dupont/` ne fait que créer de la confusion.
 
 ---
 

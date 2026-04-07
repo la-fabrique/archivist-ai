@@ -29,7 +29,7 @@ Les **noms de dossiers** (toute l’arborescence de classement) suivent une conv
 | **Pas de tiret**       | Sauf pour les dossiers **uniquement chronologiques** au format `AAAA-MM` ou `AAAA` (lisibilité et tri dans l’explorateur) |
 
 
-**Exemples de dossiers :** `Mes ventes/`, `Mes factures clients/`, `Mes modèles de contrat/`, `Factures fournisseurs/`, `Client dupont/`, `Archives/`, `2026-03/`.
+**Exemples de dossiers :** `Mes ventes/`, `Mes factures clients/`, `Mes modèles de contrat/`, `Factures fournisseurs/`, `Dupont/`, `Archives/`, `2026-03/`.
 
 **Fichiers vs dossiers :** les règles du socle commun ci‑dessous concernent les **fichiers** (nom avec date, type, tiers…). Les dossiers ne reprennent pas ce format — uniquement la convention décrite ici.
 
@@ -52,7 +52,7 @@ Ces 4 règles s’appliquent aux **fichiers** de tous les dossiers, sans excepti
 
 - **Date en préfixe** → l'explorateur trie les fichiers par ordre chronologique automatiquement. Les factures de janvier apparaissent avant celles de mars, sans intervention manuelle.
 - **Minuscules sans accents** → portabilité totale entre systèmes (Windows, macOS, Linux, Google Drive, OneDrive, NAS). Un fichier nommé `Réunion Équipe.docx` peut créer des problèmes à l'échange ou à la sauvegarde. `reunion-equipe.docx` ne créera jamais de problème.
-- **Underscores entre segments** → la distinction visuelle entre les parties du nom est immédiate. `2026-03_facture_client-dupont_003.pdf` se lit en un coup d'œil.
+- **Underscores entre segments** → la distinction visuelle entre les parties du nom est immédiate. `2026-03_Facture_Dupont_F2600003.pdf` se lit en un coup d'œil.
 
 ---
 
@@ -60,13 +60,16 @@ Ces 4 règles s’appliquent aux **fichiers** de tous les dossiers, sans excepti
 
 Chaque dossier définit ses propres segments selon la nature de ses documents. Le socle commun s'applique partout ; les segments pertinents varient.
 
-### `Mes ventes/mes_factures_clients/`
+### `Mes ventes/Mes factures clients/`
 
-**Format :** `AAAA-MM_facture_tiers_numero.ext`
+**Format :** `[AAAA-MM]_Facture_[Nom client]_[Numero].[ext]`
 
-**Exemple :** `2026-03_facture_client-dupont_003.pdf`
+- `[AAAA-MM]` — date d'émission
+- `[Nom client]` — nom du client, forme lisible
+- `[Numero]` — numéro de la facture tel qu'il apparaît dans le logiciel de facturation
+- `[ext]` — extension du fichier
 
-Le numéro séquentiel (`001`, `002`…) différencie plusieurs factures au même client le même mois. Il correspond idéalement au numéro de facture de ta comptabilité.
+**Exemple :** `2026-03_Facture_Dupont_F2600003.pdf`
 
 ---
 
@@ -94,34 +97,29 @@ Pas de préfixe date client : ce sont des documents réutilisables. La version (
 
 ---
 
-### `Mes ventes/mes_clients/[client]/contrats/`
+### `Mes ventes/Mes clients/[Nom du client]/Contrats/`
 
-**Format (contrat ou avenant client, fichier définitif ou de référence) :** `AAAA-MM-JJ_tiers_contrat_ou_avenant_CAAAA-XX.ext`
+**Format :** `[AAAA-MM]_Contrat_[Nom client]_[Numéro-Révision].[ext]` ou `[AAAA-MM]_Avenant_[Nom client]_[Numéro-Révision].[ext]`
 
-**Exemples :** `2026-04-03_societe-acme_contrat_C2026-01.pdf` / `2026-04-03_societe-acme_avenant_C2026-02.pdf`
+- `[AAAA-MM]` — date d'émission
+- `[Nom client]` — nom du client, forme lisible
+- `[Numéro-Révision]` — référence libre (numéro de contrat, objet, version… selon ta convention)
+- `[ext]` — extension du fichier
 
-
-| Segment                | Rôle                                                                            |
-| ---------------------- | ------------------------------------------------------------------------------- |
-| `AAAA-MM-JJ`           | Date de référence (souvent signature) ; règle unique pour toute l'entreprise    |
-| `tiers`                | Client en minuscules sans accents, tirets entre mots (`societe-acme`)           |
-| `contrat` ou `avenant` | Type d'acte                                                                     |
-| `CAAAA-XX`             | Référence maison : `C` + année + numéro d'ordre à deux chiffres (`C2026-01`, …) |
-
-
-**Dossier parent :** classer sous `contrats/AAAA-MM/` en utilisant le même mois que dans ton arborescence (souvent le mois de `AAAA-MM-JJ` ou du dépôt utile — à figer).
-
-**Alternative (objet au lieu de code `CAAAA-XX`) :** si tu préfères retrouver le contrat par **thème** plutôt que par référence séquentielle, tu peux utiliser `AAAA-MM_contrat_tiers_objet.ext` (ex. `2026-03_contrat_client-dupont_maintenance.pdf`). Ne mélange pas les deux systèmes dans le même dossier sans les documenter.
+**Exemples :** `2026-04_Contrat_Acme_C2026-01.pdf` / `2026-04_Avenant_Acme_C2026-02.pdf`
 
 ---
 
-### `Mes ventes/mes_clients/[client]/devis/`
+### `Mes ventes/Mes clients/[Nom du client]/Devis/`
 
-**Format :** `AAAA-MM-JJ_tiers_devis_numero.ext`
+**Format :** `[AAAA-MM]_Devis_[Nom client]_[Numero].[ext]`
 
-**Exemple :** `2026-03-15_client-martin_devis_001.pdf`
+- `[AAAA-MM]` — date d'émission
+- `[Nom client]` — nom du client, forme lisible
+- `[Numero]` — numéro du devis tel qu'il apparaît dans le logiciel
+- `[ext]` — extension du fichier
 
-Même logique que les contrats client. Pour une révision du même devis, ajoute un suffixe `-v2`, `-v3` avant l'extension.
+**Exemple :** `2026-03_Devis_Martin_D2600001.pdf`
 
 ---
 
@@ -137,13 +135,16 @@ Même logique que les modèles de contrat et de devis : pas de date client, vers
 
 ---
 
-### `Mes ventes/mes_clients/[client]/offres/`
+### `Mes ventes/Mes clients/[Nom du client]/Offres/`
 
-**Format :** `AAAA-MM-JJ_tiers_offre_numero.ext`
+**Format :** `[AAAA-MM]_Offre_[Nom client]_[Numero].[ext]`
 
-**Exemple :** `2026-03-15_client-dupont_offre_001.pdf`
+- `[AAAA-MM]` — date d'émission
+- `[Nom client]` — nom du client, forme lisible
+- `[Numero]` — numéro de l'offre tel qu'il apparaît dans le logiciel
+- `[ext]` — extension du fichier
 
-Même logique que les contrats et devis client. Pour une révision, ajoute un suffixe `-v2`, `-v3` avant l'extension.
+**Exemple :** `2026-03_Offre_Dupont_O2600001.pdf`
 
 ---
 
@@ -224,8 +225,8 @@ L'expéditeur (ou destinataire pour les courriers sortants) est important ici ca
 | ------------------------------- | -------------------------------------------------------------------------------------------- | ----------------------------------- |
 | **Dossiers**                    | Français lisible, voir section [Dossiers de l'arborescence](#dossiers-de-larborescence) | `Mes ventes/Mes factures clients/2026-03/` |
 | Casse (fichiers)                | Tout en minuscules                                                                           | `facture` pas `Facture`             |
-| Mots dans un segment (fichiers) | Séparés par des tirets `-`                                                                   | `client-dupont`, `mise-en-demeure`  |
-| Segments entre eux (fichiers)   | Séparés par des underscores `_`                                                              | `2026-03_facture_client-dupont`     |
+| Mots dans un segment (fichiers) | Séparés par des tirets `-`                                                                   | `mise-en-demeure`, `fiche-paie`     |
+| Segments entre eux (fichiers)   | Séparés par des underscores `_`                                                              | `2026-03_Facture_Dupont`            |
 | Espaces                         | Jamais                                                                                       | `client-dupont` pas `client dupont` |
 | Accents                         | Jamais                                                                                       | `fiscalite` pas `fiscalité`         |
 | Abréviations                    | Seulement si universelles                                                                    | `tva`, `rh` — éviter le reste       |
@@ -240,8 +241,8 @@ L'expéditeur (ou destinataire pour les courriers sortants) est important ici ca
 | ---------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
 | Pas de tiers                       | Omettre ce segment                                                                               | `2026-01_declaration_tva.pdf`                     |
 | Pas de date mensuelle              | Date à l'année seule                                                                             | `2025_statuts_sas-monentreprise.pdf`              |
-| Plusieurs versions                 | Suffixe `-v2`, `-v3` avant l'extension                                                           | `2026-03_devis_client-dupont_001-v2.pdf`          |
+| Plusieurs versions                 | Suffixe `-v2`, `-v3` avant l'extension                                                           | `2026-03_Devis_Dupont_D2600001-v2.pdf`            |
 | Scan ou photo d'un document papier | Préfixer le type avec `scan-`                                                                    | `2026-03_scan-facture_fournisseur-brico_001.pdf`  |
-| Deux clients sur un même document  | Choisir le client principal, noter l'autre dans les métadonnées ou dans un fichier `.md` associé | `2026-03_contrat_client-dupont_collaboration.pdf` |
+| Deux clients sur un même document  | Choisir le client principal, noter l'autre dans les métadonnées ou dans un fichier `.md` associé | `2026-03_Contrat_Dupont_collaboration.pdf`        |
 
 
