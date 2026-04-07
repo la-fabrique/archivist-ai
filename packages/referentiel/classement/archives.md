@@ -12,7 +12,6 @@ Archives/
 │   ├── ma_fiscalite_2024.zip
 │   ├── mon_social_2024.zip
 │   ├── ma_banque_et_caisse_2024.zip
-│   ├── ma_gestion_administrative_2024.zip
 │   └── manifest.md
 └── 2023/
     └── ...

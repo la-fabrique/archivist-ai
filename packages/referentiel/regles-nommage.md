@@ -201,16 +201,6 @@ Date à l'année — les documents juridiques ne se rapportent généralement pa
 
 ---
 
-### `Ma gestion administrative/`
-
-**Format :** `AAAA-MM_type_expediteur_objet.ext`
-
-**Exemple :** `2026-03_courrier_urssaf_mise-en-demeure.pdf`
-
-L'expéditeur (ou destinataire pour les courriers sortants) est important ici car les documents sont hétérogènes. Il aide à retrouver rapidement un courrier d'un organisme précis.
-
----
-
 ## Conventions d'écriture
 
 

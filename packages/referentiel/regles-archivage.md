@@ -58,7 +58,6 @@ Actif (N et N-1)  →  Archivé (N-2 et plus)  →  Purgeable (après durée lé
 | `Mon social/` | N et N-1 | N-2 → `Archives/` | 5 ans |
 | `Ma banque et caisse/` | N et N-1 | N-2 → `Archives/` | 5 ans |
 | `Mon juridique/` | Toujours actif | Jamais tant que l'entreprise existe | 5 ans après radiation |
-| `Ma gestion administrative/` | N et N-1 | N-2 → `Archives/` | Au cas par cas selon le document |
 
 **Cas particulier de `Mon juridique/`** : les statuts, K-bis et PV d'AG ne s'archivent pas. Ces documents définissent l'existence légale de ta structure — ils doivent rester accessibles en permanence.
 
@@ -74,7 +73,6 @@ Archives/
 │   ├── ma_fiscalite_2024.zip
 │   ├── mon_social_2024.zip
 │   ├── ma_banque_et_caisse_2024.zip
-│   ├── ma_gestion_administrative_2024.zip
 │   └── manifest.md
 └── 2023/
     ├── ...
@@ -101,7 +99,6 @@ Créée le : 2025-02-01
 | ma_fiscalite_2024.zip | 12 |
 | mon_social_2024.zip | 36 |
 | ma_banque_et_caisse_2024.zip | 12 |
-| ma_gestion_administrative_2024.zip | 8 |
 
 ## Dates de purge
 
