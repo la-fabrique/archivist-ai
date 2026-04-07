@@ -53,7 +53,7 @@ Actif (N et N-1)  →  Archivé (N-2 et plus)  →  Purgeable (après durée lé
 | Dossier | Accès direct | Archivage | Purge possible |
 |---------|-------------|-----------|----------------|
 | `Mes ventes/` | N et N-1 | N-2 → `Archives/` | 10 ans (factures), 5 ans (contrats) |
-| `Mes achats/` | N et N-1 | N-2 → `Archives/` | 10 ans (factures fournisseurs), 2 ans après fin (assurances) |
+| `Mes achats/` | N et N-1 | N-2 → `Archives/` | 10 ans (factures fournisseurs) |
 | `Ma fiscalité/` | N et N-1 | N-2 → `Archives/` | 6 ans |
 | `Mon social/` | N et N-1 | N-2 → `Archives/` | 5 ans |
 | `Ma banque et caisse/` | N et N-1 | N-2 → `Archives/` | 5 ans |

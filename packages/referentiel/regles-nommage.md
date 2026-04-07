@@ -148,23 +148,16 @@ Même logique que les modèles de contrat et de devis : pas de date client, vers
 
 ---
 
-### `Mes achats/factures_fournisseurs/`
+### `Mes achats/Mes factures fournisseurs/`
 
-**Format :** `AAAA-MM_facture_fournisseur_numero.ext`
+**Format :** `[AAAA-MM]_Facture_[Nom fournisseur]_[Numero].[ext]`
 
-**Exemple :** `2026-03_facture_orange_012.pdf`
+- `[AAAA-MM]` — date d'émission de la facture
+- `[Nom fournisseur]` — nom du fournisseur, forme lisible
+- `[Numero]` — numéro de la facture tel qu'il apparaît sur le document
+- `[ext]` — extension du fichier
 
-Le numéro est celui porté sur la facture du fournisseur (ou un numéro séquentiel si la facture n'en a pas).
-
----
-
-### `Mes achats/assurances/`
-
-**Format :** `AAAA_type_assureur_objet.ext`
-
-**Exemple :** `2026_police_axa_rcpro.pdf` / `2026_attestation_maif_vehicule.pdf`
-
-Date à l'année (les polices couvrent généralement une année entière). Le type distingue la police de l'attestation — documents de nature différente même s'ils concernent le même contrat.
+**Exemple :** `2026-03_Facture_OVH_F2600042.pdf`
 
 ---
 
