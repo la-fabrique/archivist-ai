@@ -16,7 +16,7 @@ Pourquoi ce choix :
 
 ---
 
-## Les 8 dossiers racine
+## Les 7 dossiers racine
 
 Ces dossiers se placent à la racine de ton espace de stockage (Drive, OneDrive, serveur, NAS). Leurs noms suivent la convention [français lisible](../regles-nommage.md#dossiers-de-larborescence) (majuscule initiale, espaces, accents).
 
@@ -25,11 +25,10 @@ Ces dossiers se placent à la racine de ton espace de stockage (Drive, OneDrive,
 | ------------------------------------------------------------ | ----------------------------- | -------------------------------------------------------------- |
 | `[Mes ventes/](mes_ventes.md)`                               | Relation commerciale sortante | Factures clients, modèles de contrat, devis et offre, offres clients, suivi client |
 | `[Mes achats/](mes_achats.md)`                               | Relation commerciale entrante | Factures fournisseurs, suivi fournisseurs                      |
-| `[Mon juridique/](mon_juridique.md)`                         | Entité juridique              | Statuts, K-bis, PV d'AG, contrats importants                   |
-| `[Mon social/](mon_social.md)`                               | Gestion du personnel          | Contrats de travail, fiches de paie, DPAE                      |
-| `[Ma fiscalité/](ma_fiscalite.md)`                           | Obligations fiscales          | Déclarations TVA, CFE, avis d'imposition, liasses fiscales     |
-| `[Ma banque et caisse/](ma_banque_et_caisse.md)`             | Trésorerie                    | Relevés bancaires, remises de chèques, journaux de caisse      |
-| `[Ma gestion administrative/](ma_gestion_administrative.md)` | Courriers et divers           | Courriers reçus et envoyés, documents administratifs divers    |
+| `[Mon juridique/](mon_juridique.md)`                         | Entité juridique              | Statuts, K-bis, PV d'assemblée                                 |
+| `[Mon social/](mon_social.md)`                               | Gestion du personnel          | Fiches de paie, DPAE, modèles de contrat de travail, suivi salarié |
+| `[Ma fiscalité/](ma_fiscalite.md)`                           | Obligations fiscales          | Déclarations TVA, liasses fiscales, avis d'imposition, avis de CFE |
+| `[Ma banque et caisse/](ma_banque_et_caisse.md)`             | Trésorerie                    | Relevés bancaires                                              |
 | `[Archives/](archives.md)`                                   | Années closes                 | Archives annuelles compressées avec manifest                   |
 
 
@@ -37,13 +36,13 @@ Ces dossiers se placent à la racine de ton espace de stockage (Drive, OneDrive,
 
 ---
 
-## Dossiers à structure libre
+## Dossiers à volume modéré
 
-`Mon juridique/`, `Mon social/`, `Ma fiscalité/`, `Ma banque et caisse/` et `Ma gestion administrative/` ont une structure plus libre.
+`Mon juridique/`, `Ma banque et caisse/` utilisent une structure plate (pas de sous-dossiers mensuels) car le volume de documents reste faible.
 
-**Pourquoi pas de sous-dossiers mensuels ?** Le volume de documents est faible. Tu ne crées pas un PV d'AG chaque mois. Ces dossiers se consultent par thème, pas par date — tu cherches "les statuts" ou "le contrat de travail de Jean", pas "les documents de mars".
+`Mon social/` et `Ma fiscalité/` combinent des sous-dossiers chronologiques pour les documents récurrents (fiches de paie, déclarations de TVA) et une structure plate pour le reste.
 
-Les suggestions de sous-dossiers pour chaque catégorie sont dans les pages dédiées ci-dessus.
+Le détail de chaque arborescence est dans les pages dédiées ci-dessus.
 
 ---
 
