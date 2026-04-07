@@ -43,7 +43,7 @@ Ces 4 règles s’appliquent aux **fichiers** de tous les dossiers, sans excepti
 | Règle                   | Détail                                                       |
 | ----------------------- | ------------------------------------------------------------ |
 | **Date en préfixe**     | Toujours en début de nom, format `AAAA-MM` ou `AAAA`         |
-| **Minuscules**          | Pas d'accents, pas de majuscules, pas d'espaces              |
+| **Casse**               | Majuscule initiale sur chaque segment, pas d'accents, pas d'espaces |
 | **Séparateurs**         | Tiret `-` dans un segment, underscore `_` entre les segments |
 | **Extension explicite** | `.pdf`, `.xlsx`, `.jpg` — toujours présente                  |
 
@@ -51,7 +51,7 @@ Ces 4 règles s’appliquent aux **fichiers** de tous les dossiers, sans excepti
 **Pourquoi ces choix :**
 
 - **Date en préfixe** → l'explorateur trie les fichiers par ordre chronologique automatiquement. Les factures de janvier apparaissent avant celles de mars, sans intervention manuelle.
-- **Minuscules sans accents** → portabilité totale entre systèmes (Windows, macOS, Linux, Google Drive, OneDrive, NAS). Un fichier nommé `Réunion Équipe.docx` peut créer des problèmes à l'échange ou à la sauvegarde. `reunion-equipe.docx` ne créera jamais de problème.
+- **Majuscule initiale par segment, sans accents** → lisibilité immédiate du nom de fichier, tout en garantissant la portabilité entre systèmes (Windows, macOS, Linux, Google Drive, OneDrive, NAS). Pas d'accents pour éviter les problèmes d'encodage à l'échange ou à la sauvegarde.
 - **Underscores entre segments** → la distinction visuelle entre les parties du nom est immédiate. `2026-03_Facture_Dupont_F2600003.pdf` se lit en un coup d'œil.
 
 ---
@@ -224,7 +224,7 @@ L'expéditeur (ou destinataire pour les courriers sortants) est important ici ca
 | Convention                      | Règle                                                                                        | Exemple                             |
 | ------------------------------- | -------------------------------------------------------------------------------------------- | ----------------------------------- |
 | **Dossiers**                    | Français lisible, voir section [Dossiers de l'arborescence](#dossiers-de-larborescence) | `Mes ventes/Mes factures clients/2026-03/` |
-| Casse (fichiers)                | Tout en minuscules                                                                           | `facture` pas `Facture`             |
+| Casse (fichiers)                | Majuscule initiale sur chaque segment                                                        | `Facture`, `Dupont`, `Declaration`  |
 | Mots dans un segment (fichiers) | Séparés par des tirets `-`                                                                   | `mise-en-demeure`, `fiche-paie`     |
 | Segments entre eux (fichiers)   | Séparés par des underscores `_`                                                              | `2026-03_Facture_Dupont`            |
 | Espaces                         | Jamais                                                                                       | `client-dupont` pas `client dupont` |
