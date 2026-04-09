@@ -26,7 +26,7 @@ Ce référentiel est fait pour toi.
 
 ## Sommaire
 
-- [Démarrage rapide](demarrage-rapide.md) — Le profil SASU solo, l'arborescence résultante, et les 4 gestes quotidiens.
+- [Démarrage rapide](demarrage-rapide.md) — Les options activées pour une SASU solo, l'arborescence résultante, et les 4 gestes quotidiens.
 - [Plan de classement](classement/__index.md) — L'arborescence de tes dossiers : quels dossiers créer, comment les organiser, et pourquoi.
 - [Règles de nommage](regles-nommage.md) — Comment nommer tes fichiers pour les retrouver sans les ouvrir.
 - [Règles d'archivage](regles-archivage.md) — Quoi garder, combien de temps, et comment alléger ton espace de travail sans perdre de documents importants.

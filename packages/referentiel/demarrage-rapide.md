@@ -2,7 +2,7 @@
 
 > Partie du [Référentiel de gestion documentaire](./_index.md) — v0
 
-Ce guide présente le cas le plus courant : **SASU solo sans salarié** (profil `sasu-solo`). Modules activés : `core` + `dirigeant-assimile-salarie` + `assurances`.
+Ce guide présente le cas le plus courant : **SASU solo sans salarié**. Options activées : `core` + `dirigeant-assimile-salarie` + `assurances`.
 
 ---
 
@@ -64,10 +64,10 @@ Ce guide présente le cas le plus courant : **SASU solo sans salarié** (profil 
 
 ```bash
 # Depuis la racine du projet
-npx referentiel-cli init --profile sasu-solo --target /chemin/vers/mon/drive
+npx referentiel-cli init --options dirigeant-assimile-salarie,assurances --target /chemin/vers/mon/drive
 ```
 
-Le CLI crée tous les dossiers correspondant au profil `sasu-solo` dans le dossier cible.
+Le CLI crée tous les dossiers correspondant aux options sélectionnées dans le dossier cible.
 
 ---
 
