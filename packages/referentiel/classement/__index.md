@@ -62,21 +62,12 @@ Ce plan de classement est conçu pour la majorité des TPE et indépendants, mai
 
 ---
 
-## Modules et profils
+## Options
 
-Le référentiel est organisé en un **noyau (`core`)** et des **modules optionnels** activés selon le profil.
+Le référentiel est organisé en un **noyau (`core`)** et des **options** que tu cumules selon ta situation.
 
-| Module | Dossier(s) ajouté(s) | Profils concernés |
-|--------|---------------------|-------------------|
+| Option | Dossier(s) ajouté(s) | Cas d'usage |
+|--------|----------------------|-------------|
 | `core` | `Mes ventes/`, `Mes achats/`, `Mon juridique/`, `Ma fiscalité/`, `Ma banque/`, `Archives/` | Tous |
-| `dirigeant-assimile-salarie` | `Mon social/` | SASU (dirigeant assimilé salarié) |
-| `assurances` | `Mes assurances/` | SASU, indép avec RC Pro ou mutuelle |
-
-### Profils prédéfinis
-
-| Profil | Modules activés |
-|--------|----------------|
-| **Indep solo micro** | `core` |
-| **SASU solo sans salarié** | `core` + `dirigeant-assimile-salarie` + `assurances` |
-| **SASU solo + salariés** | `core` + `dirigeant-assimile-salarie` + `assurances` |
-| **Indep créatif/tech** | `core` + `assurances` |
+| `dirigeant-assimile-salarie` | `Mon social/` | Dirigeant SASU, assimilé salarié |
+| `assurances` | `Mes assurances/` | RC Pro, mutuelle, assurance locaux |
