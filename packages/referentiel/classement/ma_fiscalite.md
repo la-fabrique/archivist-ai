@@ -1,3 +1,9 @@
+---
+id: ma_fiscalite
+option: core
+required: true
+---
+
 # `Ma fiscalité/`
 
 > [Plan de classement](__index.md) — [Référentiel](../_index.md) — v0

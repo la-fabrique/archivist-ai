@@ -73,27 +73,27 @@ Chaque dossier définit ses propres segments selon la nature de ses documents. L
 
 ---
 
-### `Mes ventes/mes_modeles_de_devis/`
+### `Mes ventes/Mes modèles/Contrats/`
 
-**Rôle :** gabarits de devis à dupliquer et adapter — pas les devis envoyés aux clients (voir `Mes ventes/mes_clients/[client]/devis/`).
+**Rôle :** gabarits de contrat à dupliquer et adapter — pas les contrats signés clients (voir `Mes ventes/Mes clients/[client]/Contrats/`).
 
-**Format :** `modele-devis_objet_vN.ext`
+**Format :** `modele-contrat_[objet]_v[N].[ext]`
 
-**Exemple :** `modele-devis_prestation_conseil_v1.docx`
+**Exemple :** `modele-contrat_maintenance-annuelle_v2.docx`
 
-Même logique que les modèles de contrat : pas de date client, version du gabarit uniquement.
+Pas de préfixe date client : ce sont des documents réutilisables. La version (`v1`, `v2`) sert à distinguer les révisions du modèle.
 
 ---
 
-### `Mes ventes/mes_modeles_de_contrat/`
+### `Mes ventes/Mes modèles/Devis et offres/`
 
-**Rôle :** gabarits à dupliquer et adapter — pas les contrats signés clients (voir `Mes ventes/mes_clients/[client]/contrats/`).
+**Rôle :** gabarits de devis et d'offres commerciales à dupliquer et adapter.
 
-**Format :** `modele-contrat_{objet}_v{version}.ext`
+**Format :** `modele-devis_[objet]_v[N].[ext]`
 
-**Exemple :** `modele-contrat_maintenance_annuelle_v2.docx`
+**Exemple :** `modele-devis_prestation-conseil_v1.docx`
 
-Pas de préfixe date client : ce sont des documents réutilisables. La version (`v1`, `v2`) sert à distinguer les révisions du modèle.
+Pas de préfixe date : ce sont des gabarits réutilisables. La version (`v1`, `v2`) distingue les révisions.
 
 ---
 
@@ -123,31 +123,6 @@ Pas de préfixe date client : ce sont des documents réutilisables. La version (
 
 ---
 
-### `Mes ventes/mes_modeles_d_offre/`
-
-**Rôle :** gabarits d'offre à dupliquer et adapter — pas les offres envoyées aux clients (voir `Mes ventes/mes_clients/[client]/offres/`).
-
-**Format :** `modele-offre_objet_vN.ext`
-
-**Exemple :** `modele-offre_formation-react_v2.docx`
-
-Même logique que les modèles de contrat et de devis : pas de date client, version du gabarit uniquement.
-
----
-
-### `Mes ventes/Mes clients/[Nom du client]/Offres/`
-
-**Format :** `[AAAA-MM]_Offre_[Nom client]_[Numero].[ext]`
-
-- `[AAAA-MM]` — date d'émission
-- `[Nom client]` — nom du client, forme lisible
-- `[Numero]` — numéro de l'offre tel qu'il apparaît dans le logiciel
-- `[ext]` — extension du fichier
-
-**Exemple :** `2026-03_Offre_Dupont_O2600001.pdf`
-
----
-
 ### `Mes achats/Mes factures fournisseurs/`
 
 **Format :** `[AAAA-MM]_Facture_[Nom fournisseur]_[Numero].[ext]`
@@ -163,39 +138,39 @@ Même logique que les modèles de contrat et de devis : pas de date client, vers
 
 ### `Mon social/`
 
-**Format :** `AAAA-MM_type_nom-salarie.ext`
+**Format :** `[AAAA-MM]_[Type]_[Nom-salarie].[ext]`
 
-**Exemple :** `2026-03_fiche-paie_dupont-jean.pdf`
+**Exemple :** `2026-03_Fiche-de-paie_Dupont.pdf`
 
-Le nom du salarié en dernier : dans ce dossier, tous les documents concernent du personnel. Le type en premier (`fiche-paie`, `contrat-travail`, `dpae`, `avenant`) facilite le tri.
+Le nom du salarié en dernier : dans ce dossier, tous les documents concernent du personnel. Le type en premier (`Fiche-de-paie`, `Contrat-travail`, `DPAE`, `Avenant`) facilite le tri.
 
 ---
 
 ### `Ma fiscalité/`
 
-**Format :** `AAAA-MM_type_impot.ext`
+**Format :** `[AAAA-MM]_[Type].[ext]`
 
-**Exemple :** `2026-01_declaration_tva.pdf` / `2026_avis_cfe.pdf`
+**Exemple :** `2026-01_Declaration-TVA.pdf` / `2026_Avis-CFE.pdf`
 
 Pas de numéro séquentiel : il y a rarement deux déclarations TVA le même mois. La date peut être à l'année (`AAAA`) pour les impôts annuels (CFE, liasse fiscale).
 
 ---
 
-### `Ma banque et caisse/`
+### `Ma banque/`
 
-**Format :** `AAAA-MM_releve_banque.ext`
+**Format :** `[AAAA-MM]_Releve_[Nom-banque]_[Numero].[ext]`
 
-**Exemple :** `2026-03_releve_banque-populaire.pdf`
+**Exemple :** `2026-03_Releve_Banque-Populaire_003.pdf`
 
-Si tu as plusieurs comptes, le nom de la banque les différencie. Pour les remises de chèques : `2026-03_remise-cheques_banque-populaire_001.pdf` (nom de fichier inchangé ; le dossier parent éventuel suit la convention dossiers, ex. `Remises chèques/`).
+Le sous-dossier `[Nom banque]/` permet de distinguer plusieurs établissements. Le numéro de relevé (tel qu'il apparaît sur le document) permet de trier les relevés d'un même compte.
 
 ---
 
 ### `Mon juridique/`
 
-**Format :** `AAAA_type_objet.ext`
+**Format :** `[AAAA]_[Type]_[Objet].[ext]`
 
-**Exemple :** `2025_statuts_sas-monentreprise.pdf` / `2024_pv-ag_approbation-comptes.pdf`
+**Exemple :** `2025_Statuts_SAS-Monentreprise.pdf` / `2024_PV-AG_approbation-comptes.pdf`
 
 Date à l'année — les documents juridiques ne se rapportent généralement pas à un mois précis. L'objet décrit le contenu (`approbation-comptes`, `nomination-gerant`, `modification-statuts`).
 
@@ -222,8 +197,8 @@ Date à l'année — les documents juridiques ne se rapportent généralement pa
 
 | Cas                                | Règle                                                                                            | Exemple                                           |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
-| Pas de tiers                       | Omettre ce segment                                                                               | `2026-01_declaration_tva.pdf`                     |
-| Pas de date mensuelle              | Date à l'année seule                                                                             | `2025_statuts_sas-monentreprise.pdf`              |
+| Pas de tiers                       | Omettre ce segment                                                                               | `2026-01_Declaration-TVA.pdf`                     |
+| Pas de date mensuelle              | Date à l'année seule                                                                             | `2025_Statuts_SAS-Monentreprise.pdf`              |
 | Plusieurs versions                 | Suffixe `-v2`, `-v3` avant l'extension                                                           | `2026-03_Devis_Dupont_D2600001-v2.pdf`            |
 | Scan ou photo d'un document papier | Préfixer le type avec `scan-`                                                                    | `2026-03_scan-facture_fournisseur-brico_001.pdf`  |
 | Deux clients sur un même document  | Choisir le client principal, noter l'autre dans les métadonnées ou dans un fichier `.md` associé | `2026-03_Contrat_Dupont_collaboration.pdf`        |

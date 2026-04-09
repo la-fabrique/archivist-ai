@@ -56,7 +56,7 @@ Actif (N et N-1)  →  Archivé (N-2 et plus)  →  Purgeable (après durée lé
 | `Mes achats/` | N et N-1 | N-2 → `Archives/` | 10 ans (factures fournisseurs) |
 | `Ma fiscalité/` | N et N-1 | N-2 → `Archives/` | 6 ans |
 | `Mon social/` | N et N-1 | N-2 → `Archives/` | 5 ans |
-| `Ma banque et caisse/` | N et N-1 | N-2 → `Archives/` | 5 ans |
+| `Ma banque/` | N et N-1 | N-2 → `Archives/` | 5 ans |
 | `Mon juridique/` | Toujours actif | Jamais tant que l'entreprise existe | 5 ans après radiation |
 
 **Cas particulier de `Mon juridique/`** : les statuts, K-bis et PV d'AG ne s'archivent pas. Ces documents définissent l'existence légale de ta structure — ils doivent rester accessibles en permanence.
@@ -72,7 +72,7 @@ Archives/
 │   ├── mes_achats_2024.zip
 │   ├── ma_fiscalite_2024.zip
 │   ├── mon_social_2024.zip
-│   ├── ma_banque_et_caisse_2024.zip
+│   ├── ma_banque_2024.zip
 │   └── manifest.md
 └── 2023/
     ├── ...
@@ -98,7 +98,7 @@ Créée le : 2025-02-01
 | mes_achats_2024.zip | 23 |
 | ma_fiscalite_2024.zip | 12 |
 | mon_social_2024.zip | 36 |
-| ma_banque_et_caisse_2024.zip | 12 |
+| ma_banque_2024.zip | 12 |
 
 ## Dates de purge
 
@@ -108,7 +108,7 @@ Créée le : 2025-02-01
 | mes_achats_2024.zip (factures) | 2034 |
 | ma_fiscalite_2024.zip | 2030 |
 | mon_social_2024.zip | 2029 |
-| ma_banque_et_caisse_2024.zip | 2029 |
+| ma_banque_2024.zip | 2029 |
 ```
 
 ---
@@ -117,7 +117,7 @@ Créée le : 2025-02-01
 
 **Jamais de suppression automatique.** Toute opération de purge envoie une notification et attend une validation manuelle. Un document supprimé par erreur peut être irrécupérable.
 
-**Jamais de duplication.** Un document n'existe qu'à un seul endroit physique. Les raccourcis (voir [Raccourcis et liens](raccourcis-liens.md)) ne comptent pas comme des copies.
+**Jamais de duplication.** Un document n'existe qu'à un seul endroit physique.
 
 **Vérification avant suppression.** Après la création d'une archive zip, vérifier l'intégrité du fichier compressé avant de supprimer les originaux. Ne jamais supprimer l'original sans avoir confirmé que l'archive est lisible et complète.
 

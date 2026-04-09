@@ -28,7 +28,8 @@ Ces dossiers se placent à la racine de ton espace de stockage (Drive, OneDrive,
 | `[Mon juridique/](mon_juridique.md)`                         | Entité juridique              | Statuts, K-bis, PV d'assemblée                                 |
 | `[Mon social/](mon_social.md)`                               | Gestion du personnel          | Fiches de paie, DPAE, modèles de contrat de travail, suivi salarié |
 | `[Ma fiscalité/](ma_fiscalite.md)`                           | Obligations fiscales          | Déclarations TVA, liasses fiscales, avis d'imposition, avis de CFE |
-| `[Ma banque et caisse/](ma_banque_et_caisse.md)`             | Trésorerie                    | Relevés bancaires                                              |
+| `[Ma banque/](ma_banque.md)`             | Trésorerie                    | Relevés bancaires                                              |
+| `[Mes assurances/](mes_assurances.md)`                       | Couvertures assurantielles    | RC Pro, mutuelle/prévoyance, assurance locaux                  |
 | `[Archives/](archives.md)`                                   | Années closes                 | Archives annuelles compressées avec manifest                   |
 
 
@@ -38,7 +39,7 @@ Ces dossiers se placent à la racine de ton espace de stockage (Drive, OneDrive,
 
 ## Dossiers à volume modéré
 
-`Mon juridique/`, `Ma banque et caisse/` utilisent une structure plate (pas de sous-dossiers mensuels) car le volume de documents reste faible.
+`Mon juridique/`, `Ma banque/` utilisent une structure plate (pas de sous-dossiers mensuels) car le volume de documents reste faible.
 
 `Mon social/` et `Ma fiscalité/` combinent des sous-dossiers chronologiques pour les documents récurrents (fiches de paie, déclarations de TVA) et une structure plate pour le reste.
 
@@ -56,6 +57,17 @@ Ce plan de classement est conçu pour la majorité des TPE et indépendants, mai
 | Plusieurs sociétés                   | Un dossier racine par entité juridique, chacun avec cette même structure                |
 | Projets longs (BTP, conseil, agence) | Ajouter un dossier `Mes projets/` avec un sous-dossier par projet                       |
 | Pas de salariés                      | `Mon social/` peut être réduit à la gestion de ta propre rémunération (TNS, dividendes) |
-| Activité sans devis formels          | Simplifier `Mes ventes/` en retirant `Mes modèles de devis/`, `Devis/` et `Offres/` des clients |
+| Activité sans devis formels          | Simplifier `Mes ventes/` en retirant `Mes modèles/Devis et offres/` et `Devis/` des clients |
 
 
+---
+
+## Options
+
+Le référentiel est organisé en un **noyau (`core`)** et des **options** que tu cumules selon ta situation.
+
+| Option | Dossier(s) ajouté(s) | Cas d'usage |
+|--------|----------------------|-------------|
+| `core` | `Mes ventes/`, `Mes achats/`, `Mon juridique/`, `Ma fiscalité/`, `Ma banque/`, `Archives/` | Tous |
+| `dirigeant-assimile-salarie` | `Mon social/` | Dirigeant SASU, assimilé salarié |
+| `assurances` | `Mes assurances/` | RC Pro, mutuelle, assurance locaux |

@@ -1,3 +1,9 @@
+---
+id: mes_achats
+option: core
+required: true
+---
+
 # `Mes achats/`
 
 > [Plan de classement](__index.md) — [Référentiel](../_index.md) — v0
