@@ -14,10 +14,15 @@ Mon social/
 │   └── ...
 ├── Mes modèles de contrat de travail/
 │   └── ...
-└── Mes salariés/
-    └── [Nom du salarié]/
-        ├── Contrats/
-        └── ...     ← avenants, courriers, suivi libre
+├── Mes salariés/
+│   └── [Nom du salarié]/
+│       ├── Contrats/
+│       └── ...     ← avenants, courriers, suivi libre
+├── Mes déclarations sociales/      ← DSN, bordereaux URSSAF
+│   └── [AAAA]/
+│       └── [AAAA-MM]/
+└── Mes attestations URSSAF/        ← attestations de vigilance, relevés de situation
+    └── ...
 ```
 
 **Ce qu'il faut retenir :**
@@ -26,6 +31,8 @@ Mon social/
 - `Mes DPAE/` contient les déclarations préalables à l'embauche, en structure plate.
 - `Mes modèles de contrat de travail/` regroupe les **gabarits réutilisables** à dupliquer et adapter. Pas de documents signés ici — uniquement des modèles types.
 - `Mes salariés/` offre une **vue par salarié** : chaque sous-dossier contient les contrats signés, avenants et documents de suivi du salarié. `Contrats/` est imposé ; le reste de l'organisation est libre par salarié.
+- `Mes déclarations sociales/` regroupe les DSN mensuelles et les bordereaux de cotisations URSSAF, classés par année puis par mois.
+- `Mes attestations URSSAF/` contient les attestations de vigilance (exigées par les clients pour tout contrat > 5 000 €) et les relevés de situation de compte URSSAF.
 
 ---
 
@@ -100,3 +107,35 @@ Mes salariés/
 - `[ext]` — extension du fichier (`pdf`, `docx`…)
 
 **Exemple :** `2026-01_Contrat_Dupont_CDI.pdf` (avenant : `2026-06_Avenant_Dupont_teletravail.pdf`)
+
+---
+
+## `Mes déclarations sociales/`
+
+**Rôle :** déclarations sociales transmises à l'URSSAF — DSN mensuelles et bordereaux de cotisations. Obligatoire pour tout dirigeant SASU (assimilé salarié) même sans salarié.
+
+**Organisation :** un sous-dossier par année (`[AAAA]/`), puis un sous-dossier par mois (`[AAAA-MM]/`). La DSN est mensuelle ; le volume justifie cette double hiérarchie.
+
+**Format des fichiers:** `[AAAA-MM]_[Type].[ext]`
+
+- `[AAAA-MM]` — mois de la déclaration
+- `[Type]` — type de document : `DSN`, `Bordereau-cotisations`
+- `[ext]` — extension du fichier (`pdf`…)
+
+**Exemples :** `2026-03_DSN.pdf` / `2026-03_Bordereau-cotisations.pdf`
+
+---
+
+## `Mes attestations URSSAF/`
+
+**Rôle :** attestations de vigilance délivrées par l'URSSAF (exigées par les clients pour tout contrat > 5 000 €) et relevés de situation de compte URSSAF.
+
+**Organisation :** structure plate — volume faible (une attestation par trimestre environ).
+
+**Format des fichiers:** `[AAAA-MM]_[Type].[ext]`
+
+- `[AAAA-MM]` — date de délivrance du document
+- `[Type]` — type de document : `Attestation-vigilance`, `Releve-situation`
+- `[ext]` — extension du fichier (`pdf`…)
+
+**Exemples :** `2026-03_Attestation-vigilance.pdf` / `2026-03_Releve-situation.pdf`
