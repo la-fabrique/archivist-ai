@@ -29,13 +29,13 @@ Mon juridique/
 
 **Organisation :** structure plate — pas de sous-dossiers, le volume reste faible.
 
-**Format des fichiers:** `[AAAA-MM]_Statuts_[Objet].[ext]`
+**Format des fichiers:** `[AAAA]_Statuts_[Objet].[ext]`
 
-- `[AAAA-MM]` — date de signature ou d'enregistrement
+- `[AAAA]` — année de signature ou d'enregistrement
 - `[Objet]` — nature du document (constitution, modification objet social…)
 - `[ext]` — extension du fichier (`pdf`, `docx`…)
 
-**Exemple :** `2026-01_Statuts_constitution.pdf`
+**Exemple :** `2026_Statuts_constitution.pdf`
 
 ---
 
@@ -45,12 +45,12 @@ Mon juridique/
 
 **Organisation :** structure plate — pas de sous-dossiers, le volume reste faible.
 
-**Format des fichiers:** `[AAAA-MM]_Kbis.[ext]`
+**Format des fichiers:** `[AAAA]_Kbis.[ext]`
 
-- `[AAAA-MM]` — date d'émission du K-bis
+- `[AAAA]` — année d'émission du K-bis
 - `[ext]` — extension du fichier (`pdf`…)
 
-**Exemple :** `2026-03_Kbis.pdf`
+**Exemple :** `2026_Kbis.pdf`
 
 ---
 
@@ -60,10 +60,10 @@ Mon juridique/
 
 **Organisation :** structure plate — pas de sous-dossiers, le volume reste faible.
 
-**Format des fichiers:** `[AAAA-MM]_PV-AG_[Objet].[ext]`
+**Format des fichiers:** `[AAAA]_PV-AG_[Objet].[ext]`
 
-- `[AAAA-MM]` — date de l'assemblée
+- `[AAAA]` — année de l'assemblée
 - `[Objet]` — objet principal de l'AG (approbation-comptes, nomination-gerant…)
 - `[ext]` — extension du fichier (`pdf`, `docx`…)
 
-**Exemple :** `2026-04_PV-AG_approbation-comptes.pdf`
+**Exemple :** `2026_PV-AG_approbation-comptes.pdf`

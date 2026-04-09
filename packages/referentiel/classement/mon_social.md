@@ -99,4 +99,4 @@ Mes salariés/
 - `[Référence]` — référence libre (type de contrat, numéro… selon ta convention)
 - `[ext]` — extension du fichier (`pdf`, `docx`…)
 
-**Exemple :** `2026-01_Contrat_Dupont_CDI.pdf` (avenant : `2026-06_Avenant_Dupont_télétravail.pdf`)
+**Exemple :** `2026-01_Contrat_Dupont_CDI.pdf` (avenant : `2026-06_Avenant_Dupont_teletravail.pdf`)
