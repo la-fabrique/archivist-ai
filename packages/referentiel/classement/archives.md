@@ -1,7 +1,6 @@
 ---
 id: archives
-module: core
-profiles: [indep-solo-micro, sasu-solo, sasu-solo-employe, indep-creatif-tech]
+option: core
 required: true
 ---
 
