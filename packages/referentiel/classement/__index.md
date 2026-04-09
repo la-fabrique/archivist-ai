@@ -29,6 +29,7 @@ Ces dossiers se placent à la racine de ton espace de stockage (Drive, OneDrive,
 | `[Mon social/](mon_social.md)`                               | Gestion du personnel          | Fiches de paie, DPAE, modèles de contrat de travail, suivi salarié |
 | `[Ma fiscalité/](ma_fiscalite.md)`                           | Obligations fiscales          | Déclarations TVA, liasses fiscales, avis d'imposition, avis de CFE |
 | `[Ma banque et caisse/](ma_banque_et_caisse.md)`             | Trésorerie                    | Relevés bancaires                                              |
+| `[Mes assurances/](mes_assurances.md)`                       | Couvertures assurantielles    | RC Pro, mutuelle/prévoyance, assurance locaux                  |
 | `[Archives/](archives.md)`                                   | Années closes                 | Archives annuelles compressées avec manifest                   |
 
 
