@@ -1,7 +1,6 @@
 ---
 id: mes_assurances
-module: assurances
-profiles: [sasu-solo, sasu-solo-employe, indep-creatif-tech]
+option: assurances
 required: false
 ---
 

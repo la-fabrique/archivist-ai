@@ -1,7 +1,6 @@
 ---
 id: mon_social
-module: dirigeant-assimile-salarie
-profiles: [sasu-solo, sasu-solo-employe]
+option: dirigeant-assimile-salarie
 required: true
 ---
 
