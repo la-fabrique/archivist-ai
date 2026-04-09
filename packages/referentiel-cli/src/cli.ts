@@ -4,7 +4,8 @@ const program = new Command();
 
 program
   .name("referentiel-cli")
-  .description("Pousser packages/referentiel vers Google Drive");
+  .description("Pousser packages/referentiel vers Google Drive")
+  .action(() => program.help());
 
 program
   .command("auth")
