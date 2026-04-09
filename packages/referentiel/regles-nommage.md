@@ -73,27 +73,27 @@ Chaque dossier définit ses propres segments selon la nature de ses documents. L
 
 ---
 
-### `Mes ventes/mes_modeles_de_devis/`
+### `Mes ventes/Mes modèles/Contrats/`
 
-**Rôle :** gabarits de devis à dupliquer et adapter — pas les devis envoyés aux clients (voir `Mes ventes/mes_clients/[client]/devis/`).
+**Rôle :** gabarits de contrat à dupliquer et adapter — pas les contrats signés clients (voir `Mes ventes/Mes clients/[client]/Contrats/`).
 
-**Format :** `modele-devis_objet_vN.ext`
-
-**Exemple :** `modele-devis_prestation_conseil_v1.docx`
-
-Même logique que les modèles de contrat : pas de date client, version du gabarit uniquement.
-
----
-
-### `Mes ventes/mes_modeles_de_contrat/`
-
-**Rôle :** gabarits à dupliquer et adapter — pas les contrats signés clients (voir `Mes ventes/mes_clients/[client]/contrats/`).
-
-**Format :** `modele-contrat_{objet}_v{version}.ext`
+**Format :** `modele-contrat_[objet]_v[N].[ext]`
 
 **Exemple :** `modele-contrat_maintenance-annuelle_v2.docx`
 
 Pas de préfixe date client : ce sont des documents réutilisables. La version (`v1`, `v2`) sert à distinguer les révisions du modèle.
+
+---
+
+### `Mes ventes/Mes modèles/Devis et offres/`
+
+**Rôle :** gabarits de devis et d'offres commerciales à dupliquer et adapter.
+
+**Format :** `modele-devis_[objet]_v[N].[ext]`
+
+**Exemple :** `modele-devis_prestation-conseil_v1.docx`
+
+Pas de préfixe date : ce sont des gabarits réutilisables. La version (`v1`, `v2`) distingue les révisions.
 
 ---
 
@@ -120,31 +120,6 @@ Pas de préfixe date client : ce sont des documents réutilisables. La version (
 - `[ext]` — extension du fichier
 
 **Exemple :** `2026-03_Devis_Martin_D2600001.pdf`
-
----
-
-### `Mes ventes/mes_modeles_d_offre/`
-
-**Rôle :** gabarits d'offre à dupliquer et adapter — pas les offres envoyées aux clients (voir `Mes ventes/mes_clients/[client]/offres/`).
-
-**Format :** `modele-offre_objet_vN.ext`
-
-**Exemple :** `modele-offre_formation-react_v2.docx`
-
-Même logique que les modèles de contrat et de devis : pas de date client, version du gabarit uniquement.
-
----
-
-### `Mes ventes/Mes clients/[Nom du client]/Offres/`
-
-**Format :** `[AAAA-MM]_Offre_[Nom client]_[Numero].[ext]`
-
-- `[AAAA-MM]` — date d'émission
-- `[Nom client]` — nom du client, forme lisible
-- `[Numero]` — numéro de l'offre tel qu'il apparaît dans le logiciel
-- `[ext]` — extension du fichier
-
-**Exemple :** `2026-03_Offre_Dupont_O2600001.pdf`
 
 ---
 

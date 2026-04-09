@@ -10,25 +10,21 @@ Mes ventes/
 ├── Mes factures clients/
 │   ├── [AAAA-MM]/
 │   └── ...
-├── Mes modèles de contrat/
-│   └── ...
-├── Mes modèles de devis/
-│   └── ...
-├── Mes modèles d'offre/
-│   └── ...
+├── Mes modèles/                    ← contrat + devis/offre réunis
+│   ├── Contrats/
+│   └── Devis et offres/
 └── Mes clients/
     └── [Nom du client]/
         ├── Contrats/
-        ├── Devis/
-        ├── Offres/
+        ├── Devis/                  ← inclut les propositions commerciales / offres
         └── ...     ← notes, CR, suivi libre
 ```
 
 **Ce qu'il faut retenir :**
 
 - `Mes factures clients/` contient les factures **émises**, classées dans des **sous-dossiers chronologiques** par mois (`Mes factures clients/2026-03/`). C'est l'emplacement de référence — pratique pour un export groupé (ex. envoi au comptable).
-- `Mes modèles de contrat/`, `Mes modèles de devis/` et `Mes modèles d'offre/` regroupent les **gabarits réutilisables** à dupliquer et adapter. Pas de documents signés ni finalisés ici — uniquement des modèles types.
-- `Mes clients/` offre une **vue par client** : chaque sous-dossier contient les contrats, devis et offres réels du client ainsi que les documents de suivi (notes, CR…). `Contrats/`, `Devis/` et `Offres/` sont imposés ; le reste de l'organisation est libre par client.
+- `Mes modèles/` regroupe les **gabarits réutilisables** : sous-dossier `Contrats/` pour les modèles de contrat, sous-dossier `Devis et offres/` pour les modèles de devis et d'offre commerciale (fusionnés — pour un indep solo, un devis est une offre).
+- `Mes clients/` offre une **vue par client** : chaque sous-dossier contient les contrats et devis réels du client ainsi que les documents de suivi (notes, CR…). `Contrats/` et `Devis/` sont imposés ; le reste de l'organisation est libre par client.
 
 ---
 
@@ -49,45 +45,35 @@ Mes ventes/
 
 ---
 
-## `Mes modèles de contrat/`
+## `Mes modèles/`
 
-**Rôle :** **modèles** de contrat ou d'avenant à dupliquer, compléter puis adapter pour chaque client. Pas de document signé ni de PDF « définitif client » dans ce dossier — uniquement les gabarits réutilisables (`.docx`, `.odt`, parfois PDF guide).
+**Rôle :** gabarits réutilisables à dupliquer et adapter. Pas de document signé ni finalisé ici — uniquement les modèles types. Deux sous-dossiers fixes.
 
-**Quand tu sors un contrat pour un client** (fichier adapté, puis signé ou archivé comme référence client), enregistre-le dans `Mes clients/[client]/Contrats/` — pas dans `Mes modèles de contrat/`. Voir la section **`Mes clients/`** pour le nommage des fichiers contrat.
+```
+Mes modèles/
+├── Contrats/       ← modèles de contrat et d'avenant
+└── Devis et offres/  ← modèles de devis et de propositions commerciales
+```
 
-**Format des fichiers:** `modele-contrat_objet_vN.ext`
+### `Contrats/` (modèles)
 
-**Exemple :** `modele-contrat_maintenance_annuelle_v2.docx`
+**Format des fichiers:** `modele-contrat_[objet]_v[N].[ext]`
 
-Pas de date « client » dans le nom : ce sont des gabarits réutilisables. Le segment **objet** décrit le type de modèle (souvent plusieurs mots liés par des underscores ou des tirets, ex. `maintenance_annuelle`). **vN** est la version du gabarit (`v1`, `v2`…), pas une version « client ».
+- `[objet]` — type de contrat en mots séparés par des tirets (ex. `maintenance-annuelle`, `prestation-conseil`)
+- `v[N]` — version du gabarit (`v1`, `v2`…)
+- `[ext]` — extension du fichier (`.docx`, `.odt`…)
 
----
+**Exemple :** `modele-contrat_maintenance-annuelle_v2.docx`
 
-## `Mes modèles de devis/`
+### `Devis et offres/` (modèles)
 
-**Rôle :** **modèles** de devis à dupliquer, compléter puis adapter pour chaque client. Pas de devis finalisé ni envoyé dans ce dossier — uniquement les gabarits réutilisables (`.docx`, `.odt`, parfois PDF guide).
+**Format des fichiers:** `modele-devis_[objet]_v[N].[ext]`
 
-**Quand tu finalises un devis pour un client** (fichier adapté et envoyé), enregistre-le dans `Mes clients/[client]/Devis/` — pas dans `Mes modèles de devis/`. Voir la section **`Mes clients/`** pour le nommage des fichiers devis.
+- `[objet]` — type de prestation ou de format (ex. `prestation-conseil`, `formation-react`)
+- `v[N]` — version du gabarit (`v1`, `v2`…)
+- `[ext]` — extension du fichier (`.docx`, `.odt`…)
 
-**Format des fichiers:** `modele-devis_objet_vN.ext`
-
-**Exemple :** `modele-devis_prestation_conseil_v1.docx`
-
-Même logique que les modèles de contrat : pas de date client, version du gabarit uniquement.
-
----
-
-## `Mes modèles d'offre/`
-
-**Rôle :** **modèles** d'offre commerciale à dupliquer, compléter puis adapter pour chaque client. Pas d'offre finalisée ni envoyée dans ce dossier — uniquement les gabarits réutilisables : plaquettes types, descriptifs de formation, grilles prestations, argumentaires génériques (`.docx`, `.odt`, parfois PDF guide).
-
-**Quand tu finalises une offre pour un client** (fichier adapté et envoyé), enregistre-le dans `Mes clients/[client]/Offres/` — pas dans `Mes modèles d'offre/`. Voir la section **`Mes clients/`** pour le nommage des fichiers offre.
-
-**Format des fichiers:** `modele-offre_objet_vN.ext`
-
-**Exemple :** `modele-offre_formation-react_v2.docx`
-
-Même logique que les modèles de contrat et de devis : pas de date client, version du gabarit uniquement.
+**Exemple :** `modele-devis_prestation-conseil_v1.docx`
 
 ---
 
@@ -95,14 +81,13 @@ Même logique que les modèles de contrat et de devis : pas de date client, vers
 
 **Rôle :** **vue par client** regroupant les documents directement liés à la relation avec un client : contrats signés, devis envoyés, offres personnalisées, notes de suivi, comptes-rendus, échanges de référence. Chaque client dispose de son propre sous-dossier.
 
-**Organisation :** un sous-dossier par client, nom en français lisible (`[Nom du client]/`). Les sous-dossiers `Contrats/`, `Devis/` et `Offres/` sont imposés dans chaque client ; le reste de l'organisation est libre.
+**Organisation :** un sous-dossier par client, nom en français lisible (`[Nom du client]/`). Les sous-dossiers `Contrats/` et `Devis/` sont imposés dans chaque client ; le reste de l'organisation est libre.
 
 ```
 Mes clients/
 └── [Nom du client]/
     ├── Contrats/    ← contrats et avenants réels du client
-    ├── Devis/       ← devis envoyés au client
-    ├── Offres/      ← offres personnalisées envoyées au client
+    ├── Devis/       ← devis et propositions commerciales envoyés au client
     └── ...          ← notes, CR, suivi (libre)
 ```
 
@@ -121,7 +106,7 @@ Mes clients/
 
 ### `Devis/` (dans chaque client)
 
-**Rôle :** propositions chiffrées envoyées au client (devis, propositions commerciales assimilées), y compris les versions révisées tant qu'elles restent des **devis** (pas encore une facture). Structure plate — pas de sous-dossiers mensuels, le volume par client reste faible.
+**Rôle :** propositions chiffrées et offres commerciales envoyées au client (devis, propositions commerciales, offres personnalisées). Pour un indep solo, un devis IS l'offre — pas de distinction nécessaire. Structure plate — pas de sous-dossiers mensuels, le volume par client reste faible.
 
 **Format des fichiers:** `[AAAA-MM]_Devis_[Nom client]_[Numero].[ext]`
 
@@ -131,16 +116,3 @@ Mes clients/
 - `[ext]` — extension du fichier (`pdf`, `docx`…)
 
 **Exemple :** `2026-03_Devis_Martin_D2600001.pdf`
-
-### `Offres/` (dans chaque client)
-
-**Rôle :** offres commerciales **personnalisées** envoyées au client (propositions adaptées à partir des modèles d'offre). Structure plate — pas de sous-dossiers mensuels, le volume par client reste faible.
-
-**Format des fichiers:** `[AAAA-MM]_Offre_[Nom client]_[Numero].[ext]`
-
-- `[AAAA-MM]` — date d'émission de l'offre
-- `[Nom client]` — nom du client, forme lisible
-- `[Numero]` — numéro de l'offre tel qu'il apparaît dans le logiciel
-- `[ext]` — extension du fichier (`pdf`, `docx`…)
-
-**Exemple :** `2026-03_Offre_Dupont_O2600001.pdf`
