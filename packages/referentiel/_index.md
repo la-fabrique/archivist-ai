@@ -29,7 +29,6 @@ Ce référentiel est fait pour toi.
 - [Plan de classement](classement/__index.md) — L'arborescence de tes dossiers : quels dossiers créer, comment les organiser, et pourquoi.
 - [Règles de nommage](regles-nommage.md) — Comment nommer tes fichiers pour les retrouver sans les ouvrir.
 - [Règles d'archivage](regles-archivage.md) — Quoi garder, combien de temps, et comment alléger ton espace de travail sans perdre de documents importants.
-- [Raccourcis et liens](raccourcis-liens.md) — Comment naviguer dans tes documents depuis plusieurs angles sans jamais dupliquer.
 
 ---
 

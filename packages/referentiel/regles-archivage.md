@@ -117,7 +117,7 @@ Créée le : 2025-02-01
 
 **Jamais de suppression automatique.** Toute opération de purge envoie une notification et attend une validation manuelle. Un document supprimé par erreur peut être irrécupérable.
 
-**Jamais de duplication.** Un document n'existe qu'à un seul endroit physique. Les raccourcis (voir [Raccourcis et liens](raccourcis-liens.md)) ne comptent pas comme des copies.
+**Jamais de duplication.** Un document n'existe qu'à un seul endroit physique.
 
 **Vérification avant suppression.** Après la création d'une archive zip, vérifier l'intégrité du fichier compressé avant de supprimer les originaux. Ne jamais supprimer l'original sans avoir confirmé que l'archive est lisible et complète.
 
