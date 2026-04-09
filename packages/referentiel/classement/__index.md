@@ -57,6 +57,26 @@ Ce plan de classement est conçu pour la majorité des TPE et indépendants, mai
 | Plusieurs sociétés                   | Un dossier racine par entité juridique, chacun avec cette même structure                |
 | Projets longs (BTP, conseil, agence) | Ajouter un dossier `Mes projets/` avec un sous-dossier par projet                       |
 | Pas de salariés                      | `Mon social/` peut être réduit à la gestion de ta propre rémunération (TNS, dividendes) |
-| Activité sans devis formels          | Simplifier `Mes ventes/` en retirant `Mes modèles de devis/`, `Devis/` et `Offres/` des clients |
+| Activité sans devis formels          | Simplifier `Mes ventes/` en retirant `Mes modèles/Devis et offres/` et `Devis/` des clients |
 
 
+---
+
+## Modules et profils
+
+Le référentiel est organisé en un **noyau (`core`)** et des **modules optionnels** activés selon le profil.
+
+| Module | Dossier(s) ajouté(s) | Profils concernés |
+|--------|---------------------|-------------------|
+| `core` | `Mes ventes/`, `Mes achats/`, `Mon juridique/`, `Ma fiscalité/`, `Ma banque/`, `Archives/` | Tous |
+| `dirigeant-assimile-salarie` | `Mon social/` | SASU (dirigeant assimilé salarié) |
+| `assurances` | `Mes assurances/` | SASU, indép avec RC Pro ou mutuelle |
+
+### Profils prédéfinis
+
+| Profil | Modules activés |
+|--------|----------------|
+| **Indep solo micro** | `core` |
+| **SASU solo sans salarié** | `core` + `dirigeant-assimile-salarie` + `assurances` |
+| **SASU solo + salariés** | `core` + `dirigeant-assimile-salarie` + `assurances` |
+| **Indep créatif/tech** | `core` + `assurances` |

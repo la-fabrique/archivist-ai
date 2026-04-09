@@ -1,3 +1,10 @@
+---
+id: archives
+module: core
+profiles: [indep-solo-micro, sasu-solo, sasu-solo-employe, indep-creatif-tech]
+required: true
+---
+
 # `Archives/`
 
 > [Plan de classement](__index.md) — [Référentiel](../_index.md) — v0

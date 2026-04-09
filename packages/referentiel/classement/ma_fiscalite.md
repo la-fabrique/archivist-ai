@@ -1,3 +1,10 @@
+---
+id: ma_fiscalite
+module: core
+profiles: [indep-solo-micro, sasu-solo, sasu-solo-employe, indep-creatif-tech]
+required: true
+---
+
 # `Ma fiscalité/`
 
 > [Plan de classement](__index.md) — [Référentiel](../_index.md) — v0

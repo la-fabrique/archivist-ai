@@ -1,3 +1,10 @@
+---
+id: mes_assurances
+module: assurances
+profiles: [sasu-solo, sasu-solo-employe, indep-creatif-tech]
+required: false
+---
+
 # `Mes assurances/`
 
 > [Plan de classement](__index.md) — [Référentiel](../_index.md) — v0

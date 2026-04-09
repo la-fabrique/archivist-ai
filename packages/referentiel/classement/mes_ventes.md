@@ -1,3 +1,10 @@
+---
+id: mes_ventes
+module: core
+profiles: [indep-solo-micro, sasu-solo, sasu-solo-employe, indep-creatif-tech]
+required: true
+---
+
 # `Mes ventes/`
 
 > [Plan de classement](__index.md) — [Référentiel](../_index.md) — v0

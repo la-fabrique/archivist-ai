@@ -1,3 +1,10 @@
+---
+id: mon_social
+module: dirigeant-assimile-salarie
+profiles: [sasu-solo, sasu-solo-employe]
+required: true
+---
+
 # `Mon social/`
 
 > [Plan de classement](__index.md) — [Référentiel](../_index.md) — v0
