@@ -4,13 +4,14 @@ on:
   push:
     tags:
       - 'archivist-cli/v*.*.*'
+  workflow_dispatch:
 
 jobs:
   build:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-14]
     runs-on: ${{ matrix.os }}
     permissions:
       contents: write
@@ -63,6 +64,9 @@ jobs:
         shell: bash
         run: cp packages/archivist-cli/dist/archivist.exe packages/archivist-cli/dist/archivist-windows.exe
 
+      # Note: the three upload steps run in parallel and may race to create the
+      # GitHub Release on first push. softprops/action-gh-release@v2 tolerates
+      # this (upsert on subsequent calls), so it is safe for a 3-job matrix.
       - name: Upload binary (Linux)
         if: runner.os == 'Linux'
         uses: softprops/action-gh-release@v2
