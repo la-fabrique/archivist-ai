@@ -24,7 +24,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: uv sync
+        run: uv sync --frozen
         working-directory: packages/archivist-cli
 
       - name: Run tests
@@ -34,6 +34,21 @@ jobs:
       - name: Build binary
         run: uv run pyinstaller archivist-cli.spec
         working-directory: packages/archivist-cli
+
+      - name: Smoke-test binary (Linux)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: packages/archivist-cli/dist/archivist --help
+
+      - name: Smoke-test binary (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
+        run: packages/archivist-cli/dist/archivist --help
+
+      - name: Smoke-test binary (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: packages/archivist-cli/dist/archivist.exe --help
 
       - name: Rename binary (Linux)
         if: runner.os == 'Linux'
@@ -45,7 +60,8 @@ jobs:
 
       - name: Rename binary (Windows)
         if: runner.os == 'Windows'
-        run: copy packages\archivist-cli\dist\archivist.exe packages\archivist-cli\dist\archivist-windows.exe
+        shell: bash
+        run: cp packages/archivist-cli/dist/archivist.exe packages/archivist-cli/dist/archivist-windows.exe
 
       - name: Upload binary (Linux)
         if: runner.os == 'Linux'
