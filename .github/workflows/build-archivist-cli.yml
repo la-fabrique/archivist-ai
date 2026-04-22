@@ -1,0 +1,43 @@
+name: Build archivist-cli
+
+on:
+  push:
+    tags:
+      - 'archivist-cli/v*.*.*'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Install dependencies
+        run: uv sync
+        working-directory: packages/archivist-cli
+
+      - name: Build binary
+        run: uv run pyinstaller archivist-cli.spec
+        working-directory: packages/archivist-cli
+
+      - name: Upload binary (Linux / macOS)
+        if: runner.os != 'Windows'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: packages/archivist-cli/dist/archivist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload binary (Windows)
+        if: runner.os == 'Windows'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: packages/archivist-cli/dist/archivist.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
