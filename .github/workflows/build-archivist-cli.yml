@@ -1,0 +1,92 @@
+name: Build archivist-cli
+
+on:
+  push:
+    tags:
+      - 'archivist-cli/v*.*.*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-14]
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --frozen
+        working-directory: packages/archivist-cli
+
+      - name: Run tests
+        run: uv run pytest tests/
+        working-directory: packages/archivist-cli
+
+      - name: Build binary
+        run: uv run pyinstaller archivist-cli.spec
+        working-directory: packages/archivist-cli
+
+      - name: Smoke-test binary (Linux)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: packages/archivist-cli/dist/archivist --help
+
+      - name: Smoke-test binary (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
+        run: packages/archivist-cli/dist/archivist --help
+
+      - name: Smoke-test binary (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: packages/archivist-cli/dist/archivist.exe --help
+
+      - name: Rename binary (Linux)
+        if: runner.os == 'Linux'
+        run: cp packages/archivist-cli/dist/archivist packages/archivist-cli/dist/archivist-linux
+
+      - name: Rename binary (macOS)
+        if: runner.os == 'macOS'
+        run: cp packages/archivist-cli/dist/archivist packages/archivist-cli/dist/archivist-macos-arm64
+
+      - name: Rename binary (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: cp packages/archivist-cli/dist/archivist.exe packages/archivist-cli/dist/archivist-windows.exe
+
+      # Note: the three upload steps run in parallel and may race to create the
+      # GitHub Release on first push. softprops/action-gh-release@v2 tolerates
+      # this (upsert on subsequent calls), so it is safe for a 3-job matrix.
+      - name: Upload binary (Linux)
+        if: runner.os == 'Linux'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: packages/archivist-cli/dist/archivist-linux
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload binary (macOS)
+        if: runner.os == 'macOS'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: packages/archivist-cli/dist/archivist-macos-arm64
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload binary (Windows)
+        if: runner.os == 'Windows'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: packages/archivist-cli/dist/archivist-windows.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

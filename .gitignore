@@ -24,3 +24,8 @@ dist-ssr
 *.sw?
 
 client_secret.json
+
+# Python
+.venv/
+__pycache__/
+*.pyc
