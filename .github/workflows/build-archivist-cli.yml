@@ -8,29 +8,58 @@ on:
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
 
       - name: Install dependencies
         run: uv sync
+        working-directory: packages/archivist-cli
+
+      - name: Run tests
+        run: uv run pytest tests/
         working-directory: packages/archivist-cli
 
       - name: Build binary
         run: uv run pyinstaller archivist-cli.spec
         working-directory: packages/archivist-cli
 
-      - name: Upload binary (Linux / macOS)
-        if: runner.os != 'Windows'
+      - name: Rename binary (Linux)
+        if: runner.os == 'Linux'
+        run: cp packages/archivist-cli/dist/archivist packages/archivist-cli/dist/archivist-linux
+
+      - name: Rename binary (macOS)
+        if: runner.os == 'macOS'
+        run: cp packages/archivist-cli/dist/archivist packages/archivist-cli/dist/archivist-macos
+
+      - name: Rename binary (Windows)
+        if: runner.os == 'Windows'
+        run: copy packages\archivist-cli\dist\archivist.exe packages\archivist-cli\dist\archivist-windows.exe
+
+      - name: Upload binary (Linux)
+        if: runner.os == 'Linux'
         uses: softprops/action-gh-release@v2
         with:
-          files: packages/archivist-cli/dist/archivist
+          files: packages/archivist-cli/dist/archivist-linux
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload binary (macOS)
+        if: runner.os == 'macOS'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: packages/archivist-cli/dist/archivist-macos
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -38,6 +67,6 @@ jobs:
         if: runner.os == 'Windows'
         uses: softprops/action-gh-release@v2
         with:
-          files: packages/archivist-cli/dist/archivist.exe
+          files: packages/archivist-cli/dist/archivist-windows.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
