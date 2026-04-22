@@ -1,4 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
+# Built with PyInstaller >=6.0.0 (see pyproject.toml [dependency-groups].dev)
 
 a = Analysis(
     ['src/archivist_cli/__main__.py'],
