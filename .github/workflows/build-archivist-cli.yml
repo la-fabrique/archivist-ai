@@ -56,7 +56,7 @@ jobs:
 
       - name: Rename binary (macOS)
         if: runner.os == 'macOS'
-        run: cp packages/archivist-cli/dist/archivist packages/archivist-cli/dist/archivist-macos
+        run: cp packages/archivist-cli/dist/archivist packages/archivist-cli/dist/archivist-macos-arm64
 
       - name: Rename binary (Windows)
         if: runner.os == 'Windows'
@@ -75,7 +75,7 @@ jobs:
         if: runner.os == 'macOS'
         uses: softprops/action-gh-release@v2
         with:
-          files: packages/archivist-cli/dist/archivist-macos
+          files: packages/archivist-cli/dist/archivist-macos-arm64
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
