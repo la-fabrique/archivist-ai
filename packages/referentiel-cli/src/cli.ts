@@ -38,4 +38,14 @@ program
     await runExportFrontmatters(opts);
   });
 
+program
+  .command("generate-pdf")
+  .description("Générer le PDF du référentiel (guide non-technique)")
+  .option("--output <path>", "Chemin du PDF de sortie (défaut: ./referentiel.pdf)")
+  .option("--referentiel-root <path>", "Racine locale (défaut: ./packages/referentiel)")
+  .action(async (opts: { output?: string; referentielRoot?: string }) => {
+    const { runGeneratePdf } = await import("./commands/generate-pdf.js");
+    await runGeneratePdf(opts);
+  });
+
 program.parse();
