@@ -35,6 +35,8 @@ async function readMd(root: string, ...segments: string[]): Promise<string> {
   }
 }
 
+// plan-classement.md is intentionally excluded: it contains a single-line redirect to
+// classement/__index.md which is already read as classementIndex.
 export async function readReferentielContent(root: string): Promise<ReferentielContent> {
   const [index, demarrageRapide, classementIndex, reglesNommage, reglesArchivage, yamlRaw] =
     await Promise.all([

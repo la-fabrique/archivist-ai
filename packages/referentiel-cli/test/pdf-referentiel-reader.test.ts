@@ -51,6 +51,6 @@ describe("readReferentielContent", () => {
   it("throws a descriptive error when a required file is missing", async () => {
     const root = mkdtempSync(join(tmpdir(), "ref-pdf-missing-"));
     // No files created
-    await expect(readReferentielContent(root)).rejects.toThrow("_index.md");
+    await expect(readReferentielContent(root)).rejects.toThrow("Fichier requis introuvable");
   });
 });
