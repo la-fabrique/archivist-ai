@@ -7,7 +7,6 @@ function makeContent(overrides: Partial<ReferentielContent> = {}): ReferentielCo
   return {
     index: "# Référentiel\n\nDescription du référentiel.",
     demarrageRapide: "# Démarrage rapide\n\nContenu démarrage.",
-    planClassement: "# Plan de classement\n\nContenu plan.",
     classementIndex: "# Plan de classement (index)\n\nIndex classement.",
     reglesNommage: "# Règles de nommage\n\nNommage règles.",
     reglesArchivage: "# Règles d'archivage\n\nArchivage règles.",
@@ -45,7 +44,7 @@ describe("buildHtml", () => {
   it("includes a cover page with the referentiel title", () => {
     const html = buildHtml(makeContent());
     expect(html).toContain("Référentiel de gestion documentaire");
-    expect(html).toContain("Guide d");
+    expect(html).toContain("Guide d'application");
   });
 
   it("renders markdown sections as HTML", () => {
@@ -69,5 +68,19 @@ describe("buildHtml", () => {
     const html = buildHtml(makeContent());
     expect(html).toContain("<style>");
     expect(html).toContain("font-family");
+  });
+
+  it("excludes dynamic and child folders from the summary table", () => {
+    const content = makeContent({
+      folders: [
+        { id: "root", folder_name: "Root folder", path: "Root", dynamic: false, option: "core", required: true, description: "Shown" },
+        { id: "dyn", folder_name: "Dynamic folder", path: "Dyn", dynamic: true, option: "core", required: false, description: "Hidden dynamic" },
+        { id: "child", folder_name: "Child folder", path: "Root/Child", dynamic: false, option: "core", required: false, description: "Hidden child", parent: "root" },
+      ],
+    });
+    const html = buildHtml(content);
+    expect(html).toContain("Root folder");
+    expect(html).not.toContain("Hidden dynamic");
+    expect(html).not.toContain("Hidden child");
   });
 });

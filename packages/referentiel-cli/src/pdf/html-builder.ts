@@ -112,15 +112,19 @@ function renderMd(markdown: string): string {
   return marked.parse(markdown) as string;
 }
 
+function escapeHtml(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
 function folderSummaryTable(folders: FolderEntry[]): string {
   const roots = folders.filter((f) => !f.parent && !f.dynamic);
   const rows = roots
     .map(
       (f) => `
       <tr>
-        <td><strong>${f.folder_name}</strong></td>
-        <td>${f.description}</td>
-        <td>${f.option === "core" ? "Tous" : f.option.replace(/-/g, " ")}</td>
+        <td><strong>${escapeHtml(f.folder_name)}</strong></td>
+        <td>${escapeHtml(f.description)}</td>
+        <td>${f.option === "core" ? "Tous" : escapeHtml(f.option.replace(/-/g, " "))}</td>
       </tr>`
     )
     .join("");
@@ -138,7 +142,10 @@ function folderSummaryTable(folders: FolderEntry[]): string {
     </table>`;
 }
 
-export function buildHtml(content: ReferentielContent): string {
+export function buildHtml(
+  content: ReferentielContent,
+  exportedAt: string = new Date().toLocaleDateString("fr-FR", { year: "numeric", month: "long", day: "numeric" })
+): string {
   const cover = `
     <div class="cover">
       <div class="cover-title">Référentiel de gestion documentaire</div>
@@ -148,7 +155,7 @@ export function buildHtml(content: ReferentielContent): string {
         Il est conçu pour être applicable sans formation ni outil spécial —
         un explorateur de fichiers suffit.
       </div>
-      <div class="cover-version">Exporté le ${new Date().toLocaleDateString("fr-FR", { year: "numeric", month: "long", day: "numeric" })}</div>
+      <div class="cover-version">Exporté le ${exportedAt}</div>
     </div>`;
 
   const intro = `<div class="section">${renderMd(content.index)}</div>`;

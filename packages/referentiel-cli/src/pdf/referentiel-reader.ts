@@ -20,7 +20,6 @@ export interface FolderEntry {
 export interface ReferentielContent {
   index: string;
   demarrageRapide: string;
-  planClassement: string;
   classementIndex: string;
   reglesNommage: string;
   reglesArchivage: string;
@@ -37,11 +36,10 @@ async function readMd(root: string, ...segments: string[]): Promise<string> {
 }
 
 export async function readReferentielContent(root: string): Promise<ReferentielContent> {
-  const [index, demarrageRapide, planClassement, classementIndex, reglesNommage, reglesArchivage, yamlRaw] =
+  const [index, demarrageRapide, classementIndex, reglesNommage, reglesArchivage, yamlRaw] =
     await Promise.all([
       readMd(root, "_index.md"),
       readMd(root, "demarrage-rapide.md"),
-      readMd(root, "plan-classement.md"),
       readMd(root, "classement", "__index.md"),
       readMd(root, "regles-nommage.md"),
       readMd(root, "regles-archivage.md"),
@@ -54,5 +52,5 @@ export async function readReferentielContent(root: string): Promise<ReferentielC
   }
   const folders = parsed as FolderEntry[];
 
-  return { index, demarrageRapide, planClassement, classementIndex, reglesNommage, reglesArchivage, folders };
+  return { index, demarrageRapide, classementIndex, reglesNommage, reglesArchivage, folders };
 }

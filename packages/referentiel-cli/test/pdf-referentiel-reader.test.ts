@@ -11,7 +11,6 @@ function makeFixture(): string {
   mkdirSync(classement);
   writeFileSync(join(root, "_index.md"), "# Index\n\nIntro text.");
   writeFileSync(join(root, "demarrage-rapide.md"), "# Démarrage\n\nQuick start.");
-  writeFileSync(join(root, "plan-classement.md"), "# Plan\n\nPlan text.");
   writeFileSync(join(root, "regles-nommage.md"), "# Nommage\n\nNaming rules.");
   writeFileSync(join(root, "regles-archivage.md"), "# Archivage\n\nArchiving rules.");
   writeFileSync(join(classement, "__index.md"), "# Classement\n\nFolder index.");
@@ -28,13 +27,12 @@ function makeFixture(): string {
 }
 
 describe("readReferentielContent", () => {
-  it("reads all six source files", async () => {
+  it("reads all source files", async () => {
     const root = makeFixture();
     const content = await readReferentielContent(root);
 
     expect(content.index).toContain("Intro text.");
     expect(content.demarrageRapide).toContain("Quick start.");
-    expect(content.planClassement).toContain("Plan text.");
     expect(content.classementIndex).toContain("Folder index.");
     expect(content.reglesNommage).toContain("Naming rules.");
     expect(content.reglesArchivage).toContain("Archiving rules.");
