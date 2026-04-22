@@ -60,17 +60,6 @@ Ce guide présente le cas le plus courant : **SASU solo sans salarié**. Options
 
 ---
 
-## Initialiser l'arborescence (CLI)
-
-```bash
-# Depuis la racine du projet
-npx referentiel-cli init --options dirigeant-assimile-salarie,assurances --target /chemin/vers/mon/drive
-```
-
-Le CLI crée tous les dossiers correspondant aux options sélectionnées dans le dossier cible.
-
----
-
 ## En savoir plus
 
 - [Plan de classement complet](classement/__index.md)
