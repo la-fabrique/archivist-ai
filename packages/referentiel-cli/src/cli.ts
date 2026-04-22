@@ -28,4 +28,14 @@ program
     await runPush(opts);
   });
 
+program
+  .command("export-frontmatters")
+  .description("Exporter tous les front matters vers referentiel.yaml")
+  .option("--output <path>", "Chemin du fichier de sortie YAML")
+  .option("--referentiel-root <path>", "Racine locale (défaut: ./packages/referentiel)")
+  .action(async (opts: { output?: string; referentielRoot?: string }) => {
+    const { runExportFrontmatters } = await import("./commands/export-frontmatters.js");
+    await runExportFrontmatters(opts);
+  });
+
 program.parse();

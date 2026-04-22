@@ -1,0 +1,838 @@
+- id: archives
+  folder_name: Archives
+  path: Archives
+  dynamic: false
+  option: core
+  required: true
+  description: "Années closes : archives annuelles compressées avec manifest"
+  organization:
+    type: per_entity
+    entity_subfolder: archives.annee
+- id: archives.annee
+  folder_name: "[AAAA]"
+  path: Archives/[AAAA]
+  parent: archives
+  dynamic: true
+  option: core
+  required: true
+  description: "Dossier d'archive pour une année close : fichiers compressés + manifest"
+  organization:
+    type: flat
+  file_naming:
+    pattern: "[dossier-racine]_[AAAA].[ext]"
+    fields:
+      - name: dossier-racine
+        description: nom du dossier racine archivé, en minuscules avec tirets (mes_ventes, ma_banque…)
+      - name: AAAA
+        description: année archivée
+      - name: ext
+        description: format de compression (zip, tar.gz…)
+    example: mes_ventes_2024.zip
+  special_files:
+    - name: manifest.md
+      description: liste des fichiers archivés et leur état (voir regles-archivage.md)
+- id: ma_banque
+  folder_name: Ma banque
+  path: Ma banque
+  dynamic: false
+  option: core
+  required: true
+  description: "Trésorerie : relevés bancaires et RIB"
+  organization:
+    type: subdirs
+    fixed_subdirs:
+      - ma_banque.releves_bancaires
+      - ma_banque.rib
+- id: ma_banque.releves_bancaires
+  folder_name: Mes relevés bancaires
+  path: Ma banque/Mes relevés bancaires
+  parent: ma_banque
+  dynamic: false
+  option: core
+  required: true
+  description: Relevés de compte bancaire, organisés par établissement puis par mois
+  organization:
+    type: per_entity
+    entity_subfolder: ma_banque.releves_bancaires.nom_banque
+- id: ma_banque.releves_bancaires.nom_banque
+  folder_name: "[Nom banque]"
+  path: Ma banque/Mes relevés bancaires/[Nom banque]
+  parent: ma_banque.releves_bancaires
+  dynamic: true
+  option: core
+  required: true
+  description: Dossier par établissement bancaire, contenant les relevés mensuels
+  organization:
+    type: chronological
+    subfolder_pattern: AAAA-MM
+  file_naming:
+    pattern: "[AAAA-MM]_Releve_[Nom-banque]_[Numero].[ext]"
+    fields:
+      - name: AAAA-MM
+        description: mois couvert par le relevé
+      - name: Nom-banque
+        description: nom de la banque, forme lisible (Credit-Mutuel, BNP, Qonto…)
+      - name: Numero
+        description: numéro du relevé tel qu'il apparaît sur le document
+      - name: ext
+        description: extension du fichier (pdf, csv…)
+    example: 2026-03_Releve_Credit-Mutuel_003.pdf
+- id: ma_banque.rib
+  folder_name: Mes RIB
+  path: Ma banque/Mes RIB
+  parent: ma_banque
+  dynamic: false
+  option: core
+  required: true
+  description: RIB des comptes bancaires professionnels actifs, structure plate
+  organization:
+    type: flat
+  file_naming:
+    pattern: RIB_[Nom-banque]_[Compte].[ext]
+    fields:
+      - name: Nom-banque
+        description: nom de la banque, forme lisible
+      - name: Compte
+        description: type ou libellé du compte si plusieurs chez la même banque — omettre si unique
+      - name: ext
+        description: extension du fichier (pdf…)
+    example: RIB_Credit-Mutuel.pdf
+- id: ma_fiscalite
+  folder_name: Ma fiscalité
+  path: Ma fiscalité
+  dynamic: false
+  option: core
+  required: true
+  description: "Obligations fiscales : TVA, liasses fiscales, avis d'imposition, CFE"
+  organization:
+    type: subdirs
+    fixed_subdirs:
+      - ma_fiscalite.declarations_tva
+      - ma_fiscalite.liasses_fiscales
+      - ma_fiscalite.avis_imposition
+      - ma_fiscalite.avis_cfe
+- id: ma_fiscalite.avis_cfe
+  folder_name: Mes avis de CFE
+  path: Ma fiscalité/Mes avis de CFE
+  parent: ma_fiscalite
+  dynamic: false
+  option: core
+  required: true
+  description: Avis de cotisation foncière des entreprises, structure plate
+  organization:
+    type: flat
+  file_naming:
+    pattern: "[AAAA]_Avis-CFE.[ext]"
+    fields:
+      - name: AAAA
+        description: année fiscale concernée
+      - name: ext
+        description: extension du fichier (pdf…)
+    example: 2025_Avis-CFE.pdf
+- id: ma_fiscalite.avis_imposition
+  folder_name: Mes avis d'imposition
+  path: Ma fiscalité/Mes avis d'imposition
+  parent: ma_fiscalite
+  dynamic: false
+  option: core
+  required: true
+  description: Avis d'imposition reçus (IR, IS…), structure plate
+  organization:
+    type: flat
+  file_naming:
+    pattern: "[AAAA]_Avis-imposition_[Type].[ext]"
+    fields:
+      - name: AAAA
+        description: année fiscale concernée
+      - name: Type
+        description: type d'impôt (IR, IS…)
+      - name: ext
+        description: extension du fichier (pdf…)
+    example: 2025_Avis-imposition_IR.pdf
+- id: ma_fiscalite.declarations_tva
+  folder_name: Mes déclarations de TVA
+  path: Ma fiscalité/Mes déclarations de TVA
+  parent: ma_fiscalite
+  dynamic: false
+  option: core
+  required: true
+  description: Déclarations de TVA (CA3, CA12…), classées par mois
+  organization:
+    type: chronological
+    subfolder_pattern: AAAA-MM
+  file_naming:
+    pattern: "[AAAA-MM]_Declaration-TVA.[ext]"
+    fields:
+      - name: AAAA-MM
+        description: période couverte par la déclaration
+      - name: ext
+        description: extension du fichier (pdf…)
+    example: 2026-03_Declaration-TVA.pdf
+- id: ma_fiscalite.liasses_fiscales
+  folder_name: Mes liasses fiscales
+  path: Ma fiscalité/Mes liasses fiscales
+  parent: ma_fiscalite
+  dynamic: false
+  option: core
+  required: true
+  description: Liasses fiscales annuelles, structure plate
+  organization:
+    type: flat
+  file_naming:
+    pattern: "[AAAA]_Liasse-fiscale.[ext]"
+    fields:
+      - name: AAAA
+        description: exercice fiscal concerné
+      - name: ext
+        description: extension du fichier (pdf…)
+    example: 2025_Liasse-fiscale.pdf
+- id: mes_achats
+  folder_name: Mes achats
+  path: Mes achats
+  dynamic: false
+  option: core
+  required: true
+  description: "Relation commerciale entrante : factures fournisseurs, suivi fournisseurs"
+  organization:
+    type: subdirs
+    fixed_subdirs:
+      - mes_achats.factures_fournisseurs
+      - mes_achats.fournisseurs
+- id: mes_achats.factures_fournisseurs
+  folder_name: Mes factures fournisseurs
+  path: Mes achats/Mes factures fournisseurs
+  parent: mes_achats
+  dynamic: false
+  option: core
+  required: true
+  description: Factures reçues, classées par mois de réception
+  organization:
+    type: chronological
+    subfolder_pattern: AAAA-MM
+  file_naming:
+    pattern: "[AAAA-MM]_Facture_[Nom fournisseur]_[Numero].[ext]"
+    fields:
+      - name: AAAA-MM
+        description: date d'émission de la facture
+      - name: Nom fournisseur
+        description: nom du fournisseur, forme lisible
+      - name: Numero
+        description: numéro de la facture tel qu'il apparaît sur le document
+      - name: ext
+        description: extension du fichier (pdf, docx…)
+    example: 2026-03_Facture_OVH_F2600042.pdf
+- id: mes_achats.fournisseurs
+  folder_name: Mes fournisseurs
+  path: Mes achats/Mes fournisseurs
+  parent: mes_achats
+  dynamic: false
+  option: core
+  required: true
+  description: "Vue par fournisseur : contrats, polices, attestations"
+  organization:
+    type: per_entity
+    entity_subfolder: mes_achats.fournisseurs.nom_fournisseur
+- id: mes_achats.fournisseurs.nom_fournisseur
+  folder_name: "[Nom du fournisseur]"
+  path: Mes achats/Mes fournisseurs/[Nom du fournisseur]
+  parent: mes_achats.fournisseurs
+  dynamic: true
+  option: core
+  required: true
+  description: "Dossier par fournisseur : nom lisible en français"
+  organization:
+    type: free
+    free_subdirs: true
+- id: mes_assurances
+  folder_name: Mes assurances
+  path: Mes assurances
+  dynamic: false
+  option: assurances
+  required: false
+  description: "Couvertures assurantielles : RC Pro, mutuelle/prévoyance, locaux et matériel"
+  organization:
+    type: subdirs
+    fixed_subdirs:
+      - mes_assurances.rc_pro
+      - mes_assurances.mutuelle_prevoyance
+      - mes_assurances.assurance_locaux
+- id: mes_assurances.assurance_locaux
+  folder_name: Assurance locaux et matériel
+  path: Mes assurances/Assurance locaux et matériel
+  parent: mes_assurances
+  dynamic: false
+  option: assurances
+  required: false
+  description: Polices et attestations assurance locaux professionnels et matériel
+  organization:
+    type: flat
+  file_naming:
+    pattern: "[AAAA]_[Type]_[Assureur].[ext]"
+    fields:
+      - name: AAAA
+        description: année de validité du document
+      - name: Type
+        description: "nature du document : Police, Attestation, Echeance"
+      - name: Assureur
+        description: nom de la compagnie, forme lisible
+      - name: ext
+        description: extension du fichier (pdf…)
+    example: 2026_Police_MMA.pdf
+- id: mes_assurances.mutuelle_prevoyance
+  folder_name: Mutuelle et prévoyance
+  path: Mes assurances/Mutuelle et prévoyance
+  parent: mes_assurances
+  dynamic: false
+  option: assurances
+  required: false
+  description: Polices et attestations mutuelle santé et prévoyance
+  organization:
+    type: flat
+  file_naming:
+    pattern: "[AAAA]_[Type]_[Assureur].[ext]"
+    fields:
+      - name: AAAA
+        description: année de validité du document
+      - name: Type
+        description: "nature du document : Police, Attestation, Remboursement"
+      - name: Assureur
+        description: nom de la compagnie, forme lisible
+      - name: ext
+        description: extension du fichier (pdf…)
+    example: 2026_Attestation_AlanSante.pdf
+- id: mes_assurances.rc_pro
+  folder_name: RC Pro
+  path: Mes assurances/RC Pro
+  parent: mes_assurances
+  dynamic: false
+  option: assurances
+  required: false
+  description: Polices, attestations et avis d'échéance RC professionnelle
+  organization:
+    type: flat
+  file_naming:
+    pattern: "[AAAA]_[Type]_[Assureur].[ext]"
+    fields:
+      - name: AAAA
+        description: année de validité du document
+      - name: Type
+        description: "nature du document : Police, Attestation, Echeance, Resiliation"
+      - name: Assureur
+        description: nom de la compagnie, forme lisible
+      - name: ext
+        description: extension du fichier (pdf…)
+    example: 2026_Attestation_Hiscox.pdf
+- id: mes_ventes
+  folder_name: Mes ventes
+  path: Mes ventes
+  dynamic: false
+  option: core
+  required: true
+  description: "Relation commerciale sortante : factures clients, modèles, suivi client"
+  organization:
+    type: subdirs
+    fixed_subdirs:
+      - mes_ventes.factures_clients
+      - mes_ventes.modeles
+      - mes_ventes.clients
+- id: mes_ventes.clients
+  folder_name: Mes clients
+  path: Mes ventes/Mes clients
+  parent: mes_ventes
+  dynamic: false
+  option: core
+  required: true
+  description: "Vue par client : contrats, devis et suivi libre"
+  organization:
+    type: per_entity
+    entity_subfolder: mes_ventes.clients.nom_client
+- id: mes_ventes.clients.nom_client
+  folder_name: "[Nom du client]"
+  path: Mes ventes/Mes clients/[Nom du client]
+  parent: mes_ventes.clients
+  dynamic: true
+  option: core
+  required: true
+  description: "Dossier par client : nom lisible en français"
+  organization:
+    type: mixed
+    fixed_subdirs:
+      - mes_ventes.clients.nom_client.contrats
+      - mes_ventes.clients.nom_client.devis
+    free_subdirs: true
+- id: mes_ventes.clients.nom_client.contrats
+  folder_name: Contrats
+  path: Mes ventes/Mes clients/[Nom du client]/Contrats
+  parent: mes_ventes.clients.nom_client
+  dynamic: false
+  option: core
+  required: true
+  description: Contrats et avenants réels signés avec le client
+  organization:
+    type: flat
+  file_naming:
+    pattern: "[AAAA-MM]_Contrat_[Nom client]_[Numero-Revision].[ext]"
+    fields:
+      - name: AAAA-MM
+        description: date d'émission du contrat ou de l'avenant
+      - name: Nom client
+        description: nom du client, forme lisible
+      - name: Numero-Revision
+        description: référence libre (numéro de contrat, objet, version…)
+      - name: ext
+        description: extension du fichier (pdf, docx…)
+    example: 2026-04_Contrat_Acme_C2026-01.pdf
+- id: mes_ventes.clients.nom_client.devis
+  folder_name: Devis
+  path: Mes ventes/Mes clients/[Nom du client]/Devis
+  parent: mes_ventes.clients.nom_client
+  dynamic: false
+  option: core
+  required: true
+  description: Devis et propositions commerciales envoyés au client
+  organization:
+    type: flat
+  file_naming:
+    pattern: "[AAAA-MM]_Devis_[Nom client]_[Numero].[ext]"
+    fields:
+      - name: AAAA-MM
+        description: date d'émission du devis
+      - name: Nom client
+        description: nom du client, forme lisible
+      - name: Numero
+        description: numéro du devis tel qu'il apparaît dans le logiciel
+      - name: ext
+        description: extension du fichier (pdf, docx…)
+    example: 2026-03_Devis_Martin_D2600001.pdf
+- id: mes_ventes.factures_clients
+  folder_name: Mes factures clients
+  path: Mes ventes/Mes factures clients
+  parent: mes_ventes
+  dynamic: false
+  option: core
+  required: true
+  description: Factures émises, classées par mois d'émission
+  organization:
+    type: chronological
+    subfolder_pattern: AAAA-MM
+  file_naming:
+    pattern: "[AAAA-MM]_Facture_[Nom client]_[Numero].[ext]"
+    fields:
+      - name: AAAA-MM
+        description: date d'émission de la facture
+      - name: Nom client
+        description: nom du client, forme lisible
+      - name: Numero
+        description: numéro de la facture tel qu'il apparaît dans le logiciel
+      - name: ext
+        description: extension du fichier (pdf, docx…)
+    example: 2026-03_Facture_Dupont_F2600003.pdf
+- id: mes_ventes.modeles
+  folder_name: Mes modèles
+  path: Mes ventes/Mes modèles
+  parent: mes_ventes
+  dynamic: false
+  option: core
+  required: true
+  description: "Gabarits réutilisables : contrats et devis/offres"
+  organization:
+    type: subdirs
+    fixed_subdirs:
+      - mes_ventes.modeles.contrats
+      - mes_ventes.modeles.devis_offres
+- id: mes_ventes.modeles.contrats
+  folder_name: Contrats
+  path: Mes ventes/Mes modèles/Contrats
+  parent: mes_ventes.modeles
+  dynamic: false
+  option: core
+  required: true
+  description: Modèles de contrat et d'avenant réutilisables
+  organization:
+    type: flat
+  file_naming:
+    pattern: modele-contrat_[objet]_v[N].[ext]
+    fields:
+      - name: objet
+        description: type de contrat en mots séparés par des tirets (ex. maintenance-annuelle)
+      - name: "N"
+        description: version du gabarit (1, 2…)
+      - name: ext
+        description: extension du fichier (docx, odt…)
+    example: modele-contrat_maintenance-annuelle_v2.docx
+- id: mes_ventes.modeles.devis_offres
+  folder_name: Devis et offres
+  path: Mes ventes/Mes modèles/Devis et offres
+  parent: mes_ventes.modeles
+  dynamic: false
+  option: core
+  required: true
+  description: Modèles de devis et de propositions commerciales réutilisables
+  organization:
+    type: flat
+  file_naming:
+    pattern: modele-devis_[objet]_v[N].[ext]
+    fields:
+      - name: objet
+        description: type de prestation ou de format (ex. prestation-conseil)
+      - name: "N"
+        description: version du gabarit (1, 2…)
+      - name: ext
+        description: extension du fichier (docx, odt…)
+    example: modele-devis_prestation-conseil_v1.docx
+- id: mon_juridique
+  folder_name: Mon juridique
+  path: Mon juridique
+  dynamic: false
+  option: core
+  required: true
+  description: "Entité juridique : statuts, K-bis, PV, registres, baux, CGV"
+  organization:
+    type: subdirs
+    fixed_subdirs:
+      - mon_juridique.statuts
+      - mon_juridique.kbis
+      - mon_juridique.pv_decisions
+      - mon_juridique.registres
+      - mon_juridique.baux_domiciliation
+      - mon_juridique.cgv_mentions_legales
+      - mon_juridique.marques_licences
+- id: mon_juridique.baux_domiciliation
+  folder_name: Mes baux et domiciliation
+  path: Mon juridique/Mes baux et domiciliation
+  parent: mon_juridique
+  dynamic: false
+  option: core
+  required: true
+  description: Baux commerciaux, sous-location, contrats de domiciliation
+  organization:
+    type: flat
+  file_naming:
+    pattern: "[AAAA]_[Type]_[Bailleur].[ext]"
+    fields:
+      - name: AAAA
+        description: année de signature du contrat
+      - name: Type
+        description: "type de document : Bail-commercial, Domiciliation, Avenant, Quittance"
+      - name: Bailleur
+        description: nom du bailleur ou de la société de domiciliation, forme lisible
+      - name: ext
+        description: extension du fichier (pdf…)
+    example: 2026_Domiciliation_Regus.pdf
+- id: mon_juridique.cgv_mentions_legales
+  folder_name: Mes CGV et mentions légales
+  path: Mon juridique/Mes CGV et mentions légales
+  parent: mon_juridique
+  dynamic: false
+  option: core
+  required: true
+  description: CGV, CGU, mentions légales, politique de confidentialité
+  organization:
+    type: flat
+  file_naming:
+    pattern: "[AAAA]_[Type]_v[N].[ext]"
+    fields:
+      - name: AAAA
+        description: année de la version
+      - name: Type
+        description: "type de document : CGV, CGU, Mentions-legales, Politique-confidentialite"
+      - name: "N"
+        description: numéro de version (1, 2…)
+      - name: ext
+        description: extension du fichier (pdf…)
+    example: 2026_CGV_v2.pdf
+- id: mon_juridique.kbis
+  folder_name: Mes K-bis
+  path: Mon juridique/Mes K-bis
+  parent: mon_juridique
+  dynamic: false
+  option: core
+  required: true
+  description: Extraits K-bis, justificatifs d'immatriculation
+  organization:
+    type: flat
+  file_naming:
+    pattern: "[AAAA]_Kbis.[ext]"
+    fields:
+      - name: AAAA
+        description: année d'émission
+      - name: ext
+        description: extension du fichier (pdf…)
+    example: 2026_Kbis.pdf
+- id: mon_juridique.marques_licences
+  folder_name: Mes marques et licences
+  path: Mon juridique/Mes marques et licences
+  parent: mon_juridique
+  dynamic: false
+  option: core
+  required: false
+  description: Dépôts de marque INPI, licences logicielles, cessions de droits d'auteur (optionnel)
+  organization:
+    type: flat
+  file_naming:
+    pattern: "[AAAA]_[Type]_[Objet].[ext]"
+    fields:
+      - name: AAAA
+        description: année du dépôt ou de la signature
+      - name: Type
+        description: "type de document : Depot-marque, Licence, Cession-droits, Certificat"
+      - name: Objet
+        description: nom de la marque, du logiciel ou de l'œuvre, forme lisible
+      - name: ext
+        description: extension du fichier (pdf…)
+    example: 2026_Depot-marque_NomDeMarque.pdf
+- id: mon_juridique.pv_decisions
+  folder_name: Mes PV et décisions
+  path: Mon juridique/Mes PV et décisions
+  parent: mon_juridique
+  dynamic: false
+  option: core
+  required: true
+  description: PV d'AG et décisions de l'associé unique (SASU)
+  organization:
+    type: flat
+  file_naming:
+    pattern: "[AAAA]_[Type]_[Objet].[ext]"
+    fields:
+      - name: AAAA
+        description: année de la décision ou de l'assemblée
+      - name: Type
+        description: PV-AG ou Decision-AU
+      - name: Objet
+        description: objet principal (approbation-comptes, dividendes, nomination-gerant…)
+      - name: ext
+        description: extension du fichier (pdf, docx…)
+    example: 2026_PV-AG_approbation-comptes.pdf
+- id: mon_juridique.registres
+  folder_name: Mes registres
+  path: Mon juridique/Mes registres
+  parent: mon_juridique
+  dynamic: false
+  option: core
+  required: true
+  description: "Registres obligatoires SASU : mouvements de titres et décisions"
+  organization:
+    type: subdirs
+    fixed_subdirs:
+      - mon_juridique.registres.mouvements_titres
+      - mon_juridique.registres.decisions
+- id: mon_juridique.registres.decisions
+  folder_name: Registre des décisions
+  path: Mon juridique/Mes registres/Registre des décisions
+  parent: mon_juridique.registres
+  dynamic: false
+  option: core
+  required: true
+  description: Versions successives du registre légal des décisions
+  organization:
+    type: flat
+  file_naming:
+    pattern: "[AAAA]_Registre_Decisions.[ext]"
+    fields:
+      - name: AAAA
+        description: année de l'export ou du scan
+      - name: ext
+        description: extension du fichier (pdf…)
+    example: 2026_Registre_Decisions.pdf
+- id: mon_juridique.registres.mouvements_titres
+  folder_name: Registre des mouvements de titres
+  path: Mon juridique/Mes registres/Registre des mouvements de titres
+  parent: mon_juridique.registres
+  dynamic: false
+  option: core
+  required: true
+  description: Versions successives du registre légal des mouvements de titres
+  organization:
+    type: flat
+  file_naming:
+    pattern: "[AAAA]_Registre_Mouvements-titres.[ext]"
+    fields:
+      - name: AAAA
+        description: année de l'export ou du scan
+      - name: ext
+        description: extension du fichier (pdf…)
+    example: 2026_Registre_Mouvements-titres.pdf
+- id: mon_juridique.statuts
+  folder_name: Mes statuts
+  path: Mon juridique/Mes statuts
+  parent: mon_juridique
+  dynamic: false
+  option: core
+  required: true
+  description: Statuts constitutifs et mises à jour successives
+  organization:
+    type: flat
+  file_naming:
+    pattern: "[AAAA]_Statuts_[Objet].[ext]"
+    fields:
+      - name: AAAA
+        description: année de signature ou d'enregistrement
+      - name: Objet
+        description: nature du document (constitution, modification-objet-social…)
+      - name: ext
+        description: extension du fichier (pdf, docx…)
+    example: 2026_Statuts_constitution.pdf
+- id: mon_social
+  folder_name: Mon social
+  path: Mon social
+  dynamic: false
+  option: dirigeant-assimile-salarie
+  required: true
+  description: "Gestion du personnel : fiches de paie, DPAE, modèles contrat travail, suivi salarié"
+  organization:
+    type: subdirs
+    fixed_subdirs:
+      - mon_social.fiches_de_paie
+      - mon_social.dpae
+      - mon_social.modeles_contrat_travail
+      - mon_social.salaries
+      - mon_social.declarations_sociales
+      - mon_social.attestations_urssaf
+- id: mon_social.attestations_urssaf
+  folder_name: Mes attestations URSSAF
+  path: Mon social/Mes attestations URSSAF
+  parent: mon_social
+  dynamic: false
+  option: dirigeant-assimile-salarie
+  required: true
+  description: Attestations de vigilance et relevés de situation URSSAF
+  organization:
+    type: flat
+  file_naming:
+    pattern: "[AAAA-MM]_[Type].[ext]"
+    fields:
+      - name: AAAA-MM
+        description: date de délivrance du document
+      - name: Type
+        description: "type de document : Attestation-vigilance, Releve-situation"
+      - name: ext
+        description: extension du fichier (pdf…)
+    example: 2026-03_Attestation-vigilance.pdf
+- id: mon_social.declarations_sociales
+  folder_name: Mes déclarations sociales
+  path: Mon social/Mes déclarations sociales
+  parent: mon_social
+  dynamic: false
+  option: dirigeant-assimile-salarie
+  required: true
+  description: DSN mensuelles et bordereaux URSSAF, classés par année puis mois
+  organization:
+    type: chronological
+    subfolder_pattern: AAAA/AAAA-MM
+  file_naming:
+    pattern: "[AAAA-MM]_[Type].[ext]"
+    fields:
+      - name: AAAA-MM
+        description: mois de la déclaration
+      - name: Type
+        description: "type de document : DSN, Bordereau-cotisations"
+      - name: ext
+        description: extension du fichier (pdf…)
+    example: 2026-03_DSN.pdf
+- id: mon_social.dpae
+  folder_name: Mes DPAE
+  path: Mon social/Mes DPAE
+  parent: mon_social
+  dynamic: false
+  option: dirigeant-assimile-salarie
+  required: true
+  description: Déclarations préalables à l'embauche, structure plate
+  organization:
+    type: flat
+  file_naming:
+    pattern: "[AAAA-MM]_DPAE_[Nom salarié].[ext]"
+    fields:
+      - name: AAAA-MM
+        description: date de la déclaration
+      - name: Nom salarié
+        description: nom du salarié concerné, forme lisible
+      - name: ext
+        description: extension du fichier (pdf…)
+    example: 2026-04_DPAE_Martin.pdf
+- id: mon_social.fiches_de_paie
+  folder_name: Mes fiches de paie
+  path: Mon social/Mes fiches de paie
+  parent: mon_social
+  dynamic: false
+  option: dirigeant-assimile-salarie
+  required: true
+  description: Bulletins de paie de tous les salariés, classés par mois
+  organization:
+    type: chronological
+    subfolder_pattern: AAAA-MM
+  file_naming:
+    pattern: "[AAAA-MM]_Fiche-de-paie_[Nom salarié].[ext]"
+    fields:
+      - name: AAAA-MM
+        description: mois de la paie
+      - name: Nom salarié
+        description: nom du salarié, forme lisible
+      - name: ext
+        description: extension du fichier (pdf…)
+    example: 2026-03_Fiche-de-paie_Dupont.pdf
+- id: mon_social.modeles_contrat_travail
+  folder_name: Mes modèles de contrat de travail
+  path: Mon social/Mes modèles de contrat de travail
+  parent: mon_social
+  dynamic: false
+  option: dirigeant-assimile-salarie
+  required: true
+  description: Gabarits de contrat de travail réutilisables (pas de documents signés)
+  organization:
+    type: flat
+  file_naming:
+    pattern: modele-contrat-travail_[objet]_v[N].[ext]
+    fields:
+      - name: objet
+        description: type de contrat (cdi, cdd, alternance…)
+      - name: "N"
+        description: version du gabarit (1, 2…)
+      - name: ext
+        description: extension du fichier (docx, odt…)
+    example: modele-contrat-travail_cdi_v1.docx
+- id: mon_social.salaries
+  folder_name: Mes salariés
+  path: Mon social/Mes salariés
+  parent: mon_social
+  dynamic: false
+  option: dirigeant-assimile-salarie
+  required: true
+  description: "Vue par salarié : contrats signés et suivi individuel"
+  organization:
+    type: per_entity
+    entity_subfolder: mon_social.salaries.nom_salarie
+- id: mon_social.salaries.nom_salarie
+  folder_name: "[Nom du salarié]"
+  path: Mon social/Mes salariés/[Nom du salarié]
+  parent: mon_social.salaries
+  dynamic: true
+  option: dirigeant-assimile-salarie
+  required: true
+  description: "Dossier par salarié : nom lisible en français"
+  organization:
+    type: mixed
+    fixed_subdirs:
+      - mon_social.salaries.nom_salarie.contrats
+    free_subdirs: true
+- id: mon_social.salaries.nom_salarie.contrats
+  folder_name: Contrats
+  path: Mon social/Mes salariés/[Nom du salarié]/Contrats
+  parent: mon_social.salaries.nom_salarie
+  dynamic: false
+  option: dirigeant-assimile-salarie
+  required: true
+  description: Contrats de travail et avenants signés du salarié
+  organization:
+    type: flat
+  file_naming:
+    pattern: "[AAAA-MM]_Contrat_[Nom salarié]_[Référence].[ext]"
+    fields:
+      - name: AAAA-MM
+        description: date de signature
+      - name: Nom salarié
+        description: nom du salarié, forme lisible
+      - name: Référence
+        description: type de contrat ou référence libre (CDI, CDD…)
+      - name: ext
+        description: extension du fichier (pdf, docx…)
+    example: 2026-01_Contrat_Dupont_CDI.pdf
