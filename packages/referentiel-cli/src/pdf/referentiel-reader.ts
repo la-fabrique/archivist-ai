@@ -31,8 +31,8 @@ async function readMd(root: string, ...segments: string[]): Promise<string> {
   const fullPath = join(root, ...segments);
   try {
     return await readFile(fullPath, "utf-8");
-  } catch {
-    throw new Error(`Fichier requis introuvable : ${segments.join("/")}`);
+  } catch (err) {
+    throw new Error(`Fichier requis introuvable : ${segments.join("/")}`, { cause: err });
   }
 }
 
@@ -48,7 +48,11 @@ export async function readReferentielContent(root: string): Promise<ReferentielC
       readMd(root, "referentiel.yaml"),
     ]);
 
-  const folders = yaml.load(yamlRaw) as FolderEntry[];
+  const parsed = yaml.load(yamlRaw);
+  if (!Array.isArray(parsed)) {
+    throw new Error("referentiel.yaml doit contenir une liste de dossiers");
+  }
+  const folders = parsed as FolderEntry[];
 
   return { index, demarrageRapide, planClassement, classementIndex, reglesNommage, reglesArchivage, folders };
 }
