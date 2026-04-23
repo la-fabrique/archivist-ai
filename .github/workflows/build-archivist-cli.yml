@@ -3,11 +3,49 @@ name: Build archivist-cli
 on:
   push:
     tags:
-      - 'archivist-cli/v*.*.*'
+      - '[0-9]+.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9].[0-9]+'
   workflow_dispatch:
+    inputs:
+      major:
+        description: 'Version majeure (défaut : 0)'
+        required: false
+        default: '0'
 
 jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      tag: ${{ steps.compute-tag.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+          fetch-depth: 0
+
+      - name: Compute tag
+        id: compute-tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            MAJOR="${{ inputs.major }}"
+            DATE=$(date -u +%Y%m%d)
+            EXISTING=$(git tag --list "${MAJOR}.${DATE}.*" | sort -V | tail -1)
+            if [ -z "$EXISTING" ]; then
+              INCREMENT=1
+            else
+              INCREMENT=$(echo "$EXISTING" | awk -F. '{print $NF+1}')
+            fi
+            TAG="${MAJOR}.${DATE}.${INCREMENT}"
+            git tag "$TAG"
+            git push origin "$TAG"
+          else
+            TAG="${{ github.ref_name }}"
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
   build:
+    needs: prepare
     strategy:
       fail-fast: false
       matrix:
@@ -64,13 +102,13 @@ jobs:
         shell: bash
         run: cp packages/archivist-cli/dist/archivist.exe packages/archivist-cli/dist/archivist-windows.exe
 
-      # Note: the three upload steps run in parallel and may race to create the
-      # GitHub Release on first push. softprops/action-gh-release@v2 tolerates
-      # this (upsert on subsequent calls), so it is safe for a 3-job matrix.
+      # The three upload steps run in parallel and may race to create the
+      # GitHub Release. softprops/action-gh-release@v2 tolerates this (upsert).
       - name: Upload binary (Linux)
         if: runner.os == 'Linux'
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ needs.prepare.outputs.tag }}
           files: packages/archivist-cli/dist/archivist-linux
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -79,6 +117,7 @@ jobs:
         if: runner.os == 'macOS'
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ needs.prepare.outputs.tag }}
           files: packages/archivist-cli/dist/archivist-macos-arm64
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -87,6 +126,7 @@ jobs:
         if: runner.os == 'Windows'
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ needs.prepare.outputs.tag }}
           files: packages/archivist-cli/dist/archivist-windows.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
