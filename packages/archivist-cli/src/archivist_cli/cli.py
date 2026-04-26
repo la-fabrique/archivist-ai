@@ -17,7 +17,7 @@ def main(ctx: click.Context) -> None:
         click.echo(ctx.get_help())
 
 
-@main.command()
+@main.command(name="scaffold")
 @click.option(
     "--referentiel",
     required=True,
@@ -64,6 +64,3 @@ def scaffold_cmd(
 
     if result.errors > 0:
         raise SystemExit(1)
-
-
-main.add_command(scaffold_cmd, "scaffold")

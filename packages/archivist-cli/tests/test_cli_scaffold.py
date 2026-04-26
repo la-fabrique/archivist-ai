@@ -59,9 +59,7 @@ def test_scaffold_creates_dirs(tmp_path: Path):
     assert not (target / "Mes assurances").exists()
     assert not (target / "Ma banque" / "[Nom]").exists()
 
-    # Parse only the JSON line (first line)
-    json_line = result.output.split('\n')[0]
-    summary = json.loads(json_line)
+    summary = json.loads(result.stdout.strip())
     assert summary["created"] == 2
 
 
@@ -77,9 +75,7 @@ def test_scaffold_with_extra_option(tmp_path: Path):
     assert result.exit_code == 0
     assert (target / "Mes assurances").is_dir()
 
-    # Parse only the JSON line (first line)
-    json_line = result.output.split('\n')[0]
-    summary = json.loads(json_line)
+    summary = json.loads(result.stdout.strip())
     assert summary["created"] == 3
 
 
@@ -95,9 +91,7 @@ def test_scaffold_dry_run(tmp_path: Path):
     assert result.exit_code == 0
     assert not (target / "Ma banque").exists()
 
-    # Parse only the JSON line (first line)
-    json_line = result.output.split('\n')[0]
-    summary = json.loads(json_line)
+    summary = json.loads(result.stdout.strip())
     assert summary["created"] == 2
 
 
@@ -115,8 +109,6 @@ def test_scaffold_idempotent(tmp_path: Path):
         "--target", f"file://{target}",
     ])
     assert result.exit_code == 0
-    # Parse only the JSON line (first line)
-    json_line = result.output.split('\n')[0]
-    summary = json.loads(json_line)
+    summary = json.loads(result.stdout.strip())
     assert summary["created"] == 0
     assert summary["skipped"] == 2
