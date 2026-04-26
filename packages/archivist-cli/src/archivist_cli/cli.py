@@ -4,9 +4,8 @@ import json
 
 import click
 
-from archivist_cli.adapters.fs.local import LocalFilesystem
-from archivist_cli.adapters.referentiel.yaml_file import YamlFileReferentiel
 from archivist_cli.application.scaffold import scaffold
+from archivist_cli.registry import default_registry
 
 
 @click.group(invoke_without_command=True)
@@ -48,8 +47,8 @@ def scaffold_cmd(
 ) -> None:
     """Crée l'arborescence de dossiers cible à partir du référentiel."""
     options = {"core"} | set(extra_options)
-    ref = YamlFileReferentiel(uri=referentiel)
-    fs = LocalFilesystem()
+    ref = default_registry.resolve("referentiel", "yaml_file", {"uri": referentiel})
+    fs = default_registry.resolve("fs", "local", {})
 
     result = scaffold(
         referentiel=ref,

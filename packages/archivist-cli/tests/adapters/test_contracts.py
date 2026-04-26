@@ -47,6 +47,12 @@ class FilesystemContractSuite:
         fs.make_dir(uri)
         assert fs.is_dir(uri) is True
 
+    def test_make_dir_creates_parents(self, fs: Filesystem, base_uri: str):
+        uri = f"{base_uri}/parent/child"
+        fs.make_dir(uri)
+        assert fs.exists(f"{base_uri}/parent") is True
+        assert fs.is_dir(f"{base_uri}/parent") is True
+
     def test_exists_false_for_missing(self, fs: Filesystem, base_uri: str):
         assert fs.exists(f"{base_uri}/does_not_exist") is False
 

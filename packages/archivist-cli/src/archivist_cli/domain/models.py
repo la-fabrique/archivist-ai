@@ -28,4 +28,4 @@ class ReferentielEntry:
 
     @property
     def is_scaffoldable(self) -> bool:
-        return "[" not in self.path
+        return not self.dynamic and "[" not in self.path

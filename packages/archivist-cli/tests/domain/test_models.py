@@ -58,6 +58,18 @@ def test_entry_is_not_scaffoldable_when_dynamic():
     assert entry.is_scaffoldable is False
 
 
+def test_entry_is_not_scaffoldable_when_dynamic_without_placeholder():
+    entry = ReferentielEntry(
+        id="custom_dynamic",
+        folder_name="Custom",
+        path="Custom/Folder",
+        dynamic=True,
+        option="core",
+        required=True,
+    )
+    assert entry.is_scaffoldable is False
+
+
 def test_entry_is_not_scaffoldable_when_path_has_placeholder():
     entry = ReferentielEntry(
         id="mes_ventes.clients.nom_client.contrats",

@@ -21,6 +21,11 @@ class FakeFilesystem(Filesystem):
         if uri in self._files:
             raise FilesystemError(f"path exists as file: {uri}")
         self._dirs.add(uri)
+        parts = uri.split("/")
+        for i in range(3, len(parts)):
+            parent = "/".join(parts[:i])
+            if parent not in self._files:
+                self._dirs.add(parent)
 
     def exists(self, uri: str) -> bool:
         return uri in self._dirs or uri in self._files
