@@ -11,7 +11,9 @@ class LocalFilesystem(Filesystem):
     def _to_path(uri: str) -> Path:
         parsed = urlparse(uri)
         if parsed.scheme != "file":
-            raise FilesystemError(f"unsupported scheme: {parsed.scheme}")
+            raise FilesystemError(
+                f"unsupported scheme: {parsed.scheme!r} — expected a file URI, e.g. file:///path/to/dir"
+            )
         return Path(parsed.path)
 
     def make_dir(self, uri: str) -> None:

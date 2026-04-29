@@ -13,7 +13,9 @@ class YamlFileReferentiel(Referentiel):
     def __init__(self, *, uri: str) -> None:
         parsed = urlparse(uri)
         if parsed.scheme != "file":
-            raise ReferentielError(f"unsupported scheme: {parsed.scheme}")
+            raise ReferentielError(
+                f"unsupported scheme: {parsed.scheme!r} — expected a file URI, e.g. file:///path/to/referentiel.yaml"
+            )
         self._path = Path(parsed.path)
 
     def load_entries(self) -> list[ReferentielEntry]:
