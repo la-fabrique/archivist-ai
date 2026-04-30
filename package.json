@@ -13,6 +13,7 @@
     "referentiel-cli:push": "REFERENTIEL_CLI_GOOGLE_CLIENT_SECRET=./client_secret.json REFERENTIEL_CLI_PARENT_FOLDER_ID=1tWrWxfTrn-3pIlaYH1Dbsy6R555eCXdw node packages/referentiel-cli/dist/cli.js push",
     "referentiel-cli:help": "node packages/referentiel-cli/dist/cli.js help",
     "referentiel-cli:export-frontmatters": "node packages/referentiel-cli/dist/cli.js export-frontmatters",
-    "referentiel-cli:generate-pdf": "node packages/referentiel-cli/dist/cli.js generate-pdf --referentiel-root packages/referentiel --output referentiel.pdf"
+    "referentiel-cli:generate-pdf": "node packages/referentiel-cli/dist/cli.js generate-pdf --referentiel-root packages/referentiel --output referentiel.pdf",
+    "archivist-cli:build": "cd packages/archivist-cli && uv run pyinstaller archivist-cli.spec --distpath dist"
   }
 }
