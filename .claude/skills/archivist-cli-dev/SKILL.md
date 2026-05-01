@@ -21,7 +21,7 @@ Identifier les fichiers modifiés et leur couche :
 | **application** | `src/archivist_cli/application/` | Peut importer depuis domain uniquement |
 | **adapters** | `src/archivist_cli/adapters/` | Implémente les ports de domain ; peut importer des libs externes |
 | **cli** | `src/archivist_cli/cli.py`, `registry.py` | Point d'entrée et injection de dépendances uniquement |
-| **tests** | `tests/` | Miroir de la structure src/ ; fakes dans `tests/fakes.py` |
+| **tests** | `tests/` | Miroir partiel de la structure src/ ; tests de haut niveau dans tests/ directement (test_cli.py, test_registry.py) ; fakes dans `tests/fakes.py` |
 
 ### Étape 2 — Lancer les tests
 
@@ -30,6 +30,17 @@ cd packages/archivist-cli && uv run pytest tests/ -v
 ```
 
 Résultat attendu : tous les tests passent. Si des tests échouent, diagnostiquer avant de continuer. Ne jamais commiter avec des tests rouges.
+
+### Étape 2b — Vérifier la contrainte de la couche application (si application/ est touché)
+
+Si des fichiers dans `application/` ont été modifiés, vérifier qu'aucun import depuis `adapters/` n'a été introduit :
+
+```bash
+grep -rn "from archivist_cli\.adapters\|import archivist_cli\.adapters" \
+  packages/archivist-cli/src/archivist_cli/application/
+```
+
+Résultat attendu : **aucune sortie**. La couche application ne doit dépendre que du domaine.
 
 ### Étape 3 — Vérifier la contrainte hexagonale (si domain/ est touché)
 
@@ -45,12 +56,11 @@ Résultat attendu : **aucune sortie**. Toute correspondance est une violation à
 ### Étape 4 — Vérifier que les adapters implémentent les ports (si adapters/ est touché)
 
 ```bash
-grep -n "class.*Referentiel\b\|class.*Filesystem\b" \
-  packages/archivist-cli/src/archivist_cli/adapters/referentiel/yaml_file.py \
-  packages/archivist-cli/src/archivist_cli/adapters/fs/local.py
+grep -rn "class.*Referentiel\b\|class.*Filesystem\b" \
+  packages/archivist-cli/src/archivist_cli/adapters/
 ```
 
-Vérifier que les classes concrètes trouvées héritent bien des ABCs déclarées dans `domain/ports.py` (`Referentiel`, `Filesystem`).
+In the grep output, confirm each class's parenthesised superclass matches an ABC from `domain/ports.py` (`Referentiel` or `Filesystem`). No second command needed.
 
 ## Red Flags — STOP
 
@@ -64,6 +74,7 @@ Vérifier que les classes concrètes trouvées héritent bien des ABCs déclaré
 
 - [ ] Couche identifiée
 - [ ] `uv run pytest tests/ -v` — tous les tests passent
+- [ ] Contrainte application vérifiée (si application/ modifié)
 - [ ] Contrainte hexagonale vérifiée (si domain/ modifié)
 - [ ] Héritage adapters vérifié (si adapters/ modifié)
 - [ ] Commit avec message conventionnel : `feat|fix|refactor|test(archivist-cli): <description>`
