@@ -24,16 +24,19 @@ Résultat attendu : ligne finale de la forme `X passed` sans `failed` ni `error`
 Applicable uniquement si `packages/referentiel/referentiel.yaml` apparaît dans `git diff --cached --name-only`.
 
 ```bash
-git diff --cached --name-only | grep -q "referentiel/referentiel.yaml" && \
-  uv run python -c "
+if git diff --cached --name-only | grep -q "referentiel/referentiel.yaml"; then
+  cd packages/archivist-cli && uv run python -c "
 import yaml, sys
 try:
-    yaml.safe_load(open('packages/referentiel/referentiel.yaml'))
+    yaml.safe_load(open('../referentiel/referentiel.yaml'))
     print('referentiel.yaml : valide')
 except yaml.YAMLError as e:
     print(f'referentiel.yaml INVALIDE : {e}')
     sys.exit(1)
-" || echo "referentiel.yaml non modifié — check ignoré"
+"
+else
+  echo "referentiel.yaml non modifié — check ignoré"
+fi
 ```
 
 Résultat attendu : `referentiel.yaml : valide` (si le fichier est stagé) ou `referentiel.yaml non modifié — check ignoré`.
@@ -41,7 +44,7 @@ Résultat attendu : `referentiel.yaml : valide` (si le fichier est stagé) ou `r
 ### Check 3 — Pas d'imports wildcard dans les fichiers Python stagés
 
 ```bash
-git diff --cached --name-only | grep '\.py$' | xargs grep -n "from .* import \*" 2>/dev/null
+git diff --cached --name-only | grep '\.py$' | xargs -r grep -n "from .* import \*" 2>/dev/null
 ```
 
 Résultat attendu : **aucune sortie**. Toute correspondance est un import wildcard à remplacer par des imports explicites.
@@ -54,7 +57,7 @@ Vérifier le message prévu avant de commiter :
 
 ```bash
 # Remplacer le message entre guillemets par le message prévu
-echo "feat(archivist-cli): add X" | grep -Eq "^(feat|fix|refactor|test|docs|chore|ci|style|perf)(\([a-z][a-z0-9-]*\))?: .{1,}" \
+echo "feat(archivist-cli): add X" | grep -Eq "^(feat|fix|refactor|test|docs|chore|ci|style|perf)\([a-z][a-z0-9-]*\): .{1,}" \
   && echo "conforme" || echo "NON CONFORME — attendu : type(scope): description"
 ```
 
@@ -75,7 +78,7 @@ Exemples valides :
 
 ## Checklist rapide
 
-- [ ] `uv run pytest tests/ -q` — tous les tests passent
+- [ ] `cd packages/archivist-cli && uv run pytest tests/ -q` — tous les tests passent
 - [ ] `referentiel.yaml` validé (si modifié dans le staging)
 - [ ] Pas d'import wildcard dans les fichiers Python stagés
 - [ ] Message de commit au format `type(scope): description`
