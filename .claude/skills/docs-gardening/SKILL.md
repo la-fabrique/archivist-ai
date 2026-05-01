@@ -11,6 +11,8 @@ Ce workflow inspecte l'état de la documentation et produit une liste de correct
 
 ## Workflow
 
+Toutes les commandes s'exécutent depuis la racine du dépôt (`/home/deka/sources/github/archivist-ai` ou équivalent).
+
 ### Étape 1 — Vérifier la couverture des packages dans CLAUDE.md
 
 ```bash
@@ -27,13 +29,16 @@ Packages non mentionnés → à documenter dans la section "Carte du dépôt" de
 
 ### Étape 2 — Détecter les liens markdown cassés dans packages/referentiel/
 
+Note : le scan se limite à `packages/referentiel/` car c'est le seul corpus documentaire avec des liens internes entre fichiers. Les plans dans `docs/superpowers/plans/` pointent vers des fichiers externes ou GitHub — hors scope de ce check.
+
 ```bash
 grep -rn "\[.*\](.*\.md)" packages/referentiel/ 2>/dev/null | while IFS=: read file line rest; do
-  link=$(echo "$rest" | grep -oP '\]\(\K[^)]+')
-  [ -z "$link" ] && continue
-  base=$(dirname "$file")
-  target="$base/$link"
-  [ ! -f "$target" ] && echo "CASSÉ : $file:$line → $target"
+  echo "$rest" | grep -oP '\]\(\K[^)]+' | while read -r link; do
+    [ -z "$link" ] && continue
+    base=$(dirname "$file")
+    target="$base/${link%%#*}"
+    [ ! -f "$target" ] && echo "CASSÉ : $file:$line → $link"
+  done
 done
 ```
 
@@ -41,16 +46,18 @@ Résultat attendu : aucune sortie. Chaque ligne produite est un lien à corriger
 
 ### Étape 3 — Détecter les plans potentiellement obsolètes
 
-```bash
-find docs/superpowers/plans/ -name "*.md" -mtime +30 | sort
-```
-
-Pour chaque fichier retourné, compter les tâches ouvertes :
+Identifier les plans dont le dernier commit date de plus de 30 jours :
 
 ```bash
-for f in $(find docs/superpowers/plans/ -name "*.md" -mtime +30); do
+# Lister les plans avec leur date de dernier commit
+git log --format="" --name-only -- docs/superpowers/plans/*.md | sort -u | while read -r f; do
+  [ -z "$f" ] && continue
+  age=$(git log -1 --format="%ar" -- "$f" 2>/dev/null)
   open=$(grep -c "\- \[ \]" "$f" 2>/dev/null || echo 0)
-  echo "$f : $open tâches ouvertes"
+  days=$(git log -1 --format="%ct" -- "$f" 2>/dev/null)
+  now=$(date +%s)
+  [ -n "$days" ] && diff=$(( (now - days) / 86400 )) || diff=0
+  [ "$diff" -gt 30 ] && echo "$f : dernier commit il y a $age ($open tâches ouvertes)"
 done
 ```
 
