@@ -29,3 +29,6 @@ client_secret.json
 .venv/
 __pycache__/
 *.pyc
+
+# Git worktrees
+.worktrees/

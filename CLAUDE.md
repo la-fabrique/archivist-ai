@@ -18,6 +18,30 @@ CLI **réservée aux développeurs** pour gérer les outils autour du référent
 
 À ne pas confondre avec `archivist-cli`.
 
-### `packages/archivist-cli` (package futur, pas encore créé)
+### `packages/archivist-cli/`
 
-CLI qui sera **déployée et utilisée par les utilisateurs finaux** pour classer leurs documents. C'est le point d'entrée utilisateur du projet archivist-ai.
+CLI **déployée et utilisée par les utilisateurs finaux** pour classer leurs documents. C'est le point d'entrée utilisateur du projet archivist-ai.
+
+- Stack : Python 3.12, architecture hexagonale (domain / adapters / application)
+- Tests : `cd packages/archivist-cli && uv run pytest tests/`
+
+### `packages/landing/`
+
+Site vitrine du projet. Ne pas y modifier de logique métier.
+
+---
+
+## Carte du dépôt
+
+- `docs/vision-strategie.md` — vision produit, mission, objectifs
+- `docs/architecture/` — diagrammes et décisions d'architecture
+- `docs/superpowers/specs/` — décisions de conception (ADR)
+- `docs/superpowers/plans/` — plans d'exécution actifs et terminés
+- `packages/referentiel/` — sources du référentiel (contenu documentaire, pas code)
+- `packages/referentiel-cli/` — CLI développeur TypeScript (génération, validation, export)
+- `packages/archivist-cli/` — CLI utilisateur final Python (classement de documents)
+- `packages/landing/` — site vitrine
+
+## Décisions dans le dépôt
+
+Toute décision non-triviale qui changerait le comportement de Claude Code doit être dans `docs/superpowers/specs/` sous forme d'ADR. Les décisions orales ou Slack sont invisibles pour l'agent.
