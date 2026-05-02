@@ -7,10 +7,40 @@
       "Bash(npm test *)",
       "Bash(npm run *)",
       "Bash(uv run *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Edit(/.claude/skills/**)",
+      "Bash(echo *)",
+      "Bash(grep *)",
+      "Bash(git pull *)",
+      "Bash(git merge *)"
     ]
   },
   "enabledPlugins": {
-    "superpowers@claude-plugins-official": true
+    "superpowers@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/deka/sources/github/archivist-ai/.claude/hooks/referentiel-guard.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/deka/sources/github/archivist-ai/.claude/hooks/commit-lint.sh"
+          }
+        ]
+      }
+    ]
   }
 }
