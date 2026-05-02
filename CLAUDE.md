@@ -13,4 +13,4 @@
 
 ## Décisions dans le dépôt
 
-Toute décision non-triviale qui changerait le comportement de Claude Code doit être dans `docs/superpowers/specs/`. Les décisions orales ou Slack sont invisibles pour l'agent.
+Toute décision non-triviale qui changerait le comportement de Claude Code doit être dans `docs/superpowers/specs/`.
