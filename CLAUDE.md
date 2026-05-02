@@ -8,8 +8,15 @@
 - `packages/landing/` — site vitrine
 - `docs/vision-strategie.md` — vision produit, mission, objectifs
 - `docs/architecture/` — diagrammes et décisions d'architecture
-- `docs/superpowers/specs/` — décisions de conception (ADR)
+- `docs/architecture/adrs/` — décisions d'architecture (ADRs) — consulter avant toute modification non-triviale
+- `docs/superpowers/specs/` — décisions de conception (design docs)
 - `docs/superpowers/plans/` — plans d'exécution actifs et terminés
+
+## ADRs
+
+Les ADRs consignent les décisions d'architecture qui s'appliquent au dépôt. Avant de modifier une couche structurante (architecture, contrats de sortie, ports, schéma de données), lire les ADRs pertinents dans `docs/architecture/adrs/`.
+
+Un ADR ne se supprime pas — s'il est remplacé, son status passe à `superseded by ADR-YYY`.
 
 ## Décisions dans le dépôt
 

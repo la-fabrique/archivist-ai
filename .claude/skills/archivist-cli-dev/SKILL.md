@@ -7,9 +7,19 @@ description: Use when any file in packages/archivist-cli/ is added, modified, or
 
 ## Vue d'ensemble
 
-Toute modification de `packages/archivist-cli/` déclenche ce workflow en 4 étapes. Ne sauter aucune étape, même pour "juste un test".
+Toute modification de `packages/archivist-cli/` déclenche ce workflow en 5 étapes. Ne sauter aucune étape, même pour "juste un test".
 
 ## Workflow
+
+### Étape 0 — Consulter les ADRs pertinents
+
+Avant toute modification, lister les ADRs qui concernent ce package :
+
+```bash
+ls docs/architecture/adrs/
+```
+
+Lire ceux dont le titre ou les conséquences mentionnent `archivist-cli`, les contrats de sortie CLI, ou l'architecture hexagonale. Si un ADR s'applique, respecter sa décision sans la remettre en question — ouvrir une conversation avec le développeur si un ADR semble obsolète.
 
 ### Étape 1 — Qualifier la couche touchée
 
@@ -72,6 +82,7 @@ In the grep output, confirm each class's parenthesised superclass matches an ABC
 
 ## Checklist rapide
 
+- [ ] ADRs pertinents consultés (`docs/architecture/adrs/`)
 - [ ] Couche identifiée
 - [ ] `uv run pytest tests/ -v` — tous les tests passent
 - [ ] Contrainte application vérifiée (si application/ modifié)
