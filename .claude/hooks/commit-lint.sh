@@ -21,6 +21,8 @@ MSG=$(echo "$CMD" | grep -oP '(?<=-m )["\x27][^\x27"]+["\x27]' | head -1 | tr -d
 
 # Fallback : heredoc ou message en variable (on ne peut pas l'extraire ici — laisser passer)
 if [[ -z "$MSG" ]]; then exit 0; fi
+# Ignorer les messages qui contiennent une substitution shell ($(cat <<'EOF'...))
+if [[ "$MSG" == *'$('* ]]; then exit 0; fi
 
 PATTERN='^(feat|fix|refactor|test|docs|chore|ci|style|perf)\([a-z][a-z0-9-]*\): .+'
 
