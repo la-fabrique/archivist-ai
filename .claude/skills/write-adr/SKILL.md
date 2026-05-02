@@ -31,10 +31,6 @@ Si vide → ADR-001. Sinon incrémenter.
 ## Context
 <1-3 phrases. Situation et contrainte qui rendent cette décision nécessaire.>
 
-## Options Considered
-- **Option A** — <résumé> — Pro : … / Con : …
-- **Option B** — <résumé> — Pro : … / Con : …
-
 ## Decision
 <1-2 phrases max. Ce qui a été décidé et pourquoi — pas de paragraphe.>
 
@@ -43,7 +39,7 @@ Si vide → ADR-001. Sinon incrémenter.
 - <...>
 ```
 
-**`Options Considered` est omis** si la décision n'avait pas d'alternative réelle.
+**`Options Considered`** — section facultative, à insérer entre Context et Decision **uniquement si** plusieurs alternatives réelles ont été comparées. Ne pas inventer des options pour remplir la section.
 
 ## Règles d'écriture (LLM-oriented)
 
@@ -60,7 +56,7 @@ Si vide → ADR-001. Sinon incrémenter.
 | "Je vais écrire en anglais c'est plus clair" | Non. Tout le projet est en français. Le titre aussi. |
 | "La Decision mérite une explication détaillée" | 1-2 phrases max. Le Context fournit déjà le pourquoi. |
 | "Je vais supprimer l'ancien ADR" | Jamais. Mettre `superseded by ADR-YYY`. |
-| "Options Considered est toujours requis" | Omis si une seule option réelle. |
+| "Je devrais documenter les options pour être complet" | Ne pas inventer des options. Pas d'options réelles = section absente. |
 
 ## Checklist
 
