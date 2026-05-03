@@ -9,7 +9,7 @@
 - `docs/vision-strategie.md` — vision produit, mission, objectifs
 - `docs/architecture/` — diagrammes et décisions d'architecture
 - `docs/architecture/adrs/` — décisions d'architecture (ADRs) — consulter avant toute modification non-triviale
-- `docs/superpowers/specs/` — décisions de conception (design docs)
+- `docs/features/` — features fonctionnelles (comportement attendu, format Gherkin)
 - `docs/superpowers/plans/` — plans d'exécution actifs et terminés
 
 ## ADRs
@@ -20,4 +20,5 @@ Un ADR ne se supprime pas — s'il est remplacé, son status passe à `supersede
 
 ## Décisions dans le dépôt
 
-Toute décision non-triviale qui changerait le comportement de Claude Code doit être dans `docs/superpowers/specs/`.
+- Features fonctionnelles (comportement attendu) → `docs/features/`
+- Décisions techniques (architecture, contrats) → `docs/architecture/adrs/`
