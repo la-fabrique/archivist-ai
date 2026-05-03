@@ -6,11 +6,11 @@
 - `packages/referentiel-cli/` — CLI développeur TypeScript (génération, validation, export) → `doc/usage.md`
 - `packages/archivist-cli/` — CLI utilisateur final Python, architecture hexagonale → tests : `cd packages/archivist-cli && uv run pytest tests/`
 - `packages/landing/` — site vitrine
-- `docs/vision-strategie.md` — vision produit, mission, objectifs
 - `docs/architecture/` — diagrammes et décisions d'architecture
 - `docs/architecture/adrs/` — décisions d'architecture (ADRs) — consulter avant toute modification non-triviale
 - `docs/features/` — features fonctionnelles (comportement attendu, format Gherkin)
 - `docs/superpowers/plans/` — plans d'exécution actifs et terminés
+- `.product/` — stratégie, discovery, communauté, ressources métier (hors scope agents de dev)
 
 ## ADRs
 
