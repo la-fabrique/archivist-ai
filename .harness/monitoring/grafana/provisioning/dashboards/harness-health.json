@@ -1,0 +1,102 @@
+{
+  "uid": "harness-health",
+  "title": "Harness Health",
+  "tags": ["harness", "hooks"],
+  "timezone": "browser",
+  "refresh": "10s",
+  "time": { "from": "now-1h", "to": "now" },
+  "templating": {
+    "list": [
+      {
+        "name": "hook_name",
+        "type": "query",
+        "datasource": { "type": "prometheus" },
+        "query": "label_values(harness_hook_fires_total, hook_name)",
+        "multi": true,
+        "includeAll": true,
+        "current": { "text": "All", "value": "$__all" },
+        "refresh": 2
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Hook Activity",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "rate(harness_hook_fires_total{hook_name=~\"$hook_name\"}[5m])",
+          "legendFormat": "{{hook_name}}"
+        }
+      ],
+      "datasource": { "type": "prometheus" }
+    },
+    {
+      "id": 2,
+      "title": "Block Rate",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum by (hook_name) (harness_hook_fires_total{hook_name=~\"$hook_name\", hook_event=\"num_blocking\"}) / sum by (hook_name) (harness_hook_fires_total{hook_name=~\"$hook_name\"})",
+          "legendFormat": "{{hook_name}}"
+        }
+      ],
+      "datasource": { "type": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "min": 0,
+          "max": 1,
+          "thresholds": {
+            "steps": [
+              { "value": 0, "color": "green" },
+              { "value": 0.5, "color": "yellow" },
+              { "value": 0.8, "color": "red" }
+            ]
+          },
+          "unit": "percentunit"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "Latency P95",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, rate(harness_hook_duration_ms_bucket{hook_name=~\"$hook_name\"}[5m]))",
+          "legendFormat": "{{hook_name}} p95"
+        }
+      ],
+      "datasource": { "type": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "ms" } }
+    },
+    {
+      "id": 4,
+      "title": "Errors",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        {
+          "expr": "sum by (hook_name) (increase(harness_hook_fires_total{hook_name=~\"$hook_name\", hook_event=\"num_non_blocking_error\"}[1h]))",
+          "legendFormat": "{{hook_name}}"
+        }
+      ],
+      "datasource": { "type": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "steps": [
+              { "value": 0, "color": "green" },
+              { "value": 1, "color": "red" }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "schemaVersion": 39
+}
