@@ -1,0 +1,42 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+
+connectors:
+  count:
+    logs:
+      hook_fires:
+        description: "Hook execution events"
+        conditions:
+          - 'attributes["event.name"] == "hook_execution_complete"'
+        attributes:
+          - key: hook_name
+          - key: hook_event
+
+processors:
+  batch:
+    timeout: 5s
+
+exporters:
+  prometheus:
+    endpoint: 0.0.0.0:8889
+    namespace: harness
+  debug:
+    verbosity: basic
+
+service:
+  pipelines:
+    logs/input:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [count, debug]
+    metrics/derived:
+      receivers: [count]
+      processors: [batch]
+      exporters: [prometheus]
+    metrics/passthrough:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [prometheus]
