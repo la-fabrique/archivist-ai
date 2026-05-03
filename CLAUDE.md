@@ -10,6 +10,7 @@
 - `docs/architecture/adrs/` — décisions d'architecture (ADRs) — consulter avant toute modification non-triviale
 - `docs/features/` — features fonctionnelles (comportement attendu, format Gherkin)
 - `docs/superpowers/plans/` — plans d'exécution actifs et terminés
+- `.harness/monitoring/` — stack OTEL locale (Collector + Prometheus + Grafana) → `docs/architecture/specs/2026-05-03-harness-monitoring-design.md`
 - `.product/` — stratégie, discovery, communauté, ressources métier (hors scope agents de dev)
 
 ## Architecture et ADRs
