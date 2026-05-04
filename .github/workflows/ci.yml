@@ -37,7 +37,7 @@ jobs:
         run: npm run check:links
 
       - name: Vérifier couverture CLAUDE.md
-        run: python scripts/check_claude_coverage.py
+        run: python .harness/scripts/check_claude_coverage.py
 
   tests:
     name: Tests archivist-cli

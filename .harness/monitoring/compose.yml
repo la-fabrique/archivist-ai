@@ -34,4 +34,6 @@ services:
 
 volumes:
   prometheus-data:
+    name: archivist-prometheus-data
   grafana-data:
+    name: archivist-grafana-data

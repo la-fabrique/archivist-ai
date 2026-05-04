@@ -15,7 +15,9 @@
     "referentiel-cli:export-frontmatters": "node packages/referentiel-cli/dist/cli.js export-frontmatters",
     "referentiel-cli:generate-pdf": "node packages/referentiel-cli/dist/cli.js generate-pdf --referentiel-root packages/referentiel --output referentiel.pdf",
     "archivist-cli:build": "cd packages/archivist-cli && uv run pyinstaller archivist-cli.spec --distpath dist",
-    "check:links": "remark --use remark-validate-links --frail packages/referentiel/"
+    "check:links": "remark --use remark-validate-links --frail packages/referentiel/",
+    "monitoring:up": "docker compose -f .harness/monitoring/compose.yml up -d",
+    "monitoring:down": "docker compose -f .harness/monitoring/compose.yml down"
   },
   "devDependencies": {
     "remark-cli": "^12.0.0",

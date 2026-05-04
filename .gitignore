@@ -34,4 +34,8 @@ __pycache__/
 .worktrees/
 
 
-docs/superpowers/
+docs/superpowers/**
+!docs/superpowers/specs/
+!docs/superpowers/specs/.gitkeep
+!docs/superpowers/plans/
+!docs/superpowers/plans/.gitkeep

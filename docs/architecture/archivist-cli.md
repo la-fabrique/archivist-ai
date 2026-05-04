@@ -2,8 +2,6 @@
 
 Ce document décrit l'architecture cible de la CLI `archivist-cli` à un niveau haut : périmètre, pipeline, ports, règles de dépendance, évolutivité. Il ne fixe pas les signatures précises ni les choix d'implémentation — ces points sont laissés aux plans d'implémentation et, plus tard, à des ADRs ciblés.
 
-> Le détail des décisions structurantes derrière ce document est consigné dans `docs/superpowers/specs/2026-04-26-archivist-cli-architecture-design.md`.
-
 ---
 
 ## 1. Périmètre & non-objectifs
