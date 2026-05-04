@@ -12,8 +12,24 @@
       "Bash(echo *)",
       "Bash(grep *)",
       "Bash(git pull *)",
-      "Bash(git merge *)"
+      "Bash(git merge *)",
+      "Bash(npx vitest *)",
+      "Bash(npx tsc *)",
+      "Bash(git -C *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git reset *)",
+      "Bash(curl *)"
     ]
+  },
+  "env": {
+    "CLAUDE_CODE_ENABLE_TELEMETRY": "1",
+    "OTEL_LOGS_EXPORTER": "otlp",
+    "OTEL_METRICS_EXPORTER": "otlp",
+    "OTEL_EXPORTER_OTLP_PROTOCOL": "grpc",
+    "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:4317",
+    "OTEL_LOG_TOOL_DETAILS": "1",
+    "OTEL_METRIC_EXPORT_INTERVAL": "10000",
+    "OTEL_LOGS_EXPORT_INTERVAL": "5000"
   },
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
@@ -38,6 +54,17 @@
           {
             "type": "command",
             "command": "/home/deka/sources/github/archivist-ai/.claude/hooks/commit-lint.sh"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "nc -z -w1 localhost 4317 2>/dev/null || jq -n '{\"systemMessage\": \"HARNAIS: OTEL Collector non accessible sur localhost:4317 — telemetrie inactive. Lancer: npm run monitoring:up\"}'",
+            "timeout": 5
           }
         ]
       }
