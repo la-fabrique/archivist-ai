@@ -63,8 +63,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "nc -z -w1 localhost 4317 2>/dev/null || jq -n '{\"systemMessage\": \"HARNAIS: OTEL Collector non accessible sur localhost:4317 — telemetrie inactive. Lancer: npm run monitoring:up\"}'",
-            "timeout": 5
+            "command": "/home/deka/sources/github/archivist-ai/.harness/scripts/session-start.sh",
+            "timeout": 15
           }
         ]
       }
