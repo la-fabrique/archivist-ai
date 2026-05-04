@@ -54,6 +54,10 @@
           {
             "type": "command",
             "command": "/home/deka/sources/github/archivist-ai/.claude/hooks/commit-lint.sh"
+          },
+          {
+            "type": "command",
+            "command": "/home/deka/sources/github/archivist-ai/.claude/hooks/feat-commit-cleanup.sh"
           }
         ]
       }

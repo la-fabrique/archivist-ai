@@ -8,6 +8,7 @@ Infrastructure d'ingénierie autour de l'agent de dev.
 |-----------|------|-------|
 | `PreToolUse` (Write\|Edit) | `.claude/hooks/referentiel-guard.sh` | Bloque toute écriture dans `packages/referentiel/` hors fichiers autorisés |
 | `PostToolUse` (Bash) | `.claude/hooks/commit-lint.sh` | Vérifie le format Conventional Commits après chaque `git commit` |
+| `PostToolUse` (Bash) | `.claude/hooks/feat-commit-cleanup.sh` | Rappel obligatoire d'invoquer le harness-cleaner agent après un commit `feat()` |
 | `SessionStart` | `.harness/scripts/session-start.sh` | Démarre la stack monitoring si le Collector n'est pas joignable |
 
 ## Monitoring (`monitoring/`)
