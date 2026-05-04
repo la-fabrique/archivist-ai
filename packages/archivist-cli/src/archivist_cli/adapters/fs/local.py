@@ -27,3 +27,9 @@ class LocalFilesystem(Filesystem):
 
     def is_dir(self, uri: str) -> bool:
         return self._to_path(uri).is_dir()
+
+    def list_files(self, uri: str) -> list[str]:
+        path = self._to_path(uri)
+        if not path.is_dir():
+            raise FilesystemError(f"not a directory: {uri}")
+        return [f"file://{entry}" for entry in path.iterdir() if entry.is_file()]

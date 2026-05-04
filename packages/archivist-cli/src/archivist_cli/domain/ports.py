@@ -37,3 +37,11 @@ class Filesystem(ABC):
     @abstractmethod
     def is_dir(self, uri: str) -> bool:
         ...
+
+    @abstractmethod
+    def list_files(self, uri: str) -> list[str]:
+        """Retourne les URIs file:// des fichiers directs du dossier (non récursif).
+
+        Ne retourne pas les sous-dossiers. Lève FilesystemError si l'URI est invalide.
+        """
+        ...

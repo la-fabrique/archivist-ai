@@ -33,6 +33,10 @@ class FakeFilesystem(Filesystem):
     def is_dir(self, uri: str) -> bool:
         return uri in self._dirs
 
+    def list_files(self, uri: str) -> list[str]:
+        prefix = uri.rstrip("/") + "/"
+        return [f for f in self._files if f.startswith(prefix) and "/" not in f[len(prefix):]]
+
     def add_file(self, uri: str) -> None:
         self._files.add(uri)
 

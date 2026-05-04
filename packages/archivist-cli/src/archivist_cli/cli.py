@@ -1,12 +1,17 @@
 from __future__ import annotations
 
 import json
+import logging
+from pathlib import Path
 from urllib.parse import urlparse
 
 import click
 
 from archivist_cli.application.scaffold import scaffold
+from archivist_cli.application.scan import scan
 from archivist_cli.registry import default_registry
+
+logger = logging.getLogger(__name__)
 
 
 def _require_file_uri(value: str, param_name: str) -> None:
@@ -74,3 +79,23 @@ def scaffold_cmd(
 
     if result.errors > 0:
         raise SystemExit(1)
+
+
+@main.command(name="scan")
+@click.option(
+    "--source",
+    required=True,
+    help="URI du dossier source (file:///path/to/docs).",
+)
+def scan_cmd(source: str) -> None:
+    """Scanne un dossier et liste les fichiers trouvés."""
+    _require_file_uri(source, "source")
+    fs = default_registry.resolve("fs", "local", {})
+    if not fs.is_dir(source):
+        raise click.BadParameter(
+            f"{source!r} n'est pas un dossier valide.",
+            param_hint="'--source'",
+        )
+    result = scan(filesystem=fs, source_uri=source)
+    logger.info("scan terminé : %d fichier(s) traité(s)", len(result.files))
+    click.echo(json.dumps({"scanned": len(result.files), "files": [Path(f).name for f in result.files]}))

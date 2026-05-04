@@ -5,6 +5,7 @@ Chaque adaptateur (built-in ou futur tiers) doit passer ces tests.
 
 import textwrap
 from pathlib import Path
+from urllib.parse import urlparse
 
 import pytest
 
@@ -56,6 +57,20 @@ class FilesystemContractSuite:
     def test_exists_false_for_missing(self, fs: Filesystem, base_uri: str):
         assert fs.exists(f"{base_uri}/does_not_exist") is False
 
+    def test_list_files_returns_only_files(self, fs: Filesystem, base_uri: str, create_file):
+        folder_uri = f"{base_uri}/list_test"
+        fs.make_dir(folder_uri)
+        fs.make_dir(f"{folder_uri}/subdir")
+        create_file(f"{folder_uri}/a.txt")
+        create_file(f"{folder_uri}/b.pdf")
+        result = fs.list_files(folder_uri)
+        assert sorted(result) == sorted([f"{folder_uri}/a.txt", f"{folder_uri}/b.pdf"])
+
+    def test_list_files_empty_dir(self, fs: Filesystem, base_uri: str):
+        folder_uri = f"{base_uri}/empty_dir"
+        fs.make_dir(folder_uri)
+        assert fs.list_files(folder_uri) == []
+
 
 class TestLocalFilesystemContract(FilesystemContractSuite):
     @pytest.fixture
@@ -66,6 +81,12 @@ class TestLocalFilesystemContract(FilesystemContractSuite):
     def base_uri(self, tmp_path: Path) -> str:
         return f"file://{tmp_path}"
 
+    @pytest.fixture
+    def create_file(self):
+        def _create(uri: str) -> None:
+            Path(urlparse(uri).path).touch()
+        return _create
+
 
 class TestFakeFilesystemContract(FilesystemContractSuite):
     @pytest.fixture
@@ -75,6 +96,12 @@ class TestFakeFilesystemContract(FilesystemContractSuite):
     @pytest.fixture
     def base_uri(self) -> str:
         return "file:///fake"
+
+    @pytest.fixture
+    def create_file(self, fs: FakeFilesystem):
+        def _create(uri: str) -> None:
+            fs.add_file(uri)
+        return _create
 
 
 # --- Referentiel contract ---
