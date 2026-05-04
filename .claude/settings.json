@@ -63,7 +63,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/deka/sources/github/archivist-ai/.harness/scripts/session-start.sh",
+            "command": ".harness/scripts/session-start.sh",
             "timeout": 15
           }
         ]
