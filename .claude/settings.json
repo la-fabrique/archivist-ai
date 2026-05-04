@@ -45,6 +45,15 @@
             "command": "/home/deka/sources/github/archivist-ai/.claude/hooks/referentiel-guard.sh"
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/deka/sources/github/archivist-ai/.claude/hooks/no-commit-on-main.sh"
+          }
+        ]
       }
     ],
     "PostToolUse": [

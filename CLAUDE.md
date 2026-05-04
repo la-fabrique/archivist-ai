@@ -24,3 +24,7 @@ Un ADR ne se supprime pas — s'il est remplacé, son statut passe à `supersede
 
 - Features fonctionnelles (comportement attendu) → `docs/features/`
 - Décisions techniques (architecture, contrats) → `docs/architecture/adrs/`
+
+## Worktrees — règle absolue
+
+Ne jamais committer du code directement sur `main`. Avant toute implémentation, invoquer le skill `superpowers:using-git-worktrees` pour créer un worktree isolé dans `.claude/worktrees/<feature-name>`. Tous les commits de la feature se font dans ce worktree. Le hook `no-commit-on-main.sh` bloque les commits sur `main` et rappelle cette règle.
