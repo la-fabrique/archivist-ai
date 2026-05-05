@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from archivist_cli.domain.models import FileMetadata, ReferentielEntry, ScannedFile
+from archivist_cli.domain.models import FileMetadata, ReferentielEntry
 from archivist_cli.domain.ports import Filesystem, FilesystemError, MetadataExtractor, MetadataExtractorError, Referentiel
 
 

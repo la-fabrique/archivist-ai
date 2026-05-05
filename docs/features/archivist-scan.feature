@@ -10,7 +10,7 @@ Background:
 Scenario: Scan nominal d'un dossier avec fichiers
   Given un dossier contenant 3 fichiers : "facture.pdf", "contrat.pdf", "releve.png"
   When l'utilisateur exécute "archivist scan --source file:///path/to/dossier"
-  Then la sortie stdout est le JSON {"scanned": 3, "files": ["facture.pdf", "contrat.pdf", "releve.png"]}
+  Then la sortie stdout est un JSON avec "scanned": 3 et "files" contenant 3 objets avec "name", "uri", "metadata"
   And la sortie stderr contient "INFO scanning facture.pdf"
   And la sortie stderr contient "INFO scanning contrat.pdf"
   And la sortie stderr contient "INFO scanning releve.png"
@@ -20,7 +20,7 @@ Scenario: Scan nominal d'un dossier avec fichiers
 Scenario: Scan d'un dossier vide
   Given un dossier vide
   When l'utilisateur exécute "archivist scan --source file:///path/to/dossier-vide"
-  Then la sortie stdout est le JSON {"scanned": 0, "files": []}
+  Then la sortie stdout est le JSON {"scanned": 0, "files": []} avec une liste vide
   And la sortie stderr contient "INFO scan terminé : 0 fichier(s) traité(s)"
   And le code de retour est 0
 
