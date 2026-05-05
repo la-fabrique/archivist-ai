@@ -11,8 +11,8 @@ import pytest
 
 from archivist_cli.adapters.fs.local import LocalFilesystem
 from archivist_cli.adapters.referentiel.yaml_file import YamlFileReferentiel
-from archivist_cli.domain.ports import Filesystem, FilesystemError, Referentiel
-from tests.fakes import FakeFilesystem, FakeReferentiel
+from archivist_cli.domain.ports import Filesystem, FilesystemError, MetadataExtractor, MetadataExtractorError, Referentiel
+from tests.fakes import FakeFilesystem, FakeMetadataExtractor, FakeReferentiel
 from archivist_cli.domain.models import ReferentielEntry
 
 
@@ -144,3 +144,47 @@ class TestFakeReferentielContract(ReferentielContractSuite):
     @pytest.fixture
     def referentiel(self) -> Referentiel:
         return FakeReferentiel([_make_entry("test", "Test")])
+
+
+# --- MetadataExtractor contract ---
+
+class MetadataExtractorContractSuite:
+    """Mixin de tests de contrat pour le port MetadataExtractor."""
+
+    @pytest.fixture
+    def extractor(self) -> MetadataExtractor:
+        raise NotImplementedError
+
+    @pytest.fixture
+    def valid_file_uri(self) -> str:
+        raise NotImplementedError
+
+    def test_extract_returns_required_fields(self, extractor: MetadataExtractor, valid_file_uri: str):
+        result = extractor.extract(valid_file_uri)
+        assert isinstance(result["mime_type"], str)
+        assert len(result["mime_type"]) > 0
+        assert isinstance(result["size_bytes"], int)
+        assert result["size_bytes"] >= 0
+        assert isinstance(result["modified_at"], str)
+        assert "T" in result["modified_at"]  # ISO 8601 basic check
+
+    def test_extract_optional_fields_are_none_or_typed(self, extractor: MetadataExtractor, valid_file_uri: str):
+        result = extractor.extract(valid_file_uri)
+        assert result["title"] is None or isinstance(result["title"], str)
+        assert result["author"] is None or isinstance(result["author"], str)
+        assert result["page_count"] is None or isinstance(result["page_count"], int)
+        assert result["language"] is None or isinstance(result["language"], str)
+
+    def test_extract_unsupported_scheme_raises(self, extractor: MetadataExtractor):
+        with pytest.raises(MetadataExtractorError):
+            extractor.extract("s3://bucket/file.pdf")
+
+
+class TestFakeMetadataExtractorContract(MetadataExtractorContractSuite):
+    @pytest.fixture
+    def extractor(self) -> MetadataExtractor:
+        return FakeMetadataExtractor()
+
+    @pytest.fixture
+    def valid_file_uri(self) -> str:
+        return "file:///any/file.pdf"

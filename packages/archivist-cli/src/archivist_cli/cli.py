@@ -88,7 +88,7 @@ def scaffold_cmd(
     help="URI du dossier source (file:///path/to/docs).",
 )
 def scan_cmd(source: str) -> None:
-    """Scanne un dossier et liste les fichiers trouvés."""
+    """Scanne un dossier et liste les fichiers trouvés avec leurs métadonnées."""
     _require_file_uri(source, "source")
     fs = default_registry.resolve("fs", "local", {})
     if not fs.is_dir(source):
@@ -96,6 +96,15 @@ def scan_cmd(source: str) -> None:
             f"{source!r} n'est pas un dossier valide.",
             param_hint="'--source'",
         )
-    result = scan(filesystem=fs, source_uri=source)
+    extractor = default_registry.resolve("metadata", "kreuzberg", {})
+    result = scan(filesystem=fs, source_uri=source, extractor=extractor)
     logger.info("scan terminé : %d fichier(s) traité(s)", len(result.files))
-    click.echo(json.dumps({"scanned": len(result.files), "files": [Path(f).name for f in result.files]}))
+    files_out = [
+        {
+            "name": f.name,
+            "uri": f.uri,
+            "metadata": dict(f.metadata) if f.metadata is not None else None,
+        }
+        for f in result.files
+    ]
+    click.echo(json.dumps({"scanned": len(result.files), "files": files_out}))

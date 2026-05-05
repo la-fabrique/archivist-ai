@@ -1,4 +1,4 @@
-from archivist_cli.domain.models import ReferentielEntry
+from archivist_cli.domain.models import FileMetadata, ReferentielEntry, ScannedFile
 
 
 def test_entry_from_dict_minimal():
@@ -80,3 +80,24 @@ def test_entry_is_not_scaffoldable_when_path_has_placeholder():
         required=True,
     )
     assert entry.is_scaffoldable is False
+
+
+def test_scanned_file_with_metadata():
+    meta: FileMetadata = {
+        "mime_type": "application/pdf",
+        "size_bytes": 1024,
+        "modified_at": "2026-05-04T00:00:00+00:00",
+        "title": "Test",
+        "author": None,
+        "page_count": 2,
+        "language": "fr",
+    }
+    f = ScannedFile(uri="file:///docs/test.pdf", name="test.pdf", metadata=meta)
+    assert f.uri == "file:///docs/test.pdf"
+    assert f.name == "test.pdf"
+    assert f.metadata["mime_type"] == "application/pdf"
+
+
+def test_scanned_file_without_metadata():
+    f = ScannedFile(uri="file:///docs/test.pdf", name="test.pdf", metadata=None)
+    assert f.metadata is None

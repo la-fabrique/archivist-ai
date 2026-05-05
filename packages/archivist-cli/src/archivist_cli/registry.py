@@ -27,6 +27,7 @@ class AdapterRegistry:
 
 def _build_default_registry() -> AdapterRegistry:
     from archivist_cli.adapters.fs.local import LocalFilesystem
+    from archivist_cli.adapters.metadata.kreuzberg import KreuzbergMetadataExtractor
     from archivist_cli.adapters.referentiel.yaml_file import YamlFileReferentiel
 
     registry = AdapterRegistry()
@@ -35,6 +36,7 @@ def _build_default_registry() -> AdapterRegistry:
         "referentiel", "yaml_file",
         lambda config: YamlFileReferentiel(uri=config["uri"]),
     )
+    registry.register("metadata", "kreuzberg", lambda config: KreuzbergMetadataExtractor())
     return registry
 
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import ClassVar
 
-from archivist_cli.domain.models import ReferentielEntry
+from archivist_cli.domain.models import FileMetadata, ReferentielEntry
 
 
 class ReferentielError(Exception):
@@ -43,5 +43,21 @@ class Filesystem(ABC):
         """Retourne les URIs file:// des fichiers directs du dossier (non récursif).
 
         Ne retourne pas les sous-dossiers. Lève FilesystemError si l'URI est invalide.
+        """
+        ...
+
+
+class MetadataExtractorError(Exception):
+    pass
+
+
+class MetadataExtractor(ABC):
+    VERSION: ClassVar[int] = 1
+
+    @abstractmethod
+    def extract(self, uri: str) -> FileMetadata:
+        """Extrait les métadonnées fichier et document depuis un URI file://.
+
+        Lève MetadataExtractorError si l'extraction échoue.
         """
         ...

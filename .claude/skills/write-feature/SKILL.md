@@ -96,5 +96,18 @@ Scenario: Recherche sans résultat
 
 ## Après la rédaction
 
-- Relire : chaque scenario est-il indépendant et testable isolément ?
+### Relecture
+
+- Chaque scenario est-il indépendant et testable isolément ?
 - Si une décision d'architecture est impliquée, créer aussi un ADR (`docs/architecture/adrs/`)
+
+### Commit (obligatoire)
+
+Commiter le fichier dans le worktree courant :
+
+```bash
+git add docs/features/<nom-fichier>.feature
+git commit -m "docs(features): add <nom-feature> feature spec"
+```
+
+Ne pas laisser le fichier non commité — il doit voyager avec les commits de la feature branch et arriver dans la PR.
