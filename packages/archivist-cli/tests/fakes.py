@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from archivist_cli.domain.models import ReferentielEntry
-from archivist_cli.domain.ports import Filesystem, FilesystemError, Referentiel
+from archivist_cli.domain.models import FileMetadata, ReferentielEntry, ScannedFile
+from archivist_cli.domain.ports import Filesystem, FilesystemError, MetadataExtractor, MetadataExtractorError, Referentiel
 
 
 class FakeReferentiel(Referentiel):
@@ -42,3 +42,21 @@ class FakeFilesystem(Filesystem):
 
     def add_dir(self, uri: str) -> None:
         self._dirs.add(uri)
+
+
+class FakeMetadataExtractor(MetadataExtractor):
+    def __init__(self, fail_on: set[str] | None = None) -> None:
+        self._fail_on: set[str] = fail_on or set()
+
+    def extract(self, uri: str) -> FileMetadata:
+        if uri in self._fail_on:
+            raise MetadataExtractorError(f"fake failure for {uri}")
+        return FileMetadata(
+            mime_type="application/pdf",
+            size_bytes=1024,
+            modified_at="2026-05-04T00:00:00+00:00",
+            title=None,
+            author=None,
+            page_count=None,
+            language=None,
+        )
