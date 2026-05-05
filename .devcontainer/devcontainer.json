@@ -1,0 +1,23 @@
+{
+  "name": "archivist-ai",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "dev",
+  "workspaceFolder": "/workspace",
+  "remoteUser": "vscode",
+  "postCreateCommand": "uv sync --directory packages/archivist-cli && npm install --prefix packages/referentiel-cli",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "charliermarsh.ruff",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/workspace/packages/archivist-cli/.venv/bin/python",
+        "editor.formatOnSave": true
+      }
+    }
+  }
+}
