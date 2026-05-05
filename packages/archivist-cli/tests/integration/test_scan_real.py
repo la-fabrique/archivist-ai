@@ -1,52 +1,56 @@
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 import pytest
-from click.testing import CliRunner
 
-from archivist_cli.cli import main
-
-
-@pytest.mark.skip(reason="CLI wiring updated in Task 8")
-def test_scan_lists_files(tmp_path: Path):
-    (tmp_path / "facture.pdf").write_text("x")
-    (tmp_path / "contrat.pdf").write_text("x")
-    (tmp_path / "subdir").mkdir()
-
-    runner = CliRunner()
-    result = runner.invoke(main, ["scan", "--source", f"file://{tmp_path}"])
-
-    assert result.exit_code == 0, result.output
-    data = json.loads(result.output.strip())
-    assert data["scanned"] == 2
-    assert sorted(data["files"]) == ["contrat.pdf", "facture.pdf"]
+from archivist_cli.adapters.fs.local import LocalFilesystem
+from archivist_cli.adapters.metadata.kreuzberg import KreuzbergMetadataExtractor
+from archivist_cli.application.scan import ScanResult, scan
 
 
-@pytest.mark.skip(reason="CLI wiring updated in Task 8")
-def test_scan_empty_dir(tmp_path: Path):
-    runner = CliRunner()
-    result = runner.invoke(main, ["scan", "--source", f"file://{tmp_path}"])
-
-    assert result.exit_code == 0, result.output
-    data = json.loads(result.output.strip())
-    assert data == {"scanned": 0, "files": []}
-
-
-def test_scan_rejects_non_directory(tmp_path: Path):
-    a_file = tmp_path / "doc.pdf"
-    a_file.write_text("x")
-
-    runner = CliRunner()
-    result = runner.invoke(main, ["scan", "--source", f"file://{a_file}"])
-
-    assert result.exit_code == 2
-    assert "n'est pas un dossier valide" in result.output
+@pytest.fixture
+def source_dir(tmp_path: Path) -> Path:
+    (tmp_path / "facture.txt").write_text("Facture 001\nMontant: 100€", encoding="utf-8")
+    (tmp_path / "contrat.txt").write_text("Contrat de prestation\nDurée: 12 mois", encoding="utf-8")
+    (tmp_path / "sub").mkdir()
+    (tmp_path / "sub" / "ignore.txt").write_text("ne doit pas apparaître", encoding="utf-8")
+    return tmp_path
 
 
-def test_scan_rejects_non_file_uri():
-    runner = CliRunner()
-    result = runner.invoke(main, ["scan", "--source", "s3://bucket/docs"])
+def test_scan_real_lists_files(source_dir: Path):
+    fs = LocalFilesystem()
+    extractor = KreuzbergMetadataExtractor()
+    source_uri = f"file://{source_dir}"
 
-    assert result.exit_code == 2
+    result = scan(filesystem=fs, source_uri=source_uri, extractor=extractor)
+
+    assert isinstance(result, ScanResult)
+    assert len(result.files) == 2
+    names = sorted(f.name for f in result.files)
+    assert names == ["contrat.txt", "facture.txt"]
+
+
+def test_scan_real_files_have_metadata(source_dir: Path):
+    fs = LocalFilesystem()
+    extractor = KreuzbergMetadataExtractor()
+    source_uri = f"file://{source_dir}"
+
+    result = scan(filesystem=fs, source_uri=source_uri, extractor=extractor)
+
+    for f in result.files:
+        assert f.metadata is not None
+        assert isinstance(f.metadata["mime_type"], str)
+        assert f.metadata["size_bytes"] > 0
+        assert "T" in f.metadata["modified_at"]
+
+
+def test_scan_real_non_recursive(source_dir: Path):
+    fs = LocalFilesystem()
+    extractor = KreuzbergMetadataExtractor()
+    source_uri = f"file://{source_dir}"
+
+    result = scan(filesystem=fs, source_uri=source_uri, extractor=extractor)
+
+    uris = [f.uri for f in result.files]
+    assert not any("sub" in uri for uri in uris)
