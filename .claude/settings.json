@@ -7,6 +7,7 @@
       "Bash(npm test *)",
       "Bash(npm run *)",
       "Bash(uv run *)",
+      "Bash(uv sync *)",
       "Bash(git commit *)",
       "Edit(/.claude/skills/**)",
       "Bash(echo *)",
@@ -18,7 +19,8 @@
       "Bash(git -C *)",
       "Bash(git commit -m ' *)",
       "Bash(git reset *)",
-      "Bash(curl *)"
+      "Bash(curl *)",
+      "Bash(git worktree *)"
     ]
   },
   "env": {
@@ -31,10 +33,15 @@
     "OTEL_METRIC_EXPORT_INTERVAL": "10000",
     "OTEL_LOGS_EXPORT_INTERVAL": "5000"
   },
+  "statusLine": {
+    "type": "command",
+    "command": "printf '\\033[01;32m%s@%s\\033[00m:\\033[01;34m%s\\033[00m' \"$(whoami)\" \"$(hostname -s)\" \"$(pwd)\""
+  },
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true
   },
+  "model": "claude-sonnet-4-6",
   "hooks": {
     "PreToolUse": [
       {
@@ -82,5 +89,15 @@
         ]
       }
     ]
-  }
+  },
+  "extraKnownMarketplaces": {
+    "superpowers-dev": {
+      "source": {
+        "source": "github",
+        "repo": "obra/superpowers"
+      }
+    }
+  },
+  "effortLevel": "medium",
+  "advisorModel": "claude-opus-4-6"
 }
