@@ -49,6 +49,8 @@ class FakeMetadataExtractor(MetadataExtractor):
         self._fail_on: set[str] = fail_on or set()
 
     def extract(self, uri: str) -> FileMetadata:
+        if not uri.startswith("file://"):
+            raise MetadataExtractorError(f"unsupported scheme in uri: {uri!r}")
         if uri in self._fail_on:
             raise MetadataExtractorError(f"fake failure for {uri}")
         return FileMetadata(
