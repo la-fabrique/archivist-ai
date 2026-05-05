@@ -17,19 +17,6 @@ Rédige une feature Gherkin en français décrivant le comportement attendu d'un
 
 ## Processus
 
-### 0. Vérifier le contexte worktree
-
-Avant d'écrire quoi que ce soit, vérifier que la session travaille dans un worktree isolé (pas sur `main`) :
-
-```bash
-git branch --show-current
-```
-
-- Si la branche est `main` ou `master` → **STOP**. Invoquer `superpowers:using-git-worktrees` pour créer un worktree avant de continuer.
-- Si la branche est une feature branch → continuer.
-
-Le fichier `.feature` doit être écrit et commité dans le worktree, pas sur `main`.
-
 ### 1. Clarifier si besoin
 
 Si la demande est vague (périmètre flou, acteurs inconnus, critères d'acceptation absents), poser **une seule question groupée** avant de rédiger :
