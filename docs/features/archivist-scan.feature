@@ -40,3 +40,19 @@ Scenario: URI pointant vers un fichier plutôt qu'un dossier
   When l'utilisateur exécute "archivist scan --source file:///path/to/document.pdf"
   Then le code de retour est 2
   And la sortie stderr contient "n'est pas un dossier valide"
+
+Scenario: Scan retourne les métadonnées de chaque fichier
+  Given un dossier contenant 1 fichier : "facture.pdf"
+  When l'utilisateur exécute "archivist scan --source file:///path/to/dossier"
+  Then la sortie stdout contient un objet JSON par fichier avec les champs "name", "uri", "metadata"
+  And "metadata" contient "mime_type", "size_bytes", "modified_at"
+  And les champs "title", "author", "page_count", "language" sont présents (peuvent être null)
+  And le code de retour est 0
+
+Scenario: Extraction échouée sur un fichier — le scan continue
+  Given un dossier contenant 2 fichiers dont un corrompu
+  When l'utilisateur exécute "archivist scan --source file:///path/to/dossier"
+  Then la sortie stdout liste les 2 fichiers
+  And le fichier corrompu a "metadata": null
+  And la sortie stderr contient "WARNING" pour le fichier corrompu
+  And le code de retour est 0
