@@ -48,4 +48,13 @@ program
     await runGeneratePdf(opts);
   });
 
+program
+  .command("validate")
+  .description("Valider les contraintes d'unicité du référentiel (roles, …)")
+  .option("--referentiel-root <path>", "Racine locale (défaut: ./packages/referentiel)")
+  .action(async (opts: { referentielRoot?: string }) => {
+    const { runValidate } = await import("./commands/validate.js");
+    await runValidate(opts);
+  });
+
 program.parse();
