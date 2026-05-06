@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import zipfile
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -33,3 +34,19 @@ class LocalFilesystem(Filesystem):
         if not path.is_dir():
             raise FilesystemError(f"not a directory: {uri}")
         return [f"file://{entry}" for entry in path.iterdir() if entry.is_file()]
+
+    def zip_file(self, src_uri: str, dest_uri: str) -> None:
+        src = self._to_path(src_uri)
+        dest = self._to_path(dest_uri)
+        try:
+            with zipfile.ZipFile(dest, "w", zipfile.ZIP_DEFLATED) as zf:
+                zf.write(src, src.name)
+        except OSError as exc:
+            raise FilesystemError(f"failed to create zip: {exc}") from exc
+
+    def delete_file(self, uri: str) -> None:
+        path = self._to_path(uri)
+        try:
+            path.unlink()
+        except OSError as exc:
+            raise FilesystemError(f"failed to delete file: {exc}") from exc

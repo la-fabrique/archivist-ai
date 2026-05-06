@@ -10,20 +10,29 @@ from archivist_cli.application.scan import ScanResult, scan
 
 
 @pytest.fixture
-def source_dir(tmp_path: Path) -> Path:
-    (tmp_path / "facture.txt").write_text("Facture 001\nMontant: 100€", encoding="utf-8")
-    (tmp_path / "contrat.txt").write_text("Contrat de prestation\nDurée: 12 mois", encoding="utf-8")
-    (tmp_path / "sub").mkdir()
-    (tmp_path / "sub" / "ignore.txt").write_text("ne doit pas apparaître", encoding="utf-8")
-    return tmp_path
+def archive_dir(tmp_path: Path) -> tuple[Path, Path]:
+    reception = tmp_path / "_Reception"
+    backup = tmp_path / "_Conservation brut"
+    reception.mkdir()
+    backup.mkdir()
+    (reception / "facture.txt").write_text("Facture 001\nMontant: 100€", encoding="utf-8")
+    (reception / "contrat.txt").write_text("Contrat de prestation\nDurée: 12 mois", encoding="utf-8")
+    (reception / "sub").mkdir()
+    (reception / "sub" / "ignore.txt").write_text("ne doit pas apparaître", encoding="utf-8")
+    return reception, backup
 
 
-def test_scan_real_lists_files(source_dir: Path):
+def test_scan_real_lists_files(archive_dir: tuple[Path, Path]):
+    reception, backup = archive_dir
     fs = LocalFilesystem()
     extractor = KreuzbergMetadataExtractor()
-    source_uri = f"file://{source_dir}"
 
-    result = scan(filesystem=fs, source_uri=source_uri, extractor=extractor)
+    result = scan(
+        filesystem=fs,
+        reception_uri=f"file://{reception}",
+        backup_uri=f"file://{backup}",
+        extractor=extractor,
+    )
 
     assert isinstance(result, ScanResult)
     assert len(result.files) == 2
@@ -31,12 +40,17 @@ def test_scan_real_lists_files(source_dir: Path):
     assert names == ["contrat.txt", "facture.txt"]
 
 
-def test_scan_real_files_have_metadata(source_dir: Path):
+def test_scan_real_files_have_metadata(archive_dir: tuple[Path, Path]):
+    reception, backup = archive_dir
     fs = LocalFilesystem()
     extractor = KreuzbergMetadataExtractor()
-    source_uri = f"file://{source_dir}"
 
-    result = scan(filesystem=fs, source_uri=source_uri, extractor=extractor)
+    result = scan(
+        filesystem=fs,
+        reception_uri=f"file://{reception}",
+        backup_uri=f"file://{backup}",
+        extractor=extractor,
+    )
 
     for f in result.files:
         assert f.metadata is not None
@@ -45,12 +59,51 @@ def test_scan_real_files_have_metadata(source_dir: Path):
         assert "T" in f.metadata["modified_at"]
 
 
-def test_scan_real_non_recursive(source_dir: Path):
+def test_scan_real_non_recursive(archive_dir: tuple[Path, Path]):
+    reception, backup = archive_dir
     fs = LocalFilesystem()
     extractor = KreuzbergMetadataExtractor()
-    source_uri = f"file://{source_dir}"
 
-    result = scan(filesystem=fs, source_uri=source_uri, extractor=extractor)
+    result = scan(
+        filesystem=fs,
+        reception_uri=f"file://{reception}",
+        backup_uri=f"file://{backup}",
+        extractor=extractor,
+    )
 
     uris = [f.uri for f in result.files]
     assert not any("sub" in uri for uri in uris)
+
+
+def test_scan_real_creates_zip_backup(archive_dir: tuple[Path, Path]):
+    reception, backup = archive_dir
+    fs = LocalFilesystem()
+    extractor = KreuzbergMetadataExtractor()
+
+    result = scan(
+        filesystem=fs,
+        reception_uri=f"file://{reception}",
+        backup_uri=f"file://{backup}",
+        extractor=extractor,
+    )
+
+    assert result.backed_up == 2
+    zips = list(backup.glob("*.zip"))
+    assert len(zips) == 2
+
+
+def test_scan_real_deletes_from_reception(archive_dir: tuple[Path, Path]):
+    reception, backup = archive_dir
+    fs = LocalFilesystem()
+    extractor = KreuzbergMetadataExtractor()
+
+    result = scan(
+        filesystem=fs,
+        reception_uri=f"file://{reception}",
+        backup_uri=f"file://{backup}",
+        extractor=extractor,
+    )
+
+    assert result.deleted == 2
+    remaining = [f for f in reception.iterdir() if f.is_file()]
+    assert remaining == []

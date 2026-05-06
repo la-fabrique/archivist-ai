@@ -30,7 +30,8 @@
       "Bash(git commit -m ' *)",
       "Bash(git reset *)",
       "Bash(curl *)",
-      "Bash(git worktree *)"
+      "Bash(git worktree *)",
+      "Bash(npm install *)"
     ]
   },
   "model": "claude-sonnet-4-6",

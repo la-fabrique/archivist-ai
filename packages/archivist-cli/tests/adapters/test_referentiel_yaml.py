@@ -47,3 +47,30 @@ def test_load_entries_invalid_yaml(tmp_path: Path):
     ref = YamlFileReferentiel(uri=f"file://{yaml_path}")
     with pytest.raises(ReferentielError, match="parse"):
         ref.load_entries()
+
+
+def test_load_entries_with_role(tmp_path: Path):
+    yaml_content = textwrap.dedent("""\
+        - id: reception
+          folder_name: _Réception
+          path: _Réception
+          dynamic: false
+          option: core
+          required: true
+          role: reception
+        - id: ma_banque
+          folder_name: Ma banque
+          path: Ma banque
+          dynamic: false
+          option: core
+          required: true
+    """)
+    yaml_path = tmp_path / "referentiel.yaml"
+    yaml_path.write_text(yaml_content, encoding="utf-8")
+
+    ref = YamlFileReferentiel(uri=f"file://{yaml_path}")
+    entries = ref.load_entries()
+
+    by_id = {e.id: e for e in entries}
+    assert by_id["reception"].role == "reception"
+    assert by_id["ma_banque"].role is None
