@@ -83,21 +83,52 @@ def scaffold_cmd(
 
 @main.command(name="scan")
 @click.option(
-    "--source",
+    "--referentiel",
     required=True,
-    help="URI du dossier source (file:///path/to/docs).",
+    help="URI du fichier référentiel (file:///path/to/referentiel.yaml).",
 )
-def scan_cmd(source: str) -> None:
-    """Scanne un dossier et liste les fichiers trouvés avec leurs métadonnées."""
-    _require_file_uri(source, "source")
+@click.option(
+    "--target",
+    required=True,
+    help="URI du dossier racine de l'archive (file:///path/to/archive).",
+)
+def scan_cmd(referentiel: str, target: str) -> None:
+    """Scanne _Réception, sauvegarde dans _Conservation brut, extrait les métadonnées."""
+    _require_file_uri(referentiel, "referentiel")
+    _require_file_uri(target, "target")
+
+    ref = default_registry.resolve("referentiel", "yaml_file", {"uri": referentiel})
     fs = default_registry.resolve("fs", "local", {})
-    if not fs.is_dir(source):
-        raise click.BadParameter(
-            f"{source!r} n'est pas un dossier valide.",
-            param_hint="'--source'",
-        )
     extractor = default_registry.resolve("metadata", "kreuzberg", {})
-    result = scan(filesystem=fs, source_uri=source, extractor=extractor)
+
+    entries = ref.load_entries()
+
+    def _find_role(role: str) -> str:
+        matches = [e for e in entries if e.role == role]
+        if len(matches) != 1:
+            raise click.UsageError(
+                f"Le référentiel contient {len(matches)} entrée(s) role={role!r} — exactement 1 attendue"
+            )
+        return matches[0].path
+
+    reception_path = _find_role("reception")
+    backup_path = _find_role("conservation_brut")
+
+    target_base = target.rstrip("/")
+    reception_uri = f"{target_base}/{reception_path}"
+    backup_uri = f"{target_base}/{backup_path}"
+
+    if not fs.is_dir(reception_uri):
+        raise click.UsageError(
+            f"Dossier _Réception introuvable à {reception_uri!r} — lancez scaffold d'abord"
+        )
+    if not fs.is_dir(backup_uri):
+        raise click.UsageError(
+            f"Dossier _Conservation brut introuvable à {backup_uri!r} — lancez scaffold d'abord"
+        )
+
+    result = scan(filesystem=fs, reception_uri=reception_uri, backup_uri=backup_uri, extractor=extractor)
+
     logger.info("scan terminé : %d fichier(s) traité(s)", len(result.files))
     files_out = [
         {
@@ -107,4 +138,9 @@ def scan_cmd(source: str) -> None:
         }
         for f in result.files
     ]
-    click.echo(json.dumps({"scanned": len(result.files), "files": files_out}))
+    click.echo(json.dumps({
+        "scanned": len(result.files),
+        "backed_up": result.backed_up,
+        "deleted": result.deleted,
+        "files": files_out,
+    }))
