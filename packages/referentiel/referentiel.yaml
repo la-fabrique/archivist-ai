@@ -39,6 +39,8 @@
   required: true
   role: conservation_brut
   description: Archives zip des fichiers originaux reçus, avant tout traitement
+  organization:
+    type: flat
 - id: ma_banque
   folder_name: Ma banque
   path: Ma banque
@@ -852,3 +854,5 @@
   required: true
   role: reception
   description: "Dossier d'entrée : fichiers déposés en attente de traitement par archivist"
+  organization:
+    type: flat
