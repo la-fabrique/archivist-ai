@@ -1,7 +1,8 @@
 Feature: Valider l'intégrité du référentiel
 
   Les scripts de validation vérifient mécaniquement que le référentiel est cohérent :
-  YAML bien formé, liens Markdown valides, couverture des packages dans CLAUDE.md.
+  YAML bien formé, liens Markdown valides, couverture des packages dans CLAUDE.md,
+  et unicité des rôles système (reception, conservation_brut).
   Ces vérifications tournent en CI pour détecter les régressions au plus tôt.
 
   Scenario: Le YAML du référentiel est valide et conforme au schéma
@@ -29,3 +30,21 @@ Feature: Valider l'intégrité du référentiel
     Given le fichier "CLAUDE.md" à la racine du dépôt
     When je lance la vérification de couverture
     Then chaque répertoire sous "packages/" est mentionné dans la carte du dépôt de CLAUDE.md
+
+  Scenario: Le référentiel contient exactement un dossier de réception et un dossier de conservation
+    Given le fichier "packages/referentiel/referentiel.yaml" contient une entrée "role: reception" et une entrée "role: conservation_brut"
+    When je lance "referentiel-cli validate"
+    Then la commande affiche "✓ role=reception" et "✓ role=conservation_brut"
+    And le code de retour est 0
+
+  Scenario: Absence du rôle reception — erreur de validation
+    Given le fichier "packages/referentiel/referentiel.yaml" ne contient aucune entrée avec "role: reception"
+    When je lance "referentiel-cli validate"
+    Then la commande affiche une erreur mentionnant "role=\"reception\": 0 entrée(s) trouvée(s)"
+    And le code de retour est 1
+
+  Scenario: Doublon du rôle conservation_brut — erreur de validation
+    Given le fichier "packages/referentiel/referentiel.yaml" contient 2 entrées avec "role: conservation_brut"
+    When je lance "referentiel-cli validate"
+    Then la commande affiche une erreur mentionnant "role=\"conservation_brut\": 2 entrée(s) trouvée(s)"
+    And le code de retour est 1
