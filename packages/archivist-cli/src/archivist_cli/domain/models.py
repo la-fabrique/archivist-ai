@@ -13,6 +13,7 @@ class ReferentielEntry:
     option: str
     required: bool
     parent: str | None = None
+    role: str | None = None
 
     @classmethod
     def from_dict(cls, raw: dict[str, Any]) -> ReferentielEntry:
@@ -24,6 +25,7 @@ class ReferentielEntry:
             option=raw["option"],
             required=raw["required"],
             parent=raw.get("parent"),
+            role=raw.get("role"),
         )
 
     @property
