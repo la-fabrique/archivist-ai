@@ -16,6 +16,7 @@ class FakeFilesystem(Filesystem):
     def __init__(self) -> None:
         self._dirs: set[str] = set()
         self._files: set[str] = set()
+        self.zipped: list[tuple[str, str]] = []
 
     def make_dir(self, uri: str) -> None:
         if uri in self._files:
@@ -36,6 +37,17 @@ class FakeFilesystem(Filesystem):
     def list_files(self, uri: str) -> list[str]:
         prefix = uri.rstrip("/") + "/"
         return [f for f in self._files if f.startswith(prefix) and "/" not in f[len(prefix):]]
+
+    def zip_file(self, src_uri: str, dest_uri: str) -> None:
+        if src_uri not in self._files:
+            raise FilesystemError(f"source not found: {src_uri}")
+        self.zipped.append((src_uri, dest_uri))
+        self._files.add(dest_uri)
+
+    def delete_file(self, uri: str) -> None:
+        if uri not in self._files:
+            raise FilesystemError(f"file not found: {uri}")
+        self._files.discard(uri)
 
     def add_file(self, uri: str) -> None:
         self._files.add(uri)
