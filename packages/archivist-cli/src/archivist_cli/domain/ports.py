@@ -46,6 +46,22 @@ class Filesystem(ABC):
         """
         ...
 
+    @abstractmethod
+    def zip_file(self, src_uri: str, dest_uri: str) -> None:
+        """Compresse src_uri dans une archive zip dest_uri.
+
+        Lève FilesystemError si src n'existe pas ou si dest ne peut pas être écrit.
+        """
+        ...
+
+    @abstractmethod
+    def delete_file(self, uri: str) -> None:
+        """Supprime le fichier.
+
+        Lève FilesystemError si le fichier n'existe pas.
+        """
+        ...
+
 
 class MetadataExtractorError(Exception):
     pass

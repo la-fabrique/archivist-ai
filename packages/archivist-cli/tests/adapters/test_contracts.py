@@ -71,6 +71,31 @@ class FilesystemContractSuite:
         fs.make_dir(folder_uri)
         assert fs.list_files(folder_uri) == []
 
+    def test_zip_file_creates_archive(self, fs: Filesystem, base_uri: str, create_file):
+        folder_uri = f"{base_uri}/zip_test"
+        fs.make_dir(folder_uri)
+        src = f"{folder_uri}/doc.pdf"
+        dest = f"{folder_uri}/doc_20260506T120000.zip"
+        create_file(src)
+        fs.zip_file(src, dest)
+        assert fs.exists(dest) is True
+
+    def test_zip_file_missing_src_raises(self, fs: Filesystem, base_uri: str):
+        with pytest.raises(FilesystemError):
+            fs.zip_file(f"{base_uri}/nonexistent.pdf", f"{base_uri}/out.zip")
+
+    def test_delete_file_removes_file(self, fs: Filesystem, base_uri: str, create_file):
+        folder_uri = f"{base_uri}/delete_test"
+        fs.make_dir(folder_uri)
+        uri = f"{folder_uri}/todelete.pdf"
+        create_file(uri)
+        fs.delete_file(uri)
+        assert fs.exists(uri) is False
+
+    def test_delete_file_missing_raises(self, fs: Filesystem, base_uri: str):
+        with pytest.raises(FilesystemError):
+            fs.delete_file(f"{base_uri}/nonexistent.pdf")
+
 
 class TestLocalFilesystemContract(FilesystemContractSuite):
     @pytest.fixture
