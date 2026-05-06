@@ -80,6 +80,17 @@
           }
         ]
       }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/dev-cycle-reminder.sh",
+            "timeout": 5
+          }
+        ]
+      }
     ]
   },
   "statusLine": {
