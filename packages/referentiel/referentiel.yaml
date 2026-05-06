@@ -31,6 +31,14 @@
   special_files:
     - name: manifest.md
       description: liste des fichiers archivés et leur état (voir regles-archivage.md)
+- id: conservation_brut
+  folder_name: _Conservation brut
+  path: _Conservation brut
+  dynamic: false
+  option: core
+  required: true
+  role: conservation_brut
+  description: Archives zip des fichiers originaux reçus, avant tout traitement
 - id: ma_banque
   folder_name: Ma banque
   path: Ma banque
@@ -836,3 +844,11 @@
       - name: ext
         description: extension du fichier (pdf, docx…)
     example: 2026-01_Contrat_Dupont_CDI.pdf
+- id: reception
+  folder_name: _Réception
+  path: _Réception
+  dynamic: false
+  option: core
+  required: true
+  role: reception
+  description: "Dossier d'entrée : fichiers déposés en attente de traitement par archivist"
