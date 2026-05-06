@@ -3,9 +3,10 @@ from __future__ import annotations
 import asyncio
 import logging
 from dataclasses import dataclass
+from datetime import datetime, timezone
 
 from archivist_cli.domain.models import ScannedFile
-from archivist_cli.domain.ports import Filesystem, MetadataExtractor, MetadataExtractorError
+from archivist_cli.domain.ports import Filesystem, FilesystemError, MetadataExtractor, MetadataExtractorError
 
 logger = logging.getLogger(__name__)
 
@@ -15,9 +16,11 @@ MAX_CONCURRENT = 4
 @dataclass(frozen=True)
 class ScanResult:
     files: list[ScannedFile]
+    backed_up: int
+    deleted: int
 
 
-async def _process_file(
+async def _extract_file(
     uri: str,
     extractor: MetadataExtractor,
     sem: asyncio.Semaphore,
@@ -43,16 +46,43 @@ async def _process_file(
 def scan(
     *,
     filesystem: Filesystem,
-    source_uri: str,
+    reception_uri: str,
+    backup_uri: str,
     extractor: MetadataExtractor,
 ) -> ScanResult:
-    uris = filesystem.list_files(source_uri)
+    all_uris = filesystem.list_files(reception_uri)
 
+    # Phase 1 — backup zip (synchrone, avant tout)
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
+    backed_up_uris: list[str] = []
+    for uri in all_uris:
+        name = uri.rsplit("/", 1)[-1]
+        dest = f"{backup_uri.rstrip('/')}/{name}_{timestamp}.zip"
+        try:
+            filesystem.zip_file(uri, dest)
+            backed_up_uris.append(uri)
+        except FilesystemError as e:
+            logger.error("%s — backup échoué, fichier ignoré : %s", name, e)
+
+    # Phase 2 — extraction métadonnées (async)
     async def _pipeline() -> list[ScannedFile]:
         sem = asyncio.Semaphore(MAX_CONCURRENT)
         return list(
-            await asyncio.gather(*[_process_file(uri, extractor, sem) for uri in uris])
+            await asyncio.gather(
+                *[_extract_file(uri, extractor, sem) for uri in backed_up_uris]
+            )
         )
 
-    files = asyncio.run(_pipeline())
-    return ScanResult(files=files)
+    files = asyncio.run(_pipeline()) if backed_up_uris else []
+
+    # Phase 3 — suppression (synchrone)
+    deleted = 0
+    for uri in backed_up_uris:
+        name = uri.rsplit("/", 1)[-1]
+        try:
+            filesystem.delete_file(uri)
+            deleted += 1
+        except FilesystemError as e:
+            logger.error("%s — suppression échouée : %s", name, e)
+
+    return ScanResult(files=files, backed_up=len(backed_up_uris), deleted=deleted)
