@@ -38,8 +38,6 @@ class LocalFilesystem(Filesystem):
     def zip_file(self, src_uri: str, dest_uri: str) -> None:
         src = self._to_path(src_uri)
         dest = self._to_path(dest_uri)
-        if not src.exists():
-            raise FilesystemError(f"source not found: {src}")
         try:
             with zipfile.ZipFile(dest, "w", zipfile.ZIP_DEFLATED) as zf:
                 zf.write(src, src.name)
@@ -48,8 +46,6 @@ class LocalFilesystem(Filesystem):
 
     def delete_file(self, uri: str) -> None:
         path = self._to_path(uri)
-        if not path.exists():
-            raise FilesystemError(f"file not found: {path}")
         try:
             path.unlink()
         except OSError as exc:

@@ -13,6 +13,10 @@ logger = logging.getLogger(__name__)
 MAX_CONCURRENT = 4
 
 
+def _uri_name(uri: str) -> str:
+    return uri.rsplit("/", 1)[-1]
+
+
 @dataclass(frozen=True)
 class ScanResult:
     files: list[ScannedFile]
@@ -25,7 +29,7 @@ async def _extract_file(
     extractor: MetadataExtractor,
     sem: asyncio.Semaphore,
 ) -> ScannedFile:
-    name = uri.rsplit("/", 1)[-1]
+    name = _uri_name(uri)
     async with sem:
         logger.info("scanning %s", name)
         try:
@@ -34,8 +38,8 @@ async def _extract_file(
                 "%s — %s, %s page(s), %s",
                 name,
                 metadata["mime_type"],
-                metadata.get("page_count") or "?",
-                metadata.get("language") or "?",
+                metadata.get("page_count", "?"),
+                metadata.get("language", "?"),
             )
         except MetadataExtractorError as e:
             logger.warning("%s — extraction échouée : %s", name, e)
@@ -54,10 +58,11 @@ def scan(
 
     # Phase 1 — backup zip (synchrone, avant tout)
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
+    backup_base = backup_uri.rstrip("/")
     backed_up_uris: list[str] = []
     for uri in all_uris:
-        name = uri.rsplit("/", 1)[-1]
-        dest = f"{backup_uri.rstrip('/')}/{name}_{timestamp}.zip"
+        name = _uri_name(uri)
+        dest = f"{backup_base}/{name}_{timestamp}.zip"
         try:
             filesystem.zip_file(uri, dest)
             backed_up_uris.append(uri)
@@ -67,10 +72,8 @@ def scan(
     # Phase 2 — extraction métadonnées (async)
     async def _pipeline() -> list[ScannedFile]:
         sem = asyncio.Semaphore(MAX_CONCURRENT)
-        return list(
-            await asyncio.gather(
-                *[_extract_file(uri, extractor, sem) for uri in backed_up_uris]
-            )
+        return await asyncio.gather(
+            *[_extract_file(uri, extractor, sem) for uri in backed_up_uris]
         )
 
     files = asyncio.run(_pipeline()) if backed_up_uris else []
@@ -78,7 +81,7 @@ def scan(
     # Phase 3 — suppression (synchrone)
     deleted = 0
     for uri in backed_up_uris:
-        name = uri.rsplit("/", 1)[-1]
+        name = _uri_name(uri)
         try:
             filesystem.delete_file(uri)
             deleted += 1
