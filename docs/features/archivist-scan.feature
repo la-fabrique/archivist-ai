@@ -1,58 +1,77 @@
-Feature: Scanner un dossier source
+Feature: Scanner le dossier de réception
 
-Pour permettre au pipeline OCR/classement de traiter des documents,
-la commande scan itère les fichiers d'un dossier source et retourne
-la liste structurée des fichiers trouvés, sans récursion dans les sous-dossiers.
+Pour permettre au pipeline de traitement de documents d'ingérer les fichiers déposés,
+la commande scan lit les fichiers du dossier _Réception défini dans le référentiel,
+sauvegarde chaque original dans _Conservation brut (archive zip horodatée), extrait les
+métadonnées, puis supprime les originaux de la réception. Sans backup réussi, aucun
+fichier n'est traité ni supprimé.
 
 Background:
   Given l'outil archivist est installé
+  And un référentiel contenant une entrée "role: reception" pointant vers "_Réception"
+  And un référentiel contenant une entrée "role: conservation_brut" pointant vers "_Conservation brut"
 
-Scenario: Scan nominal d'un dossier avec fichiers
-  Given un dossier contenant 3 fichiers : "facture.pdf", "contrat.pdf", "releve.png"
-  When l'utilisateur exécute "archivist scan --source file:///path/to/dossier"
-  Then la sortie stdout est un JSON avec "scanned": 3 et "files" contenant 3 objets avec "name", "uri", "metadata"
+Scenario: Scan nominal — backup, extraction et suppression
+  Given un dossier "_Réception" contenant 3 fichiers : "facture.pdf", "contrat.pdf", "releve.png"
+  And un dossier "_Conservation brut" vide
+  When l'utilisateur exécute "archivist scan --referentiel file:///path/to/referentiel.yaml --target file:///path/to/archive"
+  Then la sortie stdout est un JSON avec "scanned": 3, "backed_up": 3, "deleted": 3
+  And "files" contient 3 objets avec les champs "name", "uri", "metadata"
+  And le dossier "_Conservation brut" contient 3 archives zip nommées "<nom>_<timestamp>.zip"
+  And le dossier "_Réception" est vide
   And la sortie stderr contient "INFO scanning facture.pdf"
-  And la sortie stderr contient "INFO scanning contrat.pdf"
-  And la sortie stderr contient "INFO scanning releve.png"
   And la sortie stderr contient "INFO scan terminé : 3 fichier(s) traité(s)"
   And le code de retour est 0
 
-Scenario: Scan d'un dossier vide
-  Given un dossier vide
-  When l'utilisateur exécute "archivist scan --source file:///path/to/dossier-vide"
-  Then la sortie stdout est le JSON {"scanned": 0, "files": []} avec une liste vide
-  And la sortie stderr contient "INFO scan terminé : 0 fichier(s) traité(s)"
+Scenario: Scan d'un dossier _Réception vide
+  Given un dossier "_Réception" vide
+  When l'utilisateur exécute "archivist scan --referentiel file:///path/to/referentiel.yaml --target file:///path/to/archive"
+  Then la sortie stdout est le JSON {"scanned": 0, "backed_up": 0, "deleted": 0, "files": []}
   And le code de retour est 0
 
 Scenario: Le scan est non récursif
-  Given un dossier contenant 2 fichiers et 1 sous-dossier lui-même contenant 3 fichiers
-  When l'utilisateur exécute "archivist scan --source file:///path/to/dossier"
+  Given un dossier "_Réception" contenant 2 fichiers et 1 sous-dossier avec 3 fichiers supplémentaires
+  When l'utilisateur exécute "archivist scan --referentiel file:///path/to/referentiel.yaml --target file:///path/to/archive"
   Then la sortie stdout liste uniquement les 2 fichiers du niveau racine
-  And les fichiers du sous-dossier ne sont pas inclus
+  And les fichiers du sous-dossier ne sont pas inclus dans "files"
+  And "scanned": 2
 
-Scenario: URI avec schéma invalide
-  When l'utilisateur exécute "archivist scan --source /chemin/sans/scheme"
-  Then le code de retour est 2
-  And la sortie stderr contient un message d'erreur sur le paramètre "--source"
+Scenario: Échec du backup — le fichier n'est ni extrait ni supprimé
+  Given un dossier "_Réception" contenant 1 fichier "facture.pdf"
+  And le système de fichiers ne peut pas créer de zip dans "_Conservation brut"
+  When l'utilisateur exécute "archivist scan --referentiel file:///path/to/referentiel.yaml --target file:///path/to/archive"
+  Then la sortie stdout est le JSON {"scanned": 0, "backed_up": 0, "deleted": 0, "files": []}
+  And le fichier "facture.pdf" est toujours présent dans "_Réception"
+  And la sortie stderr contient "ERROR" mentionnant le fichier concerné
+  And le code de retour est 0
 
-Scenario: URI pointant vers un fichier plutôt qu'un dossier
-  Given un fichier "document.pdf" accessible à l'URI "file:///path/to/document.pdf"
-  When l'utilisateur exécute "archivist scan --source file:///path/to/document.pdf"
-  Then le code de retour est 2
-  And la sortie stderr contient "n'est pas un dossier valide"
+Scenario: Extraction échouée sur un fichier — le scan continue et supprime quand même
+  Given un dossier "_Réception" contenant 2 fichiers dont un corrompu
+  When l'utilisateur exécute "archivist scan --referentiel file:///path/to/referentiel.yaml --target file:///path/to/archive"
+  Then la sortie stdout liste les 2 fichiers avec "backed_up": 2 et "deleted": 2
+  And le fichier corrompu a "metadata": null
+  And la sortie stderr contient "WARNING" pour le fichier corrompu
+  And les 2 fichiers ont été supprimés de "_Réception"
+  And le code de retour est 0
 
 Scenario: Scan retourne les métadonnées de chaque fichier
-  Given un dossier contenant 1 fichier : "facture.pdf"
-  When l'utilisateur exécute "archivist scan --source file:///path/to/dossier"
-  Then la sortie stdout contient un objet JSON par fichier avec les champs "name", "uri", "metadata"
-  And "metadata" contient "mime_type", "size_bytes", "modified_at"
+  Given un dossier "_Réception" contenant 1 fichier "facture.pdf"
+  When l'utilisateur exécute "archivist scan --referentiel file:///path/to/referentiel.yaml --target file:///path/to/archive"
+  Then "metadata" contient "mime_type", "size_bytes", "modified_at"
   And les champs "title", "author", "page_count", "language" sont présents (peuvent être null)
   And le code de retour est 0
 
-Scenario: Extraction échouée sur un fichier — le scan continue
-  Given un dossier contenant 2 fichiers dont un corrompu
-  When l'utilisateur exécute "archivist scan --source file:///path/to/dossier"
-  Then la sortie stdout liste les 2 fichiers
-  And le fichier corrompu a "metadata": null
-  And la sortie stderr contient "WARNING" pour le fichier corrompu
-  And le code de retour est 0
+Scenario: Option --referentiel manquante
+  When l'utilisateur exécute "archivist scan --target file:///path/to/archive"
+  Then le code de retour est 2
+  And la sortie stderr contient un message d'erreur mentionnant "--referentiel"
+
+Scenario: URI --referentiel avec schéma invalide
+  When l'utilisateur exécute "archivist scan --referentiel /chemin/sans/scheme --target file:///path/to/archive"
+  Then le code de retour est 2
+
+Scenario: Dossier _Réception absent de l'archive cible
+  Given un dossier cible sans dossier "_Réception"
+  When l'utilisateur exécute "archivist scan --referentiel file:///path/to/referentiel.yaml --target file:///path/to/archive"
+  Then le code de retour est 2
+  And la sortie stderr contient "scaffold" dans le message d'erreur
