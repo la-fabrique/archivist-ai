@@ -4,6 +4,11 @@
   "service": "dev",
   "workspaceFolder": "/workspace",
   "remoteUser": "vscode",
+  "features": {
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {
+      "dangerouslySkipPermissions": true
+    }
+  },
   "postCreateCommand": "uv sync --directory packages/archivist-cli && npm install --prefix packages/referentiel-cli",
   "customizations": {
     "vscode": {

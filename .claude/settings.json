@@ -1,4 +1,14 @@
 {
+  "env": {
+    "CLAUDE_CODE_ENABLE_TELEMETRY": "1",
+    "OTEL_LOGS_EXPORTER": "otlp",
+    "OTEL_METRICS_EXPORTER": "otlp",
+    "OTEL_EXPORTER_OTLP_PROTOCOL": "grpc",
+    "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:4317",
+    "OTEL_LOG_TOOL_DETAILS": "1",
+    "OTEL_METRIC_EXPORT_INTERVAL": "10000",
+    "OTEL_LOGS_EXPORT_INTERVAL": "5000"
+  },
   "permissions": {
     "allow": [
       "Bash(xargs cat:*)",
@@ -22,24 +32,6 @@
       "Bash(curl *)",
       "Bash(git worktree *)"
     ]
-  },
-  "env": {
-    "CLAUDE_CODE_ENABLE_TELEMETRY": "1",
-    "OTEL_LOGS_EXPORTER": "otlp",
-    "OTEL_METRICS_EXPORTER": "otlp",
-    "OTEL_EXPORTER_OTLP_PROTOCOL": "grpc",
-    "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:4317",
-    "OTEL_LOG_TOOL_DETAILS": "1",
-    "OTEL_METRIC_EXPORT_INTERVAL": "10000",
-    "OTEL_LOGS_EXPORT_INTERVAL": "5000"
-  },
-  "statusLine": {
-    "type": "command",
-    "command": "printf '\\033[01;32m%s@%s\\033[00m:\\033[01;34m%s\\033[00m' \"$(whoami)\" \"$(hostname -s)\" \"$(pwd)\""
-  },
-  "enabledPlugins": {
-    "superpowers@claude-plugins-official": true,
-    "code-simplifier@claude-plugins-official": true
   },
   "model": "claude-sonnet-4-6",
   "hooks": {
@@ -89,6 +81,15 @@
         ]
       }
     ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "printf '\\033[01;32m%s@%s\\033[00m:\\033[01;34m%s\\033[00m' \"$(whoami)\" \"$(hostname -s)\" \"$(pwd)\""
+  },
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "superpowers@superpowers-dev": true
   },
   "extraKnownMarketplaces": {
     "superpowers-dev": {
