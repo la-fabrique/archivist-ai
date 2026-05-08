@@ -27,4 +27,4 @@ Un ADR ne se supprime pas — s'il est remplacé, son statut passe à `supersede
 
 ## Worktrees — règle absolue
 
-Ne jamais committer du code directement sur `main`. Avant toute implémentation, invoquer le skill `superpowers:using-git-worktrees` pour créer un worktree isolé dans `.claude/worktrees/<feature-name>`. Tous les commits de la feature se font dans ce worktree. Le hook `no-commit-on-main.sh` bloque les commits sur `main` et rappelle cette règle.
+Ne jamais travailler directement sur `main` pour une feature. Avant toute feature — **brainstorming inclus** — invoquer le skill `superpowers:using-git-worktrees` pour créer un worktree isolé dans `.claude/worktrees/<feature-name>`. Le brainstorming, la rédaction de specs et l'implémentation se font tous dans ce worktree. Le hook `no-commit-on-main.sh` bloque les commits sur `main` et le hook `session-start.sh` rappelle cette règle au démarrage de chaque session.
