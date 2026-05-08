@@ -12,7 +12,7 @@ from archivist_cli.domain.ports import MetadataExtractor, MetadataExtractorError
 
 
 class KreuzbergMetadataExtractor(MetadataExtractor):
-    VERSION: ClassVar[int] = 1
+    VERSION: ClassVar[int] = 2
 
     def extract(self, uri: str) -> ExtractionResult:
         parsed = urlparse(uri)
