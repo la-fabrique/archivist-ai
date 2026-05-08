@@ -10,6 +10,7 @@ from urllib.parse import urlparse
 import pytest
 
 from archivist_cli.adapters.fs.local import LocalFilesystem
+from archivist_cli.adapters.index.noop import NoopIndex
 from archivist_cli.adapters.referentiel.yaml_file import YamlFileReferentiel
 from archivist_cli.domain.ports import Filesystem, FilesystemError, Index, IndexError, MetadataExtractor, MetadataExtractorError, Referentiel
 from tests.fakes import FakeFilesystem, FakeIndex, FakeMetadataExtractor, FakeReferentiel
@@ -273,3 +274,9 @@ class TestFakeIndexContract(IndexContractSuite):
     @pytest.fixture
     def index(self) -> Index:
         return FakeIndex()
+
+
+class TestNoopIndexContract(IndexContractSuite):
+    @pytest.fixture
+    def index(self) -> Index:
+        return NoopIndex()
