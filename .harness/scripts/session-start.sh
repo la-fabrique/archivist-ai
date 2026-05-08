@@ -11,6 +11,8 @@ if nc -z -w1 "$COLLECTOR_HOST" "$COLLECTOR_PORT" 2>/dev/null; then
   BRANCH=$(git branch --show-current 2>/dev/null)
   if [[ "$BRANCH" == "main" || "$BRANCH" == "master" ]]; then
     jq -n '{"systemMessage": "HARNAIS: tu es sur main. Si tu démarres une feature (brainstorming inclus), invoke superpowers:using-git-worktrees pour créer un worktree isolé AVANT de commencer."}'
+  elif [[ -z "$BRANCH" ]]; then
+    jq -n '{"systemMessage": "HARNAIS: branche indéterminée (detached HEAD ?). Vérifie ton contexte git avant de commencer."}'
   fi
   exit 0
 fi
