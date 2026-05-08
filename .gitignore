@@ -34,7 +34,7 @@ __pycache__/
 # Git worktrees
 .worktrees/
 .claude/worktrees/
-
+settings.local.json
 
 docs/superpowers/**
 !docs/superpowers/specs/

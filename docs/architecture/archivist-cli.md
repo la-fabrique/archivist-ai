@@ -25,20 +25,46 @@ Index/DB des décisions, validation humaine, cache OCR/LLM, profils de configura
 
 ## 2. Pipeline & contrats des étapes
 
-### Famille « pipeline » — `classify` (use case principal)
+### État actuel — `scan` (use case implémenté)
+
+La commande `scan` couvre la réception et la mise en conservation brute. Elle opère sur deux dossiers du référentiel identifiés par leur `role` : `reception` et `conservation_brut`.
 
 ```
-        ┌──────────┐   ┌─────┐   ┌────────────┐   ┌────────────┐   ┌──────────┐
-source ─►  Ingest  ├──►│ OCR ├──►│ Extraction ├──►│ Classement ├──►│  Apply   │─► cible
-        └────┬─────┘   └──┬──┘   └─────┬──────┘   └─────┬──────┘   └────┬─────┘
-             │            │             │                 │                │
-            FS         OCR engine     LLM             LLM + Référentiel   FS
-                                                                         (+ Index)
+        ┌──────────┐   ┌──────────────┐   ┌───────────────────┐   ┌────────────┐
+source ─►  Ingest  ├──►│  Backup ZIP  ├──►│ MetadataExtract   ├──►│   Delete   │
+(_Réception)       │   │(_Cons. brut) │   │   (async ×4)      │   │ (source)   │
+        └────┬─────┘   └──────┬───────┘   └────────┬──────────┘   └─────┬──────┘
+             │                │                     │                    │
+            FS               FS                MetadataExtractor        FS
+                                               (kreuzberg)
+```
+
+| Phase | Entrée | Sortie | Port(s) sollicité(s) |
+|---|---|---|---|
+| Ingest | URI `_Réception` | liste d'URIs fichiers | `Filesystem.list_files` |
+| Backup ZIP | URI fichier source | archive `.zip` horodatée dans `_Conservation brut` | `Filesystem.zip_file` |
+| MetadataExtract | URI fichier source | `FileMetadata` (mime, taille, titre, auteur, pages, langue) | `MetadataExtractor` |
+| Delete | URI fichier source | suppression du fichier de réception | `Filesystem.delete_file` |
+
+Résultat agrégé : `ScanResult(files: list[ScannedFile], backed_up: int, deleted: int)`.
+
+> Les phases Backup et Delete sont synchrones ; MetadataExtract est asynchrone (semaphore ×4 concurrent).
+
+### Vision cible — `classify` (à implémenter)
+
+```
+        ┌──────────┐   ┌──────────────┐   ┌─────┐   ┌────────────┐   ┌────────────┐   ┌──────────┐
+source ─►  Ingest  ├──►│  Backup ZIP  ├──►│ OCR ├──►│ Extraction ├──►│ Classement ├──►│  Apply   │─► cible
+        └────┬─────┘   └──────┬───────┘   └──┬──┘   └─────┬──────┘   └─────┬──────┘   └────┬─────┘
+             │                │               │             │                 │                │
+            FS               FS           OcrEngine       LLM             LLM + Référentiel   FS
+                        (_Cons. brut)                                                        (+ Index)
 ```
 
 | Étape | Entrée | Sortie | Port(s) sollicité(s) |
 |---|---|---|---|
-| Ingest | URI source (dossier) | Flux de `SourceDocument` | `Filesystem` |
+| Ingest | URI source (dossier) | flux de `SourceDocument` | `Filesystem` |
+| Backup ZIP | `SourceDocument` | archive `.zip` dans `_Conservation brut` | `Filesystem` |
 | OCR | `SourceDocument` | `OcrText` | `OcrEngine` |
 | Extraction | `OcrText` | `ExtractedFields` | `LanguageModel` |
 | Classement | `ExtractedFields` + référentiel | `ClassificationDecision` | `LanguageModel`, `Referentiel` |
@@ -85,17 +111,19 @@ Trois cercles concentriques, façon hexagonale.
 - `cli` dépend de `application` + `adapters` — c'est le seul endroit où l'on **câble**.
 - **Aucune flèche inverse.** Un adaptateur n'importe jamais un use case ; le domain n'importe jamais un adaptateur.
 
-### Layout cible (`src/archivist_cli/`)
+### Layout (`src/archivist_cli/`) — état actuel + cible
 
 ```
 domain/          ports.py, models.py
-application/     classify.py, scaffold.py, audit.py
+application/     scan.py, scaffold.py          ← implémentés
+                 classify.py, audit.py         ← cible
 adapters/
   fs/            local.py
-  ocr/           tesseract.py
-  llm/           openai.py
+  metadata/      kreuzberg.py                  ← implémenté
   referentiel/   yaml_file.py
-  index/         noop.py
+  ocr/           tesseract.py                  ← cible
+  llm/           openai.py                     ← cible
+  index/         noop.py                       ← cible
 cli.py
 registry.py
 ```
@@ -109,30 +137,33 @@ registry.py
 
 ## 4. Catalogue des ports
 
-Cinq ports, tous définis dès la v1, même quand un seul adaptateur (voire un *no-op*) est livré.
-
-### `Filesystem`
+### `Filesystem` ✓ implémenté
 Stockage hiérarchique, manipulé par **URI** (`file://`, `s3://`, `gdrive://`…) — jamais par `pathlib.Path`, qui fuiterait dans le domain.
-Adaptateurs : `local` (v1), puis `s3`, `gdrive`, `webdav`.
+Opérations : `make_dir`, `exists`, `is_dir`, `list_files`, `zip_file`, `delete_file`.
+Adaptateurs : `local` (implémenté), puis `s3`, `gdrive`, `webdav`.
 
-### `OcrEngine`
+### `MetadataExtractor` ✓ implémenté
+Extraction des métadonnées fichier et document depuis un URI `file://`. Retourne un `FileMetadata` (mime_type, size_bytes, modified_at, title, author, page_count, language).
+Adaptateurs : `kreuzberg` (implémenté — extraction synchrone via `extract_file_sync`, wrappée en async dans le use case).
+
+### `Referentiel` ✓ implémenté
+Accès au référentiel de classement. Expose les entrées avec leur `role` (`reception`, `conservation_brut`, …) pour que la CLI puisse résoudre les dossiers sans logique métier.
+Adaptateurs : `yaml_file` (implémenté, pointe sur l'artefact du package `referentiel`), puis `http`, `git`, `versioned`.
+
+### `OcrEngine` — cible
 Extraction de texte depuis des bytes. Le port porte les **capacités** (langues, tabulaire, …) pour qu'un use case puisse rejeter tôt un moteur incompatible.
-Adaptateurs : `tesseract` (v1), puis `mistral-ocr`, `azure-di`, `gcp-docai`.
+Adaptateurs : `tesseract`, puis `mistral-ocr`, `azure-di`, `gcp-docai`.
 
-### `LanguageModel`
+### `LanguageModel` — cible
 Un seul port couvre **extraction structurée** et **classement** — deux usages, un même contrat. Le schéma de sortie attendu est porté par l'appelant, pas par l'adaptateur.
-Adaptateurs : `openai` ou `ollama` en v1, puis `mistral-api`, `anthropic`.
+Adaptateurs : `openai` ou `ollama`, puis `mistral-api`, `anthropic`.
 
-### `Referentiel`
-Accès au référentiel de classement.
-Adaptateurs : `yaml_file` (v1, pointe sur l'artefact du package `referentiel`), puis `http`, `git`, `versioned`.
-
-### `Index`
-Mémoire des décisions. **Port défini, no-op livré en v1.** Présent dans le pipeline dès le départ pour éviter de réécrire le câblage le jour où on branche un vrai stockage.
-Adaptateurs : `noop` (v1), puis `sqlite`, `tantivy`, `elastic`.
+### `Index` — cible
+Mémoire des décisions. **Port à définir, no-op à livrer.** Présent dans le pipeline dès le départ pour éviter de réécrire le câblage le jour où on branche un vrai stockage.
+Adaptateurs : `noop`, puis `sqlite`, `tantivy`, `elastic`.
 
 ### Règle transverse
-Chaque port définit ses **erreurs propres** (`OcrError`, `FilesystemError`, `LlmError`, …). Aucune ABC ne renvoie d'exception non documentée. Le use case décide de la politique.
+Chaque port définit ses **erreurs propres** (`MetadataExtractorError`, `FilesystemError`, `ReferentielError`, `OcrError`, `LlmError`, …). Aucune ABC ne renvoie d'exception non documentée. Le use case décide de la politique.
 
 ---
 
@@ -164,9 +195,12 @@ archivist <commande> [--source URI] [--target URI]
                      [options spécifiques à l'adaptateur]
 ```
 
-### Trois commandes en v1
-- `archivist classify` — pipeline complet, déplace + renomme.
+### Commandes implémentées
+- `archivist scan` — réception → backup ZIP dans `_Conservation brut` → extraction métadonnées (kreuzberg) → suppression source.
 - `archivist scaffold` — crée l'arborescence cible à partir du référentiel.
+
+### Commandes cibles (non livrées)
+- `archivist classify` — pipeline complet OCR + LLM, déplace + renomme.
 - `archivist audit` — vérifie la cohérence entre arborescence et référentiel.
 
 ### Configuration v1
