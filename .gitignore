@@ -39,7 +39,5 @@ settings.local.json
 docs/superpowers/**
 !docs/superpowers/specs/
 !docs/superpowers/specs/.gitkeep
-!docs/superpowers/specs/**
 !docs/superpowers/plans/
 !docs/superpowers/plans/.gitkeep
-!docs/superpowers/plans/**
