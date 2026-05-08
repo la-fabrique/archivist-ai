@@ -27,7 +27,7 @@ Un ADR ne se supprime pas — s'il est remplacé, son statut passe à `supersede
 
 ## Fin de feature — règle absolue
 
-Après avoir créé une PR ou mergé une feature, appeler le harness-cleaner si `docs/superpowers/` contient des fichiers liés à la feature (plans, specs). Le harness-cleaner génère les `.feature` Gherkin dans `docs/features/` et supprime les fichiers superpowers traités.
+Avant de créer une PR, appeler le harness-cleaner si `docs/superpowers/` contient des fichiers liés à la feature (plans, specs). Le harness-cleaner génère les `.feature` Gherkin dans `docs/features/` et supprime les fichiers superpowers traités. La PR doit inclure ces commits de nettoyage.
 
 ## Worktrees — règle absolue
 
