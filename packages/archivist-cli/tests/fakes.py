@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from archivist_cli.domain.models import ExtractionResult, FileMetadata, ReferentielEntry
-from archivist_cli.domain.ports import Filesystem, FilesystemError, MetadataExtractor, MetadataExtractorError, Referentiel
+from archivist_cli.domain.ports import Filesystem, FilesystemError, Index, IndexError, MetadataExtractor, MetadataExtractorError, Referentiel
 
 
 class FakeReferentiel(Referentiel):
@@ -54,6 +54,17 @@ class FakeFilesystem(Filesystem):
 
     def add_dir(self, uri: str) -> None:
         self._dirs.add(uri)
+
+
+class FakeIndex(Index):
+    def __init__(self) -> None:
+        self.indexed: list[tuple[str, str, FileMetadata]] = []
+
+    def index_document(self, uri: str, content: str, metadata: FileMetadata) -> None:
+        existing = [i for i, (u, _, _) in enumerate(self.indexed) if u == uri]
+        for i in reversed(existing):
+            self.indexed.pop(i)
+        self.indexed.append((uri, content, metadata))
 
 
 class FakeMetadataExtractor(MetadataExtractor):

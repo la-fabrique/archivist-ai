@@ -77,3 +77,20 @@ class MetadataExtractor(ABC):
         Lève MetadataExtractorError si l'extraction échoue.
         """
         ...
+
+
+class IndexError(Exception):
+    pass
+
+
+class Index(ABC):
+    VERSION: ClassVar[int] = 1
+
+    @abstractmethod
+    def index_document(self, uri: str, content: str, metadata: FileMetadata) -> None:
+        """Indexe un document par son URI.
+
+        Comportement upsert : réindexe si l'URI existe déjà.
+        Lève IndexError si l'indexation échoue.
+        """
+        ...

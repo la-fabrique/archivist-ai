@@ -11,9 +11,9 @@ import pytest
 
 from archivist_cli.adapters.fs.local import LocalFilesystem
 from archivist_cli.adapters.referentiel.yaml_file import YamlFileReferentiel
-from archivist_cli.domain.ports import Filesystem, FilesystemError, MetadataExtractor, MetadataExtractorError, Referentiel
-from tests.fakes import FakeFilesystem, FakeMetadataExtractor, FakeReferentiel
-from archivist_cli.domain.models import ExtractionResult, ReferentielEntry
+from archivist_cli.domain.ports import Filesystem, FilesystemError, Index, IndexError, MetadataExtractor, MetadataExtractorError, Referentiel
+from tests.fakes import FakeFilesystem, FakeIndex, FakeMetadataExtractor, FakeReferentiel
+from archivist_cli.domain.models import ExtractionResult, FileMetadata, ReferentielEntry
 
 
 # --- Filesystem contract ---
@@ -214,3 +214,62 @@ class TestFakeMetadataExtractorContract(MetadataExtractorContractSuite):
     @pytest.fixture
     def valid_file_uri(self) -> str:
         return "file:///any/file.pdf"
+
+
+# --- Index contract ---
+
+class IndexContractSuite:
+    """Mixin de tests de contrat pour le port Index."""
+
+    @pytest.fixture
+    def index(self) -> Index:
+        raise NotImplementedError
+
+    def test_index_document_stores_document(self, index: Index):
+        index.index_document(
+            uri="file:///docs/facture.pdf",
+            content="Facture du 01/05/2026",
+            metadata=FileMetadata(
+                mime_type="application/pdf",
+                size_bytes=2048,
+                modified_at="2026-05-01T10:00:00+00:00",
+                title="Facture",
+                author="Fournisseur SA",
+                page_count=1,
+                language="fr",
+            ),
+        )
+
+    def test_index_document_upsert_does_not_raise(self, index: Index):
+        meta = FileMetadata(
+            mime_type="application/pdf",
+            size_bytes=1024,
+            modified_at="2026-05-01T00:00:00+00:00",
+            title=None,
+            author=None,
+            page_count=None,
+            language=None,
+        )
+        index.index_document(uri="file:///docs/contrat.pdf", content="version 1", metadata=meta)
+        index.index_document(uri="file:///docs/contrat.pdf", content="version 2", metadata=meta)
+
+    def test_index_document_empty_content(self, index: Index):
+        index.index_document(
+            uri="file:///docs/vide.pdf",
+            content="",
+            metadata=FileMetadata(
+                mime_type="application/pdf",
+                size_bytes=0,
+                modified_at="2026-05-01T00:00:00+00:00",
+                title=None,
+                author=None,
+                page_count=None,
+                language=None,
+            ),
+        )
+
+
+class TestFakeIndexContract(IndexContractSuite):
+    @pytest.fixture
+    def index(self) -> Index:
+        return FakeIndex()
