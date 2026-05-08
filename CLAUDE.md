@@ -25,6 +25,10 @@ Un ADR ne se supprime pas — s'il est remplacé, son statut passe à `supersede
 - Features fonctionnelles (comportement attendu) → `docs/features/`
 - Décisions techniques (architecture, contrats) → `docs/architecture/adrs/`
 
+## Fin de feature — règle absolue
+
+Après avoir créé une PR ou mergé une feature, appeler le harness-cleaner si `docs/superpowers/` contient des fichiers liés à la feature (plans, specs). Le harness-cleaner génère les `.feature` Gherkin dans `docs/features/` et supprime les fichiers superpowers traités.
+
 ## Worktrees — règle absolue
 
 Ne jamais travailler directement sur `main` pour une feature. Avant toute feature — **brainstorming inclus** — invoquer le skill `superpowers:using-git-worktrees` pour créer un worktree isolé dans `.claude/worktrees/<feature-name>`. Le brainstorming, la rédaction de specs et l'implémentation se font tous dans ce worktree. Le hook `no-commit-on-main.sh` bloque les commits sur `main` et le hook `session-start.sh` rappelle cette règle au démarrage de chaque session.
