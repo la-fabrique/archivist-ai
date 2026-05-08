@@ -48,3 +48,9 @@ class ScannedFile:
     uri: str
     name: str
     metadata: FileMetadata | None
+
+
+@dataclass(frozen=True)
+class ExtractionResult:
+    content: str
+    metadata: FileMetadata

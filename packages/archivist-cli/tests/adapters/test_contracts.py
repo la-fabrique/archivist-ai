@@ -13,7 +13,7 @@ from archivist_cli.adapters.fs.local import LocalFilesystem
 from archivist_cli.adapters.referentiel.yaml_file import YamlFileReferentiel
 from archivist_cli.domain.ports import Filesystem, FilesystemError, MetadataExtractor, MetadataExtractorError, Referentiel
 from tests.fakes import FakeFilesystem, FakeMetadataExtractor, FakeReferentiel
-from archivist_cli.domain.models import ReferentielEntry
+from archivist_cli.domain.models import ExtractionResult, ReferentielEntry
 
 
 # --- Filesystem contract ---
@@ -186,19 +186,20 @@ class MetadataExtractorContractSuite:
 
     def test_extract_returns_required_fields(self, extractor: MetadataExtractor, valid_file_uri: str):
         result = extractor.extract(valid_file_uri)
-        assert isinstance(result["mime_type"], str)
-        assert len(result["mime_type"]) > 0
-        assert isinstance(result["size_bytes"], int)
-        assert result["size_bytes"] >= 0
-        assert isinstance(result["modified_at"], str)
-        assert "T" in result["modified_at"]  # ISO 8601 basic check
+        assert isinstance(result.content, str)
+        assert isinstance(result.metadata["mime_type"], str)
+        assert len(result.metadata["mime_type"]) > 0
+        assert isinstance(result.metadata["size_bytes"], int)
+        assert result.metadata["size_bytes"] >= 0
+        assert isinstance(result.metadata["modified_at"], str)
+        assert "T" in result.metadata["modified_at"]
 
     def test_extract_optional_fields_are_none_or_typed(self, extractor: MetadataExtractor, valid_file_uri: str):
         result = extractor.extract(valid_file_uri)
-        assert result["title"] is None or isinstance(result["title"], str)
-        assert result["author"] is None or isinstance(result["author"], str)
-        assert result["page_count"] is None or isinstance(result["page_count"], int)
-        assert result["language"] is None or isinstance(result["language"], str)
+        assert result.metadata["title"] is None or isinstance(result.metadata["title"], str)
+        assert result.metadata["author"] is None or isinstance(result.metadata["author"], str)
+        assert result.metadata["page_count"] is None or isinstance(result.metadata["page_count"], int)
+        assert result.metadata["language"] is None or isinstance(result.metadata["language"], str)
 
     def test_extract_unsupported_scheme_raises(self, extractor: MetadataExtractor):
         with pytest.raises(MetadataExtractorError):

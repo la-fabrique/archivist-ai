@@ -33,7 +33,8 @@ async def _extract_file(
     async with sem:
         logger.info("scanning %s", name)
         try:
-            metadata = await asyncio.to_thread(extractor.extract, uri)
+            extraction = await asyncio.to_thread(extractor.extract, uri)
+            metadata = extraction.metadata
             logger.info(
                 "%s — %s, %s page(s), %s",
                 name,
