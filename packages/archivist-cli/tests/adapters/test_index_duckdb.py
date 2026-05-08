@@ -7,16 +7,7 @@ import pytest
 
 from archivist_cli.adapters.index.duckdb import DuckDbIndex
 from archivist_cli.domain.models import FileMetadata
-from archivist_cli.domain.ports import Index, IndexError
-from tests.adapters.test_contracts import IndexContractSuite
-
-
-class TestDuckDbIndexContract(IndexContractSuite):
-    @pytest.fixture
-    def index(self, tmp_path: Path):
-        idx = DuckDbIndex(db_uri=f"file://{tmp_path}/test.db")
-        yield idx
-        idx._conn.close()
+from archivist_cli.domain.ports import IndexError
 
 
 def test_duckdb_index_persists_document(tmp_path: Path):

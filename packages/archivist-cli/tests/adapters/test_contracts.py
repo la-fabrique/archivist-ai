@@ -10,6 +10,7 @@ from urllib.parse import urlparse
 import pytest
 
 from archivist_cli.adapters.fs.local import LocalFilesystem
+from archivist_cli.adapters.index.duckdb import DuckDbIndex
 from archivist_cli.adapters.index.noop import NoopIndex
 from archivist_cli.adapters.referentiel.yaml_file import YamlFileReferentiel
 from archivist_cli.domain.ports import Filesystem, FilesystemError, Index, IndexError, MetadataExtractor, MetadataExtractorError, Referentiel
@@ -280,9 +281,6 @@ class TestNoopIndexContract(IndexContractSuite):
     @pytest.fixture
     def index(self) -> Index:
         return NoopIndex()
-
-
-from archivist_cli.adapters.index.duckdb import DuckDbIndex
 
 
 class TestDuckDbIndexContract(IndexContractSuite):
