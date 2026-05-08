@@ -280,3 +280,14 @@ class TestNoopIndexContract(IndexContractSuite):
     @pytest.fixture
     def index(self) -> Index:
         return NoopIndex()
+
+
+from archivist_cli.adapters.index.duckdb import DuckDbIndex
+
+
+class TestDuckDbIndexContract(IndexContractSuite):
+    @pytest.fixture
+    def index(self, tmp_path: Path):
+        idx = DuckDbIndex(db_uri=f"file://{tmp_path}/test.db")
+        yield idx
+        idx._conn.close()
