@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from archivist_cli.domain.models import FileMetadata, ReferentielEntry
-from archivist_cli.domain.ports import Filesystem, FilesystemError, MetadataExtractor, MetadataExtractorError, Referentiel
+from archivist_cli.domain.models import ExtractionResult, FileMetadata, ReferentielEntry
+from archivist_cli.domain.ports import Filesystem, FilesystemError, Index, IndexError, MetadataExtractor, MetadataExtractorError, Referentiel
 
 
 class FakeReferentiel(Referentiel):
@@ -56,21 +56,35 @@ class FakeFilesystem(Filesystem):
         self._dirs.add(uri)
 
 
+class FakeIndex(Index):
+    def __init__(self) -> None:
+        self.indexed: list[tuple[str, str, FileMetadata]] = []
+
+    def index_document(self, uri: str, content: str, metadata: FileMetadata) -> None:
+        existing = [i for i, (u, _, _) in enumerate(self.indexed) if u == uri]
+        for i in reversed(existing):
+            self.indexed.pop(i)
+        self.indexed.append((uri, content, metadata))
+
+
 class FakeMetadataExtractor(MetadataExtractor):
     def __init__(self, fail_on: set[str] | None = None) -> None:
         self._fail_on: set[str] = fail_on or set()
 
-    def extract(self, uri: str) -> FileMetadata:
+    def extract(self, uri: str) -> ExtractionResult:
         if not uri.startswith("file://"):
             raise MetadataExtractorError(f"unsupported scheme in uri: {uri!r}")
         if uri in self._fail_on:
             raise MetadataExtractorError(f"fake failure for {uri}")
-        return FileMetadata(
-            mime_type="application/pdf",
-            size_bytes=1024,
-            modified_at="2026-05-04T00:00:00+00:00",
-            title=None,
-            author=None,
-            page_count=None,
-            language=None,
+        return ExtractionResult(
+            content="contenu extrait du document de test",
+            metadata=FileMetadata(
+                mime_type="application/pdf",
+                size_bytes=1024,
+                modified_at="2026-05-04T00:00:00+00:00",
+                title=None,
+                author=None,
+                page_count=None,
+                language=None,
+            ),
         )

@@ -7,14 +7,14 @@ from urllib.parse import urlparse
 
 from kreuzberg import extract_file_sync
 
-from archivist_cli.domain.models import FileMetadata
+from archivist_cli.domain.models import ExtractionResult, FileMetadata
 from archivist_cli.domain.ports import MetadataExtractor, MetadataExtractorError
 
 
 class KreuzbergMetadataExtractor(MetadataExtractor):
-    VERSION: ClassVar[int] = 1
+    VERSION: ClassVar[int] = 2
 
-    def extract(self, uri: str) -> FileMetadata:
+    def extract(self, uri: str) -> ExtractionResult:
         parsed = urlparse(uri)
         if parsed.scheme != "file":
             raise MetadataExtractorError(
@@ -57,12 +57,15 @@ class KreuzbergMetadataExtractor(MetadataExtractor):
             except Exception:
                 language = None
 
-        return FileMetadata(
-            mime_type=result.mime_type,
-            size_bytes=file_stat.st_size,
-            modified_at=modified_at,
-            title=meta.get("title"),
-            author=author,
-            page_count=page_count,
-            language=language,
+        return ExtractionResult(
+            content=result.content,
+            metadata=FileMetadata(
+                mime_type=result.mime_type,
+                size_bytes=file_stat.st_size,
+                modified_at=modified_at,
+                title=meta.get("title"),
+                author=author,
+                page_count=page_count,
+                language=language,
+            ),
         )

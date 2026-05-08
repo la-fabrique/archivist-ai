@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 from archivist_cli.adapters.fs.local import LocalFilesystem
+from archivist_cli.adapters.index.noop import NoopIndex
 from archivist_cli.adapters.metadata.kreuzberg import KreuzbergMetadataExtractor
 from archivist_cli.application.scan import ScanResult, scan
 
@@ -32,6 +33,7 @@ def test_scan_real_lists_files(archive_dir: tuple[Path, Path]):
         reception_uri=f"file://{reception}",
         backup_uri=f"file://{backup}",
         extractor=extractor,
+        index=NoopIndex(),
     )
 
     assert isinstance(result, ScanResult)
@@ -50,6 +52,7 @@ def test_scan_real_files_have_metadata(archive_dir: tuple[Path, Path]):
         reception_uri=f"file://{reception}",
         backup_uri=f"file://{backup}",
         extractor=extractor,
+        index=NoopIndex(),
     )
 
     for f in result.files:
@@ -69,6 +72,7 @@ def test_scan_real_non_recursive(archive_dir: tuple[Path, Path]):
         reception_uri=f"file://{reception}",
         backup_uri=f"file://{backup}",
         extractor=extractor,
+        index=NoopIndex(),
     )
 
     uris = [f.uri for f in result.files]
@@ -85,6 +89,7 @@ def test_scan_real_creates_zip_backup(archive_dir: tuple[Path, Path]):
         reception_uri=f"file://{reception}",
         backup_uri=f"file://{backup}",
         extractor=extractor,
+        index=NoopIndex(),
     )
 
     assert result.backed_up == 2
@@ -102,6 +107,7 @@ def test_scan_real_deletes_from_reception(archive_dir: tuple[Path, Path]):
         reception_uri=f"file://{reception}",
         backup_uri=f"file://{backup}",
         extractor=extractor,
+        index=NoopIndex(),
     )
 
     assert result.deleted == 2

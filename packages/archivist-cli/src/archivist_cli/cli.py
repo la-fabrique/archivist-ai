@@ -7,6 +7,7 @@ from urllib.parse import urlparse
 
 import click
 
+from archivist_cli.adapters.index.noop import NoopIndex
 from archivist_cli.application.scaffold import scaffold
 from archivist_cli.application.scan import scan
 from archivist_cli.registry import default_registry
@@ -127,7 +128,7 @@ def scan_cmd(referentiel: str, target: str) -> None:
             f"Dossier _Conservation brut introuvable à {backup_uri!r} — lancez scaffold d'abord"
         )
 
-    result = scan(filesystem=fs, reception_uri=reception_uri, backup_uri=backup_uri, extractor=extractor)
+    result = scan(filesystem=fs, reception_uri=reception_uri, backup_uri=backup_uri, extractor=extractor, index=NoopIndex())
 
     logger.info("scan terminé : %d fichier(s) traité(s)", len(result.files))
     files_out = [

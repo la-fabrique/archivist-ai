@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import ClassVar
 
-from archivist_cli.domain.models import FileMetadata, ReferentielEntry
+from archivist_cli.domain.models import ExtractionResult, FileMetadata, ReferentielEntry
 
 
 class ReferentielError(Exception):
@@ -68,12 +68,29 @@ class MetadataExtractorError(Exception):
 
 
 class MetadataExtractor(ABC):
+    VERSION: ClassVar[int] = 2
+
+    @abstractmethod
+    def extract(self, uri: str) -> ExtractionResult:
+        """Extrait le texte et les métadonnées depuis un URI file://.
+
+        Lève MetadataExtractorError si l'extraction échoue.
+        """
+        ...
+
+
+class IndexError(Exception):
+    pass
+
+
+class Index(ABC):
     VERSION: ClassVar[int] = 1
 
     @abstractmethod
-    def extract(self, uri: str) -> FileMetadata:
-        """Extrait les métadonnées fichier et document depuis un URI file://.
+    def index_document(self, uri: str, content: str, metadata: FileMetadata) -> None:
+        """Indexe un document par son URI.
 
-        Lève MetadataExtractorError si l'extraction échoue.
+        Comportement upsert : réindexe si l'URI existe déjà.
+        Lève IndexError si l'indexation échoue.
         """
         ...

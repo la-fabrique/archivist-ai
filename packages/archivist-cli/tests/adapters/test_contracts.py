@@ -10,10 +10,12 @@ from urllib.parse import urlparse
 import pytest
 
 from archivist_cli.adapters.fs.local import LocalFilesystem
+from archivist_cli.adapters.index.duckdb import DuckDbIndex
+from archivist_cli.adapters.index.noop import NoopIndex
 from archivist_cli.adapters.referentiel.yaml_file import YamlFileReferentiel
-from archivist_cli.domain.ports import Filesystem, FilesystemError, MetadataExtractor, MetadataExtractorError, Referentiel
-from tests.fakes import FakeFilesystem, FakeMetadataExtractor, FakeReferentiel
-from archivist_cli.domain.models import ReferentielEntry
+from archivist_cli.domain.ports import Filesystem, FilesystemError, Index, IndexError, MetadataExtractor, MetadataExtractorError, Referentiel
+from tests.fakes import FakeFilesystem, FakeIndex, FakeMetadataExtractor, FakeReferentiel
+from archivist_cli.domain.models import ExtractionResult, FileMetadata, ReferentielEntry
 
 
 # --- Filesystem contract ---
@@ -186,19 +188,20 @@ class MetadataExtractorContractSuite:
 
     def test_extract_returns_required_fields(self, extractor: MetadataExtractor, valid_file_uri: str):
         result = extractor.extract(valid_file_uri)
-        assert isinstance(result["mime_type"], str)
-        assert len(result["mime_type"]) > 0
-        assert isinstance(result["size_bytes"], int)
-        assert result["size_bytes"] >= 0
-        assert isinstance(result["modified_at"], str)
-        assert "T" in result["modified_at"]  # ISO 8601 basic check
+        assert isinstance(result.content, str)
+        assert isinstance(result.metadata["mime_type"], str)
+        assert len(result.metadata["mime_type"]) > 0
+        assert isinstance(result.metadata["size_bytes"], int)
+        assert result.metadata["size_bytes"] >= 0
+        assert isinstance(result.metadata["modified_at"], str)
+        assert "T" in result.metadata["modified_at"]
 
     def test_extract_optional_fields_are_none_or_typed(self, extractor: MetadataExtractor, valid_file_uri: str):
         result = extractor.extract(valid_file_uri)
-        assert result["title"] is None or isinstance(result["title"], str)
-        assert result["author"] is None or isinstance(result["author"], str)
-        assert result["page_count"] is None or isinstance(result["page_count"], int)
-        assert result["language"] is None or isinstance(result["language"], str)
+        assert result.metadata["title"] is None or isinstance(result.metadata["title"], str)
+        assert result.metadata["author"] is None or isinstance(result.metadata["author"], str)
+        assert result.metadata["page_count"] is None or isinstance(result.metadata["page_count"], int)
+        assert result.metadata["language"] is None or isinstance(result.metadata["language"], str)
 
     def test_extract_unsupported_scheme_raises(self, extractor: MetadataExtractor):
         with pytest.raises(MetadataExtractorError):
@@ -213,3 +216,76 @@ class TestFakeMetadataExtractorContract(MetadataExtractorContractSuite):
     @pytest.fixture
     def valid_file_uri(self) -> str:
         return "file:///any/file.pdf"
+
+
+# --- Index contract ---
+
+class IndexContractSuite:
+    """Mixin de tests de contrat pour le port Index."""
+
+    @pytest.fixture
+    def index(self) -> Index:
+        raise NotImplementedError
+
+    def test_index_document_stores_document(self, index: Index):
+        index.index_document(
+            uri="file:///docs/facture.pdf",
+            content="Facture du 01/05/2026",
+            metadata=FileMetadata(
+                mime_type="application/pdf",
+                size_bytes=2048,
+                modified_at="2026-05-01T10:00:00+00:00",
+                title="Facture",
+                author="Fournisseur SA",
+                page_count=1,
+                language="fr",
+            ),
+        )
+
+    def test_index_document_upsert_does_not_raise(self, index: Index):
+        meta = FileMetadata(
+            mime_type="application/pdf",
+            size_bytes=1024,
+            modified_at="2026-05-01T00:00:00+00:00",
+            title=None,
+            author=None,
+            page_count=None,
+            language=None,
+        )
+        index.index_document(uri="file:///docs/contrat.pdf", content="version 1", metadata=meta)
+        index.index_document(uri="file:///docs/contrat.pdf", content="version 2", metadata=meta)
+
+    def test_index_document_empty_content(self, index: Index):
+        index.index_document(
+            uri="file:///docs/vide.pdf",
+            content="",
+            metadata=FileMetadata(
+                mime_type="application/pdf",
+                size_bytes=0,
+                modified_at="2026-05-01T00:00:00+00:00",
+                title=None,
+                author=None,
+                page_count=None,
+                language=None,
+            ),
+        )
+
+
+class TestFakeIndexContract(IndexContractSuite):
+    @pytest.fixture
+    def index(self) -> Index:
+        return FakeIndex()
+
+
+class TestNoopIndexContract(IndexContractSuite):
+    @pytest.fixture
+    def index(self) -> Index:
+        return NoopIndex()
+
+
+class TestDuckDbIndexContract(IndexContractSuite):
+    @pytest.fixture
+    def index(self, tmp_path: Path):
+        idx = DuckDbIndex(db_uri=f"file://{tmp_path}/test.db")
+        yield idx
+        idx._conn.close()
