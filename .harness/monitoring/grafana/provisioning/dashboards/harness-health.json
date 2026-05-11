@@ -96,6 +96,113 @@
           }
         }
       }
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "fieldConfig": {
+        "defaults": {
+          "custom": {"align": "auto", "displayMode": "auto"}
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "started_at"},
+            "properties": [
+              {"id": "displayName", "value": "Démarré le"},
+              {"id": "unit", "value": "dateTimeFromNow"},
+              {"id": "custom.width", "value": 160}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "branch"},
+            "properties": [
+              {"id": "displayName", "value": "Branche"},
+              {"id": "custom.width", "value": 180}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "skills_count"},
+            "properties": [
+              {"id": "displayName", "value": "Skills"},
+              {"id": "custom.width", "value": 70}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "ratio"},
+            "properties": [
+              {"id": "displayName", "value": "Progression"},
+              {"id": "unit", "value": "percentunit"},
+              {"id": "min", "value": 0},
+              {"id": "max", "value": 1},
+              {"id": "custom.displayMode", "value": "gradient-gauge"}
+            ]
+          }
+        ]
+      },
+      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 16},
+      "id": 5,
+      "options": {"footer": {"show": false}, "showHeader": true},
+      "targets": [
+        {
+          "datasource": {"type": "prometheus"},
+          "editorMode": "code",
+          "expr": "last_over_time(harness_session_info[7d])",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "__auto",
+          "refId": "A"
+        },
+        {
+          "datasource": {"type": "prometheus"},
+          "editorMode": "code",
+          "expr": "count by (session_id) (last_over_time(harness_skill_invoked[7d]))",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "__auto",
+          "refId": "B"
+        }
+      ],
+      "title": "Session Flow Completion",
+      "transformations": [
+        {
+          "id": "joinByField",
+          "options": {"byField": "session_id", "mode": "outer"}
+        },
+        {
+          "id": "renameByName",
+          "options": {
+            "Value #A": "started_at",
+            "Value #B": "skills_count",
+            "Time": "",
+            "__name__": "",
+            "job": "",
+            "instance": ""
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "ratio",
+            "mode": "binary",
+            "binary": {"left": "skills_count", "operator": "/", "right": "7"},
+            "reduce": {"reducer": "sum"}
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {"names": ["session_id", "branch", "started_at", "skills_count", "ratio"]}
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {"fields": [{"displayName": "started_at", "desc": true}]}
+        },
+        {
+          "id": "limit",
+          "options": {"limitField": 10}
+        }
+      ],
+      "type": "table"
     }
   ],
   "schemaVersion": 39
