@@ -106,6 +106,7 @@ SessionStop
 | `PreToolUse` (Bash) | `.claude/hooks/no-commit-on-main.sh` | Commande `git commit` sur main | **Bloque** le commit (`decision: block`) |
 | `PostToolUse` (Bash) | `.claude/hooks/commit-lint.sh` | Commande `git commit` | Valide le format Conventional Commits |
 | `PostToolUse` (Bash) | `.claude/hooks/feat-commit-cleanup.sh` | Commit `feat()` détecté | Injection `additionalContext` obligatoire : invoquer harness-cleaner |
+| `PostToolUse` (Skill) | `.harness/scripts/skill-trace.sh` | Invocation d'un skill | Émet span OTEL GenAI `execute_tool {skill}` + métrique `skill_invoked` vers Tempo/Prometheus |
 | `Stop` | `.claude/hooks/dev-cycle-reminder.sh` | Fin de session sur branche feature | Rappel : `/simplify` + harness-cleaner |
 
 ---
@@ -156,11 +157,12 @@ Séquence d'exécution :
 
 ## Monitoring (`.harness/monitoring/`)
 
-Stack Docker locale : OTEL Collector → Prometheus → Grafana.
+Stack Docker locale : OTEL Collector → Prometheus + Tempo → Grafana.
 
-- Collector reçoit les events OTEL natifs de Claude Code
-- Prometheus scrape `:8889`
-- Grafana `:3000` — dashboard "Harness Health"
+- Collector reçoit les events OTEL natifs de Claude Code (gRPC `:4317`) et les spans bash des hooks (HTTP `:4318`)
+- Prometheus scrape `:8889` — métriques sessions et skills
+- Tempo `:3200` — traces distribuées (waterfall `invoke_agent → execute_tool`)
+- Grafana `:3000` — dashboard "Harness Health" (panel "Session Flow Completion" : 10 dernières sessions, ratio X/7)
 
 ```bash
 docker compose -f .harness/monitoring/compose.yml up -d
@@ -185,7 +187,9 @@ Spec complète : [`docs/architecture/specs/2026-05-03-harness-monitoring-design.
 
 | Script | Usage |
 |--------|-------|
-| `session-start.sh` | Hook SessionStart — démarre monitoring si absent, rappel worktree sur main |
+| `session-start.sh` | Hook SessionStart — démarre monitoring si absent, rappel worktree sur main, émet root span OTEL GenAI `invoke_agent claude-code` |
+| `skill-trace.sh` | Hook PostToolUse(Skill) — émet span OTEL GenAI `execute_tool {skill}` + métrique `skill_invoked` |
+| `harness-trace.sh` | Lib partagée — `emit_span`, `emit_session_metric`, `emit_skill_metric` via OTLP/HTTP JSON `:4318` |
 | `check_claude_coverage.py` | Vérifie que chaque `packages/*` est documenté dans CLAUDE.md |
 
 ---
