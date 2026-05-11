@@ -69,6 +69,15 @@
             "command": "/home/deka/sources/github/archivist-ai/.claude/hooks/feat-commit-cleanup.sh"
           }
         ]
+      },
+      {
+        "matcher": "Skill",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".harness/scripts/skill-trace.sh"
+          }
+        ]
       }
     ],
     "SessionStart": [
