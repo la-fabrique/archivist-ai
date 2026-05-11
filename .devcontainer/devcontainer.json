@@ -1,6 +1,6 @@
 {
   "name": "archivist-ai",
-  "dockerComposeFile": "docker-compose.yml",
+  "dockerComposeFile": "compose.yml",
   "service": "dev",
   "workspaceFolder": "/workspace",
   "remoteUser": "vscode",

@@ -4,7 +4,6 @@
 
 COLLECTOR_HOST="localhost"
 COLLECTOR_PORT="4317"
-COMPOSE_FILE="$(dirname "$0")/../monitoring/compose.yml"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SESSION_FILE="/tmp/claude-harness-session.env"
 
@@ -63,15 +62,4 @@ if nc -z -w1 "$COLLECTOR_HOST" "$COLLECTOR_PORT" 2>/dev/null; then
   exit 0
 fi
 
-# Collector inaccessible — démarrer la stack
-docker compose -f "$COMPOSE_FILE" up -d 2>/dev/null
-
-for i in $(seq 1 10); do
-  sleep 1
-  if nc -z -w1 "$COLLECTOR_HOST" "$COLLECTOR_PORT" 2>/dev/null; then
-    jq -n '{"systemMessage": "HARNAIS: stack monitoring démarrée (Collector + Prometheus + Grafana sur :3000 + Tempo sur :3200)"}'
-    exit 0
-  fi
-done
-
-jq -n '{"systemMessage": "HARNAIS: impossible de démarrer le Collector sur localhost:4317 — vérifier docker ou lancer: npm run monitoring:up"}'
+jq -n '{"systemMessage": "HARNAIS: Collector inaccessible sur localhost:4317 — la stack monitoring démarre normalement avec le devcontainer (otel-collector, grafana:3000, prometheus:9090, tempo:3200)"}'

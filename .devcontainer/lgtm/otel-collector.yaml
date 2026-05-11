@@ -27,7 +27,7 @@ exporters:
     namespace: harness
     metric_expiration: 168h
   otlp/tempo:
-    endpoint: http://tempo:3200/otlp
+    endpoint: tempo:4317
     tls:
       insecure: true
   debug:

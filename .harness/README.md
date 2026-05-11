@@ -13,7 +13,7 @@ SessionStart
     │
     ▼
 [hook] session-start.sh
-    ├─ démarre la stack monitoring si Collector absent
+    ├─ vérifie que le Collector répond (démarre avec le devcontainer)
     └─ si branche = main → message : invoquer superpowers:using-git-worktrees
            │
            ▼
@@ -101,7 +101,7 @@ SessionStop
 
 | Événement | Fichier | Déclencheur | Effet |
 |-----------|---------|-------------|-------|
-| `SessionStart` | `.harness/scripts/session-start.sh` | Toujours | Démarre la stack monitoring ; rappel worktree si sur main |
+| `SessionStart` | `.harness/scripts/session-start.sh` | Toujours | Vérifie que le Collector répond (stack démarrée avec le devcontainer) ; rappel worktree si sur main |
 | `PreToolUse` (Write\|Edit) | `.claude/hooks/referentiel-guard.sh` | Fichier dans `packages/referentiel/` | Rappel d'invoquer `referentiel-update` |
 | `PreToolUse` (Bash) | `.claude/hooks/no-commit-on-main.sh` | Commande `git commit` sur main | **Bloque** le commit (`decision: block`) |
 | `PostToolUse` (Bash) | `.claude/hooks/commit-lint.sh` | Commande `git commit` | Valide le format Conventional Commits |
@@ -157,17 +157,14 @@ Séquence d'exécution :
 
 ## Monitoring (`.harness/monitoring/`)
 
-Stack Docker locale : OTEL Collector → Prometheus + Tempo → Grafana.
+Stack Docker : OTEL Collector → Prometheus + Tempo → Grafana. **Démarre automatiquement avec le devcontainer** (définie dans `.devcontainer/compose.yml`).
 
 - Collector reçoit les events OTEL natifs de Claude Code (gRPC `:4317`) et les spans bash des hooks (HTTP `:4318`)
 - Prometheus scrape `:8889` — métriques sessions et skills
 - Tempo `:3200` — traces distribuées (waterfall `invoke_agent → execute_tool`)
 - Grafana `:3000` — dashboard "Harness Health" (panel "Session Flow Completion" : 10 dernières sessions, ratio X/7)
 
-```bash
-docker compose -f .harness/monitoring/compose.yml up -d
-# ou : npm run monitoring:up
-```
+Les configs sont dans `.devcontainer/lgtm/` (montées en volume par le devcontainer).
 
 Variables d'environnement (dans `settings.json`, section `env`) :
 
