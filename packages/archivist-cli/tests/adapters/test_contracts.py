@@ -98,6 +98,20 @@ class FilesystemContractSuite:
         with pytest.raises(FilesystemError):
             fs.delete_file(f"{base_uri}/nonexistent.pdf")
 
+    def test_move_file_moves_and_removes_src(self, fs: Filesystem, base_uri: str, create_file):
+        folder_uri = f"{base_uri}/move_test"
+        fs.make_dir(folder_uri)
+        src = f"{folder_uri}/src.pdf"
+        dest = f"{folder_uri}/dest.pdf"
+        create_file(src)
+        fs.move_file(src, dest)
+        assert not fs.exists(src)
+        assert fs.exists(dest)
+
+    def test_move_file_missing_src_raises(self, fs: Filesystem, base_uri: str):
+        with pytest.raises(FilesystemError):
+            fs.move_file(f"{base_uri}/nonexistent.pdf", f"{base_uri}/dest.pdf")
+
 
 class TestLocalFilesystemContract(FilesystemContractSuite):
     @pytest.fixture
