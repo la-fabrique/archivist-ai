@@ -73,3 +73,56 @@ archivist scaffold \
 ```
 
 Aucun dossier n'est créé. Le résumé indique le nombre de dossiers qui auraient été créés.
+
+---
+
+## `archivist classify` — Classer les documents via LLM
+
+Lit les fichiers de `_Réception`, les sauvegarde dans `_Conservation brut`, les classe
+via un LLM et les déplace + renomme selon les conventions du référentiel.
+
+```bash
+archivist classify \
+  --referentiel file:///chemin/vers/referentiel.yaml \
+  --target file:///chemin/vers/mon/drive \
+  --llm claude-cli
+```
+
+### Options
+
+| Flag | Requis | Description |
+|------|--------|-------------|
+| `--referentiel URI` | oui | Chemin vers `referentiel.yaml` (`file:///…`) |
+| `--target URI` | oui | Racine de l'archive (même convention que `scaffold`/`scan`) |
+| `--llm NAME` | oui | Adaptateur LLM. Valeur disponible : `claude-cli` |
+
+### Adaptateur `claude-cli`
+
+Utilise le binaire `claude` (Claude Code CLI) via la session browser authentifiée.
+Aucune clé API requise. Le binaire `claude` doit être disponible dans le `PATH`.
+
+### Sortie
+
+**stdout** — NDJSON : une ligne JSON par fichier traité, puis une ligne de résumé :
+
+```json
+{"uri": "file:///…/facture.pdf", "name": "facture.pdf", "status": "classified", "entry_id": "mes_achats.factures_fournisseurs", "dest_name": "2026-03_Facture_OVH_F001.pdf", "dest_uri": "file:///…"}
+{"uri": "file:///…/unknown.pdf", "name": "unknown.pdf", "status": "unclassified", "reason": "llm_uncertain: type inconnu"}
+{"scanned": 2, "classified": 1, "unclassified": 1, "failed": 0}
+```
+
+Valeurs de `status` : `classified` | `unclassified` | `failed`.
+
+**Politique d'erreur :**
+
+| Situation | Fichier |
+|---|---|
+| Erreur pendant le backup | reste dans `_Réception` |
+| LLM incertain (`null`) | déplacé dans `_Non classé` |
+| Erreur post-backup | déplacé dans `_Non classé` |
+| Succès | déplacé + renommé dans le dossier cible |
+
+### Prérequis
+
+L'archive cible doit contenir les dossiers `_Réception`, `_Conservation brut` et `_Non classé`.
+Lancez `archivist scaffold` avant le premier `classify`.
