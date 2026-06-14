@@ -50,3 +50,11 @@ class LocalFilesystem(Filesystem):
             path.unlink()
         except OSError as exc:
             raise FilesystemError(f"failed to delete file: {exc}") from exc
+
+    def move_file(self, src_uri: str, dest_uri: str) -> None:
+        src = self._to_path(src_uri)
+        dest = self._to_path(dest_uri)
+        try:
+            src.rename(dest)
+        except OSError as exc:
+            raise FilesystemError(f"failed to move file: {exc}") from exc

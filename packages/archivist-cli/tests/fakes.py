@@ -49,6 +49,12 @@ class FakeFilesystem(Filesystem):
             raise FilesystemError(f"file not found: {uri}")
         self._files.discard(uri)
 
+    def move_file(self, src_uri: str, dest_uri: str) -> None:
+        if src_uri not in self._files:
+            raise FilesystemError(f"source not found: {src_uri}")
+        self._files.discard(src_uri)
+        self._files.add(dest_uri)
+
     def add_file(self, uri: str) -> None:
         self._files.add(uri)
 
