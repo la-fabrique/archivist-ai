@@ -57,3 +57,40 @@ jobs:
       - name: Run tests
         run: uv run pytest tests/ -v
         working-directory: packages/archivist-cli
+
+  build:
+    name: Build archivist-cli (${{ matrix.os }})
+    needs: tests
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --frozen
+        working-directory: packages/archivist-cli
+
+      - name: Build binary
+        run: uv run pyinstaller archivist-cli.spec
+        working-directory: packages/archivist-cli
+
+      - name: Smoke-test binary (Linux)
+        if: runner.os == 'Linux'
+        run: packages/archivist-cli/dist/archivist --help
+
+      - name: Smoke-test binary (macOS)
+        if: runner.os == 'macOS'
+        run: packages/archivist-cli/dist/archivist --help
+
+      - name: Smoke-test binary (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: packages/archivist-cli/dist/archivist.exe --help
