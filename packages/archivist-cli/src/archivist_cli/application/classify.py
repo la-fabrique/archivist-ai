@@ -212,8 +212,8 @@ def _resolve_role(entries: list[ReferentielEntry], role: str, target_uri: str) -
 def _move_best_effort(fs: Filesystem, src_uri: str, dest_uri: str) -> None:
     try:
         fs.move_file(src_uri, dest_uri)
-    except FilesystemError:
-        pass
+    except FilesystemError as exc:
+        logger.warning("failed to move %s to %s: %s", src_uri, dest_uri, exc)
 
 
 def _build_filename(
@@ -241,12 +241,10 @@ def _resolve_base_dir(
     resolved = re.sub(r'\[([^\]]+)\]', replace_segment, entry.path)
     base_dir = f"{target_uri.rstrip('/')}/{resolved}"
 
-    if entry.organization_type == "chronological":
-        date_re = re.compile(r'^\d{4}-\d{2}$')
-        for value in fields.values():
-            if value and date_re.match(value):
-                base_dir = f"{base_dir}/{value}"
-                break
+    if entry.organization_type == "chronological" and entry.organization_subfolder_pattern:
+        subfolder_value = fields.get(entry.organization_subfolder_pattern)
+        if subfolder_value:
+            base_dir = f"{base_dir}/{subfolder_value}"
 
     return base_dir
 
