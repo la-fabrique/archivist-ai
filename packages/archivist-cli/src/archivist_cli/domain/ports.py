@@ -66,6 +66,7 @@ class Filesystem(ABC):
     def move_file(self, src_uri: str, dest_uri: str) -> None:
         """Déplace et renomme src_uri en dest_uri.
 
+        Écrase le fichier destination s'il existe déjà.
         Lève FilesystemError si src n'existe pas ou si dest ne peut pas être écrit.
         """
         ...

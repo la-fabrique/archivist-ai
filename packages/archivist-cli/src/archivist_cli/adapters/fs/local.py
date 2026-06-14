@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import shutil
 import zipfile
 from pathlib import Path
 from urllib.parse import urlparse
@@ -54,7 +55,9 @@ class LocalFilesystem(Filesystem):
     def move_file(self, src_uri: str, dest_uri: str) -> None:
         src = self._to_path(src_uri)
         dest = self._to_path(dest_uri)
+        if not src.exists():
+            raise FilesystemError(f"source not found: {src_uri}")
         try:
-            src.rename(dest)
-        except OSError as exc:
+            shutil.move(str(src), str(dest))
+        except (OSError, shutil.Error) as exc:
             raise FilesystemError(f"failed to move file: {exc}") from exc
