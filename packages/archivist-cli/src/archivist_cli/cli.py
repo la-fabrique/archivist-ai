@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 import click
 
 from archivist_cli.adapters.index.noop import NoopIndex
+from archivist_cli.application.classify import ClassifyConfig, ClassifyUseCase
 from archivist_cli.application.scaffold import scaffold
 from archivist_cli.application.scan import scan
 from archivist_cli.registry import default_registry
@@ -145,3 +146,82 @@ def scan_cmd(referentiel: str, target: str) -> None:
         "deleted": result.deleted,
         "files": files_out,
     }))
+
+
+@main.command(name="classify")
+@click.option(
+    "--referentiel",
+    required=True,
+    help="URI du fichier référentiel (file:///path/to/referentiel.yaml).",
+)
+@click.option(
+    "--target",
+    required=True,
+    help="URI du dossier racine de l'archive (file:///path/to/archive).",
+)
+@click.option(
+    "--llm",
+    "llm_name",
+    required=True,
+    help="Adaptateur LLM à utiliser (ex: claude-cli).",
+)
+def classify_cmd(referentiel: str, target: str, llm_name: str) -> None:
+    """Classe les fichiers de _Réception via LLM et les déplace vers le bon dossier."""
+    _require_file_uri(referentiel, "referentiel")
+    _require_file_uri(target, "target")
+
+    ref = default_registry.resolve("referentiel", "yaml_file", {"uri": referentiel})
+    fs = default_registry.resolve("fs", "local", {})
+    extractor = default_registry.resolve("metadata", "kreuzberg", {})
+    llm = default_registry.resolve("llm", llm_name, {})
+
+    entries = ref.load_entries()
+
+    def _find_role(role: str) -> str:
+        matches = [e for e in entries if e.role == role]
+        if len(matches) != 1:
+            raise click.UsageError(
+                f"Le référentiel contient {len(matches)} entrée(s) role={role!r} — exactement 1 attendue"
+            )
+        return matches[0].path
+
+    for role in ("reception", "conservation_brut", "non_classe"):
+        path = _find_role(role)
+        role_uri = f"{target.rstrip('/')}/{path}"
+        if not fs.is_dir(role_uri):
+            raise click.UsageError(
+                f"Dossier manquant : {role_uri!r} — lancez scaffold d'abord"
+            )
+
+    uc = ClassifyUseCase(
+        fs=fs,
+        referentiel=ref,
+        extractor=extractor,
+        llm=llm,
+        index=NoopIndex(),
+    )
+    result = uc.run(ClassifyConfig(referentiel_uri=referentiel, target_uri=target))
+
+    for event in result.events:
+        row = {
+            "uri": event.uri,
+            "name": event.name,
+            "status": event.status.value,
+        }
+        if event.entry_id is not None:
+            row["entry_id"] = event.entry_id
+        if event.dest_name is not None:
+            row["dest_name"] = event.dest_name
+        if event.dest_uri is not None:
+            row["dest_uri"] = event.dest_uri
+        if event.reason is not None:
+            row["reason"] = event.reason
+        click.echo(json.dumps(row, ensure_ascii=False))
+
+    summary = {
+        "scanned": result.scanned,
+        "classified": result.classified,
+        "unclassified": result.unclassified,
+        "failed": result.failed,
+    }
+    click.echo(json.dumps(summary))
