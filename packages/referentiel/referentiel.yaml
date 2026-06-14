@@ -846,6 +846,16 @@
       - name: ext
         description: extension du fichier (pdf, docx…)
     example: 2026-01_Contrat_Dupont_CDI.pdf
+- id: non_classe
+  folder_name: _Non classé
+  path: _Non classé
+  dynamic: false
+  option: core
+  required: true
+  role: non_classe
+  description: Fichiers que le pipeline classify n'a pas pu classer (LLM incertain ou erreur post-backup)
+  organization:
+    type: flat
 - id: reception
   folder_name: _Réception
   path: _Réception

@@ -1,10 +1,17 @@
 from __future__ import annotations
 
+from typing import ClassVar
+
 from archivist_cli.domain.models import ExtractionResult, FileMetadata, ReferentielEntry
-from archivist_cli.domain.ports import Filesystem, FilesystemError, Index, IndexError, MetadataExtractor, MetadataExtractorError, Referentiel
+from archivist_cli.domain.ports import (
+    Filesystem, FilesystemError, Index, IndexError,
+    LanguageModel, LlmError, MetadataExtractor, MetadataExtractorError, Referentiel,
+)
 
 
 class FakeReferentiel(Referentiel):
+    VERSION: ClassVar[int] = 1
+
     def __init__(self, entries: list[ReferentielEntry]) -> None:
         self._entries = entries
 
@@ -13,10 +20,13 @@ class FakeReferentiel(Referentiel):
 
 
 class FakeFilesystem(Filesystem):
+    VERSION: ClassVar[int] = 2
+
     def __init__(self) -> None:
         self._dirs: set[str] = set()
         self._files: set[str] = set()
         self.zipped: list[tuple[str, str]] = []
+        self.moved: list[tuple[str, str]] = []
 
     def make_dir(self, uri: str) -> None:
         if uri in self._files:
@@ -36,7 +46,7 @@ class FakeFilesystem(Filesystem):
 
     def list_files(self, uri: str) -> list[str]:
         prefix = uri.rstrip("/") + "/"
-        return [f for f in self._files if f.startswith(prefix) and "/" not in f[len(prefix):]]
+        return sorted(f for f in self._files if f.startswith(prefix) and "/" not in f[len(prefix):])
 
     def zip_file(self, src_uri: str, dest_uri: str) -> None:
         if src_uri not in self._files:
@@ -49,6 +59,13 @@ class FakeFilesystem(Filesystem):
             raise FilesystemError(f"file not found: {uri}")
         self._files.discard(uri)
 
+    def move_file(self, src_uri: str, dest_uri: str) -> None:
+        if src_uri not in self._files:
+            raise FilesystemError(f"file not found: {src_uri}")
+        self._files.discard(src_uri)
+        self._files.add(dest_uri)
+        self.moved.append((src_uri, dest_uri))
+
     def add_file(self, uri: str) -> None:
         self._files.add(uri)
 
@@ -57,6 +74,8 @@ class FakeFilesystem(Filesystem):
 
 
 class FakeIndex(Index):
+    VERSION: ClassVar[int] = 1
+
     def __init__(self) -> None:
         self.indexed: list[tuple[str, str, FileMetadata]] = []
 
@@ -68,6 +87,8 @@ class FakeIndex(Index):
 
 
 class FakeMetadataExtractor(MetadataExtractor):
+    VERSION: ClassVar[int] = 1
+
     def __init__(self, fail_on: set[str] | None = None) -> None:
         self._fail_on: set[str] = fail_on or set()
 
@@ -88,3 +109,27 @@ class FakeMetadataExtractor(MetadataExtractor):
                 language=None,
             ),
         )
+
+
+class FakeLlm(LanguageModel):
+    VERSION: ClassVar[int] = 1
+
+    def __init__(
+        self,
+        responses: list[dict] | None = None,
+        fail_on_calls: set[int] | None = None,
+    ) -> None:
+        self._responses: list[dict] = list(responses or [])
+        self._fail_on: set[int] = fail_on_calls or set()
+        self._call_count = 0
+        self.calls: list[str] = []
+
+    def complete(self, prompt: str, output_schema: dict) -> dict:
+        self.calls.append(prompt)
+        idx = self._call_count
+        self._call_count += 1
+        if idx in self._fail_on:
+            raise LlmError(f"FakeLlm injected error on call #{idx}")
+        if idx < len(self._responses):
+            return self._responses[idx]
+        raise LlmError(f"FakeLlm has no response for call #{idx}")

@@ -23,7 +23,7 @@ class Referentiel(ABC):
 
 
 class Filesystem(ABC):
-    VERSION: ClassVar[int] = 1
+    VERSION: ClassVar[int] = 2
 
     @abstractmethod
     def make_dir(self, uri: str) -> None:
@@ -62,6 +62,15 @@ class Filesystem(ABC):
         """
         ...
 
+    @abstractmethod
+    def move_file(self, src_uri: str, dest_uri: str) -> None:
+        """Déplace et renomme src_uri en dest_uri.
+
+        Écrase le fichier destination s'il existe déjà.
+        Lève FilesystemError si src n'existe pas ou si dest ne peut pas être écrit.
+        """
+        ...
+
 
 class MetadataExtractorError(Exception):
     pass
@@ -92,5 +101,21 @@ class Index(ABC):
 
         Comportement upsert : réindexe si l'URI existe déjà.
         Lève IndexError si l'indexation échoue.
+        """
+        ...
+
+
+class LlmError(Exception):
+    pass
+
+
+class LanguageModel(ABC):
+    VERSION: ClassVar[int] = 1
+
+    @abstractmethod
+    def complete(self, prompt: str, output_schema: dict) -> dict:
+        """Envoie un prompt et retourne un dict structuré conforme au schéma.
+
+        Lève LlmError si l'appel échoue ou si la sortie ne peut pas être parsée.
         """
         ...

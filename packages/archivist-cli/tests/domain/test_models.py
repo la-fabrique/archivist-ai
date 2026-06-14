@@ -1,4 +1,7 @@
-from archivist_cli.domain.models import FileMetadata, ReferentielEntry, ScannedFile
+from archivist_cli.domain.models import (
+    ClassifyEvent, ClassifyEventStatus, ClassifyResult,
+    FileMetadata, FileNaming, FileNamingField, ReferentielEntry, ScannedFile,
+)
 
 
 def test_entry_from_dict_minimal():
@@ -101,3 +104,62 @@ def test_scanned_file_with_metadata():
 def test_scanned_file_without_metadata():
     f = ScannedFile(uri="file:///docs/test.pdf", name="test.pdf", metadata=None)
     assert f.metadata is None
+
+
+def test_referentiel_entry_loads_file_naming():
+    raw = {
+        "id": "mes_achats.factures_fournisseurs",
+        "folder_name": "Mes factures fournisseurs",
+        "path": "Mes achats/Mes factures fournisseurs",
+        "dynamic": False,
+        "option": "core",
+        "required": True,
+        "description": "Factures reçues",
+        "file_naming": {
+            "pattern": "[AAAA-MM]_Facture_[Nom fournisseur]_[Numero].[ext]",
+            "fields": [
+                {"name": "AAAA-MM", "description": "date d'émission"},
+                {"name": "Nom fournisseur", "description": "nom du fournisseur"},
+                {"name": "Numero", "description": "numéro de facture"},
+                {"name": "ext", "description": "extension"},
+            ],
+        },
+        "organization": {"type": "chronological", "subfolder_pattern": "AAAA-MM"},
+    }
+    entry = ReferentielEntry.from_dict(raw)
+    assert entry.description == "Factures reçues"
+    assert entry.file_naming is not None
+    assert entry.file_naming.pattern == "[AAAA-MM]_Facture_[Nom fournisseur]_[Numero].[ext]"
+    assert len(entry.file_naming.fields) == 4
+    assert entry.file_naming.fields[0] == FileNamingField(name="AAAA-MM", description="date d'émission")
+    assert entry.organization_type == "chronological"
+    assert entry.organization_subfolder_pattern == "AAAA-MM"
+
+
+def test_referentiel_entry_without_file_naming():
+    raw = {
+        "id": "reception",
+        "folder_name": "_Réception",
+        "path": "_Réception",
+        "dynamic": False,
+        "option": "core",
+        "required": True,
+        "role": "reception",
+    }
+    entry = ReferentielEntry.from_dict(raw)
+    assert entry.file_naming is None
+    assert entry.organization_type is None
+    assert entry.description is None
+
+
+def test_classify_result_counts():
+    events = [
+        ClassifyEvent(uri="a", name="a.pdf", status=ClassifyEventStatus.CLASSIFIED, entry_id="x", dest_name="y.pdf", dest_uri="file:///y.pdf"),
+        ClassifyEvent(uri="b", name="b.pdf", status=ClassifyEventStatus.UNCLASSIFIED, reason="unknown"),
+        ClassifyEvent(uri="c", name="c.pdf", status=ClassifyEventStatus.FAILED, reason="error"),
+    ]
+    result = ClassifyResult(events=events)
+    assert result.scanned == 3
+    assert result.classified == 1
+    assert result.unclassified == 1
+    assert result.failed == 1
