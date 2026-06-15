@@ -93,12 +93,12 @@ def config_show() -> None:
 @main.command(name="scaffold")
 @click.option(
     "--referentiel",
-    required=True,
+    default=None,
     help="URI du fichier référentiel (file:///path/to/referentiel.yaml).",
 )
 @click.option(
     "--root",
-    required=True,
+    default=None,
     help="URI du dossier racine de l'archive (file:///path/to/archive).",
 )
 @click.option(
@@ -114,12 +114,25 @@ def config_show() -> None:
     help="Affiche les dossiers qui seraient créés sans les créer.",
 )
 def scaffold_cmd(
-    referentiel: str,
-    root: str,
+    referentiel: str | None,
+    root: str | None,
     extra_options: tuple[str, ...],
     dry_run: bool,
 ) -> None:
     """Crée l'arborescence de dossiers cible à partir du référentiel."""
+    cfg = load_config()
+    referentiel = referentiel or cfg.referentiel
+    root = root or cfg.root
+    if referentiel is None:
+        raise click.UsageError(
+            "--referentiel manquant. Configurez-le avec :\n"
+            "  archivist config set referentiel file:///path/to/referentiel.yaml"
+        )
+    if root is None:
+        raise click.UsageError(
+            "--root manquant. Configurez-le avec :\n"
+            "  archivist config set root file:///path/to/archive"
+        )
     _require_file_uri(referentiel, "referentiel")
     _require_file_uri(root, "root")
     options = {"core"} | set(extra_options)
@@ -144,16 +157,29 @@ def scaffold_cmd(
 @main.command(name="scan")
 @click.option(
     "--referentiel",
-    required=True,
+    default=None,
     help="URI du fichier référentiel (file:///path/to/referentiel.yaml).",
 )
 @click.option(
     "--root",
-    required=True,
+    default=None,
     help="URI du dossier racine de l'archive (file:///path/to/archive).",
 )
-def scan_cmd(referentiel: str, root: str) -> None:
+def scan_cmd(referentiel: str | None, root: str | None) -> None:
     """Scanne _Réception, sauvegarde dans _Conservation brut, extrait les métadonnées."""
+    cfg = load_config()
+    referentiel = referentiel or cfg.referentiel
+    root = root or cfg.root
+    if referentiel is None:
+        raise click.UsageError(
+            "--referentiel manquant. Configurez-le avec :\n"
+            "  archivist config set referentiel file:///path/to/referentiel.yaml"
+        )
+    if root is None:
+        raise click.UsageError(
+            "--root manquant. Configurez-le avec :\n"
+            "  archivist config set root file:///path/to/archive"
+        )
     _require_file_uri(referentiel, "referentiel")
     _require_file_uri(root, "root")
 
@@ -209,22 +235,41 @@ def scan_cmd(referentiel: str, root: str) -> None:
 @main.command(name="classify")
 @click.option(
     "--referentiel",
-    required=True,
+    default=None,
     help="URI du fichier référentiel (file:///path/to/referentiel.yaml).",
 )
 @click.option(
     "--root",
-    required=True,
+    default=None,
     help="URI du dossier racine de l'archive (file:///path/to/archive).",
 )
 @click.option(
     "--llm",
     "llm_name",
-    required=True,
+    default=None,
     help="Adaptateur LLM à utiliser (ex: claude-cli).",
 )
-def classify_cmd(referentiel: str, root: str, llm_name: str) -> None:
+def classify_cmd(referentiel: str | None, root: str | None, llm_name: str | None) -> None:
     """Classe les fichiers de _Réception via LLM et les déplace vers le bon dossier."""
+    cfg = load_config()
+    referentiel = referentiel or cfg.referentiel
+    root = root or cfg.root
+    llm_name = llm_name or cfg.llm
+    if referentiel is None:
+        raise click.UsageError(
+            "--referentiel manquant. Configurez-le avec :\n"
+            "  archivist config set referentiel file:///path/to/referentiel.yaml"
+        )
+    if root is None:
+        raise click.UsageError(
+            "--root manquant. Configurez-le avec :\n"
+            "  archivist config set root file:///path/to/archive"
+        )
+    if llm_name is None:
+        raise click.UsageError(
+            "--llm manquant. Configurez-le avec :\n"
+            "  archivist config set llm claude-cli"
+        )
     _require_file_uri(referentiel, "referentiel")
     _require_file_uri(root, "root")
 
