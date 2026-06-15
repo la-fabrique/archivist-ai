@@ -23,7 +23,7 @@ def test_scaffold_with_real_referentiel(tmp_path: Path):
     result = runner.invoke(main, [
         "scaffold",
         "--referentiel", f"file://{REFERENTIEL_PATH}",
-        "--target", f"file://{target}",
+        "--root", f"file://{target}",
     ])
 
     assert result.exit_code == 0, result.output
@@ -53,7 +53,7 @@ def test_scaffold_all_options(tmp_path: Path):
     result = runner.invoke(main, [
         "scaffold",
         "--referentiel", f"file://{REFERENTIEL_PATH}",
-        "--target", f"file://{target}",
+        "--root", f"file://{target}",
         "--option", "assurances",
         "--option", "dirigeant-assimile-salarie",
     ])

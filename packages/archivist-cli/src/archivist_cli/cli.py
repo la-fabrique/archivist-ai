@@ -97,9 +97,9 @@ def config_show() -> None:
     help="URI du fichier référentiel (file:///path/to/referentiel.yaml).",
 )
 @click.option(
-    "--target",
+    "--root",
     required=True,
-    help="URI du dossier cible (file:///path/to/target).",
+    help="URI du dossier racine de l'archive (file:///path/to/archive).",
 )
 @click.option(
     "--option",
@@ -115,13 +115,13 @@ def config_show() -> None:
 )
 def scaffold_cmd(
     referentiel: str,
-    target: str,
+    root: str,
     extra_options: tuple[str, ...],
     dry_run: bool,
 ) -> None:
     """Crée l'arborescence de dossiers cible à partir du référentiel."""
     _require_file_uri(referentiel, "referentiel")
-    _require_file_uri(target, "target")
+    _require_file_uri(root, "root")
     options = {"core"} | set(extra_options)
     ref = default_registry.resolve("referentiel", "yaml_file", {"uri": referentiel})
     fs = default_registry.resolve("fs", "local", {})
@@ -129,7 +129,7 @@ def scaffold_cmd(
     result = scaffold(
         referentiel=ref,
         filesystem=fs,
-        target_uri=target,
+        target_uri=root,
         options=options,
         dry_run=dry_run,
     )
@@ -148,14 +148,14 @@ def scaffold_cmd(
     help="URI du fichier référentiel (file:///path/to/referentiel.yaml).",
 )
 @click.option(
-    "--target",
+    "--root",
     required=True,
     help="URI du dossier racine de l'archive (file:///path/to/archive).",
 )
-def scan_cmd(referentiel: str, target: str) -> None:
+def scan_cmd(referentiel: str, root: str) -> None:
     """Scanne _Réception, sauvegarde dans _Conservation brut, extrait les métadonnées."""
     _require_file_uri(referentiel, "referentiel")
-    _require_file_uri(target, "target")
+    _require_file_uri(root, "root")
 
     ref = default_registry.resolve("referentiel", "yaml_file", {"uri": referentiel})
     fs = default_registry.resolve("fs", "local", {})
@@ -174,7 +174,7 @@ def scan_cmd(referentiel: str, target: str) -> None:
     reception_path = _find_role("reception")
     backup_path = _find_role("conservation_brut")
 
-    target_base = target.rstrip("/")
+    target_base = root.rstrip("/")
     reception_uri = f"{target_base}/{reception_path}"
     backup_uri = f"{target_base}/{backup_path}"
 
@@ -213,7 +213,7 @@ def scan_cmd(referentiel: str, target: str) -> None:
     help="URI du fichier référentiel (file:///path/to/referentiel.yaml).",
 )
 @click.option(
-    "--target",
+    "--root",
     required=True,
     help="URI du dossier racine de l'archive (file:///path/to/archive).",
 )
@@ -223,10 +223,10 @@ def scan_cmd(referentiel: str, target: str) -> None:
     required=True,
     help="Adaptateur LLM à utiliser (ex: claude-cli).",
 )
-def classify_cmd(referentiel: str, target: str, llm_name: str) -> None:
+def classify_cmd(referentiel: str, root: str, llm_name: str) -> None:
     """Classe les fichiers de _Réception via LLM et les déplace vers le bon dossier."""
     _require_file_uri(referentiel, "referentiel")
-    _require_file_uri(target, "target")
+    _require_file_uri(root, "root")
 
     ref = default_registry.resolve("referentiel", "yaml_file", {"uri": referentiel})
     fs = default_registry.resolve("fs", "local", {})
@@ -245,7 +245,7 @@ def classify_cmd(referentiel: str, target: str, llm_name: str) -> None:
 
     for role in ("reception", "conservation_brut", "non_classe"):
         path = _find_role(role)
-        role_uri = f"{target.rstrip('/')}/{path}"
+        role_uri = f"{root.rstrip('/')}/{path}"
         if not fs.is_dir(role_uri):
             raise click.UsageError(
                 f"Dossier manquant : {role_uri!r} — lancez scaffold d'abord"
@@ -258,7 +258,7 @@ def classify_cmd(referentiel: str, target: str, llm_name: str) -> None:
         llm=llm,
         index=NoopIndex(),
     )
-    result = uc.run(ClassifyConfig(referentiel_uri=referentiel, target_uri=target))
+    result = uc.run(ClassifyConfig(referentiel_uri=referentiel, target_uri=root))
 
     for event in result.events:
         row = {

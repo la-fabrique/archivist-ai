@@ -51,7 +51,7 @@ def test_scaffold_creates_dirs(tmp_path: Path):
     result = runner.invoke(main, [
         "scaffold",
         "--referentiel", f"file://{ref_path}",
-        "--target", f"file://{target}",
+        "--root", f"file://{target}",
     ])
     assert result.exit_code == 0
     assert (target / "Ma banque").is_dir()
@@ -69,7 +69,7 @@ def test_scaffold_with_extra_option(tmp_path: Path):
     result = runner.invoke(main, [
         "scaffold",
         "--referentiel", f"file://{ref_path}",
-        "--target", f"file://{target}",
+        "--root", f"file://{target}",
         "--option", "assurances",
     ])
     assert result.exit_code == 0
@@ -85,7 +85,7 @@ def test_scaffold_dry_run(tmp_path: Path):
     result = runner.invoke(main, [
         "scaffold",
         "--referentiel", f"file://{ref_path}",
-        "--target", f"file://{target}",
+        "--root", f"file://{target}",
         "--dry-run",
     ])
     assert result.exit_code == 0
@@ -101,12 +101,12 @@ def test_scaffold_idempotent(tmp_path: Path):
     runner.invoke(main, [
         "scaffold",
         "--referentiel", f"file://{ref_path}",
-        "--target", f"file://{target}",
+        "--root", f"file://{target}",
     ])
     result = runner.invoke(main, [
         "scaffold",
         "--referentiel", f"file://{ref_path}",
-        "--target", f"file://{target}",
+        "--root", f"file://{target}",
     ])
     assert result.exit_code == 0
     summary = json.loads(result.stdout.strip())
