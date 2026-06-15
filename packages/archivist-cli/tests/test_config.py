@@ -1,0 +1,53 @@
+from __future__ import annotations
+
+from pathlib import Path
+
+from archivist_cli.config import AppConfig, load_config, save_config
+
+
+def test_load_config_returns_empty_when_no_file(tmp_path: Path):
+    cfg = load_config(data_dir=tmp_path)
+    assert cfg == AppConfig()
+
+
+def test_load_config_returns_all_fields(tmp_path: Path):
+    (tmp_path / "config.yaml").write_text(
+        "referentiel: file:///ref.yaml\nroot: file:///docs\nllm: claude-cli\n",
+        encoding="utf-8",
+    )
+    cfg = load_config(data_dir=tmp_path)
+    assert cfg.referentiel == "file:///ref.yaml"
+    assert cfg.root == "file:///docs"
+    assert cfg.llm == "claude-cli"
+
+
+def test_save_and_load_roundtrip(tmp_path: Path):
+    original = AppConfig(
+        referentiel="file:///ref.yaml",
+        root="file:///docs",
+        llm="claude-cli",
+    )
+    save_config(original, data_dir=tmp_path)
+    loaded = load_config(data_dir=tmp_path)
+    assert loaded == original
+
+
+def test_save_creates_directory(tmp_path: Path):
+    nested = tmp_path / "a" / "b"
+    save_config(AppConfig(llm="claude-cli"), data_dir=nested)
+    assert (nested / "config.yaml").exists()
+
+
+def test_save_omits_none_fields(tmp_path: Path):
+    save_config(AppConfig(llm="claude-cli"), data_dir=tmp_path)
+    loaded = load_config(data_dir=tmp_path)
+    assert loaded.referentiel is None
+    assert loaded.root is None
+    assert loaded.llm == "claude-cli"
+
+
+def test_save_overwrites_existing(tmp_path: Path):
+    save_config(AppConfig(llm="claude-cli"), data_dir=tmp_path)
+    save_config(AppConfig(llm="openai"), data_dir=tmp_path)
+    loaded = load_config(data_dir=tmp_path)
+    assert loaded.llm == "openai"
