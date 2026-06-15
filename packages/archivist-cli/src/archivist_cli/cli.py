@@ -120,9 +120,10 @@ def scaffold_cmd(
     dry_run: bool,
 ) -> None:
     """Crée l'arborescence de dossiers cible à partir du référentiel."""
-    cfg = load_config()
-    referentiel = referentiel or cfg.referentiel
-    root = root or cfg.root
+    if referentiel is None or root is None:
+        cfg = load_config()
+        referentiel = referentiel or cfg.referentiel
+        root = root or cfg.root
     if referentiel is None:
         raise click.UsageError(
             "--referentiel manquant. Configurez-le avec :\n"
@@ -167,9 +168,10 @@ def scaffold_cmd(
 )
 def scan_cmd(referentiel: str | None, root: str | None) -> None:
     """Scanne _Réception, sauvegarde dans _Conservation brut, extrait les métadonnées."""
-    cfg = load_config()
-    referentiel = referentiel or cfg.referentiel
-    root = root or cfg.root
+    if referentiel is None or root is None:
+        cfg = load_config()
+        referentiel = referentiel or cfg.referentiel
+        root = root or cfg.root
     if referentiel is None:
         raise click.UsageError(
             "--referentiel manquant. Configurez-le avec :\n"
@@ -251,10 +253,11 @@ def scan_cmd(referentiel: str | None, root: str | None) -> None:
 )
 def classify_cmd(referentiel: str | None, root: str | None, llm_name: str | None) -> None:
     """Classe les fichiers de _Réception via LLM et les déplace vers le bon dossier."""
-    cfg = load_config()
-    referentiel = referentiel or cfg.referentiel
-    root = root or cfg.root
-    llm_name = llm_name or cfg.llm
+    if referentiel is None or root is None or llm_name is None:
+        cfg = load_config()
+        referentiel = referentiel or cfg.referentiel
+        root = root or cfg.root
+        llm_name = llm_name or cfg.llm
     if referentiel is None:
         raise click.UsageError(
             "--referentiel manquant. Configurez-le avec :\n"
