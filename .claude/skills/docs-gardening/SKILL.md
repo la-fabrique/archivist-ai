@@ -11,7 +11,7 @@ Ce workflow inspecte l'état de la documentation et produit une liste de correct
 
 ## Workflow
 
-Toutes les commandes s'exécutent depuis la racine du dépôt (`/home/deka/sources/github/archivist-ai` ou équivalent).
+Toutes les commandes s'exécutent depuis la racine du dépôt.
 
 ### Étape 1 — Vérifier la couverture des packages dans CLAUDE.md
 
@@ -84,12 +84,12 @@ Ne proposer des corrections que si demandé. Ne rien modifier sans confirmation.
 
 ## Red Flags — STOP
 
-| Pensée | Réalité |
-|--------|---------|
-| "Ce lien est juste mal formaté, inutile de le signaler" | Signaler quand même — l'agent le lit comme du texte mort. |
-| "Le plan est ancien mais toujours utile" | Signaler avec contexte — l'humain décide de l'archiver ou pas. |
-| "CLAUDE.md mentionne le package indirectement" | Une mention implicite ne suffit pas — un pointeur explicite est requis. |
-| "Je vais corriger les liens cassés directement" | Ce workflow signale uniquement. Attendre confirmation avant de modifier. |
+| Pensée                                                  | Réalité                                                                  |
+| ------------------------------------------------------- | ------------------------------------------------------------------------ |
+| "Ce lien est juste mal formaté, inutile de le signaler" | Signaler quand même — l'agent le lit comme du texte mort.                |
+| "Le plan est ancien mais toujours utile"                | Signaler avec contexte — l'humain décide de l'archiver ou pas.           |
+| "CLAUDE.md mentionne le package indirectement"          | Une mention implicite ne suffit pas — un pointeur explicite est requis.  |
+| "Je vais corriger les liens cassés directement"         | Ce workflow signale uniquement. Attendre confirmation avant de modifier. |
 
 ## Checklist rapide
 
