@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import shutil
 from dataclasses import dataclass
 from pathlib import Path
+from urllib.parse import urlparse
 
 import yaml
 from platformdirs import user_data_dir
@@ -44,3 +46,14 @@ def save_config(config: AppConfig, data_dir: Path | None = None) -> None:
         data["llm"] = config.llm
     with (dir_ / "config.yaml").open("w", encoding="utf-8") as f:
         yaml.safe_dump(data, f, allow_unicode=True)
+
+
+def install_referentiel(source_uri: str, data_dir: Path | None = None) -> str:
+    dir_ = data_dir or app_data_dir()
+    source_path = Path(urlparse(source_uri).path)
+    if not source_path.exists():
+        raise FileNotFoundError(f"Référentiel source introuvable : {source_path}")
+    dir_.mkdir(parents=True, exist_ok=True)
+    dest = dir_ / "referentiel.yaml"
+    shutil.copy2(source_path, dest)
+    return f"file://{dest}"

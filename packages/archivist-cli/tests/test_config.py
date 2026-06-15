@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import pytest
 from pathlib import Path
 
 import yaml
 
-from archivist_cli.config import AppConfig, load_config, save_config
+from archivist_cli.config import AppConfig, load_config, save_config, install_referentiel
 
 
 def test_load_config_returns_empty_when_no_file(tmp_path: Path):
@@ -58,3 +59,29 @@ def test_save_overwrites_existing(tmp_path: Path):
     loaded = load_config(data_dir=tmp_path)
     assert loaded.llm == "openai"
     assert loaded.root is None  # must be gone, not merged
+
+
+def test_install_referentiel_copies_file(tmp_path: Path):
+    source = tmp_path / "source.yaml"
+    source.write_text("entries: []\n", encoding="utf-8")
+    data_dir = tmp_path / "app"
+
+    uri = install_referentiel(f"file://{source}", data_dir=data_dir)
+
+    assert (data_dir / "referentiel.yaml").read_text() == "entries: []\n"
+    assert uri == f"file://{data_dir / 'referentiel.yaml'}"
+
+
+def test_install_referentiel_creates_app_dir(tmp_path: Path):
+    source = tmp_path / "ref.yaml"
+    source.write_text("entries: []\n", encoding="utf-8")
+    data_dir = tmp_path / "nested" / "app"
+
+    install_referentiel(f"file://{source}", data_dir=data_dir)
+
+    assert data_dir.is_dir()
+
+
+def test_install_referentiel_raises_when_source_missing(tmp_path: Path):
+    with pytest.raises(FileNotFoundError):
+        install_referentiel("file:///nonexistent/referentiel.yaml", data_dir=tmp_path)
