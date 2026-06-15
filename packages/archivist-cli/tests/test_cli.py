@@ -1,5 +1,12 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
 from click.testing import CliRunner
+
 from archivist_cli.cli import main
+from archivist_cli.config import AppConfig, load_config, save_config
 
 
 def test_help_exits_zero():
@@ -49,11 +56,6 @@ def test_scan_invalid_target_scheme():
     assert result.exit_code != 0
 
 
-import json
-from pathlib import Path
-from archivist_cli.config import AppConfig, load_config, save_config
-
-
 def test_config_show_empty(tmp_path: Path, monkeypatch):
     monkeypatch.setattr("archivist_cli.config.app_data_dir", lambda: tmp_path)
     runner = CliRunner()
@@ -101,7 +103,7 @@ def test_config_set_referentiel(tmp_path: Path, monkeypatch):
     assert result.exit_code == 0
     assert (tmp_path / "referentiel.yaml").exists()
     cfg = load_config(data_dir=tmp_path)
-    assert cfg.referentiel is not None
+    assert cfg.referentiel == f"file://{tmp_path / 'referentiel.yaml'}"
 
 
 def test_config_set_referentiel_missing_file(tmp_path: Path, monkeypatch):

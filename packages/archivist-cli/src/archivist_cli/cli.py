@@ -50,7 +50,7 @@ def config_set_referentiel(uri: str) -> None:
     _require_file_uri(uri, "referentiel")
     try:
         installed_uri = install_referentiel(uri)
-    except FileNotFoundError as e:
+    except (FileNotFoundError, ValueError) as e:
         raise click.ClickException(str(e))
     cfg = load_config()
     save_config(AppConfig(referentiel=installed_uri, root=cfg.root, llm=cfg.llm))
