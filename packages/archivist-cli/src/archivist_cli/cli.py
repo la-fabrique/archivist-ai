@@ -11,6 +11,7 @@ from archivist_cli.adapters.index.noop import NoopIndex
 from archivist_cli.application.classify import ClassifyConfig, ClassifyUseCase
 from archivist_cli.application.scaffold import scaffold
 from archivist_cli.application.scan import scan
+from archivist_cli.config import AppConfig, install_referentiel, load_config, save_config
 from archivist_cli.registry import default_registry
 
 logger = logging.getLogger(__name__)
@@ -30,6 +31,63 @@ def main(ctx: click.Context) -> None:
     """archivist — OCR et classement de documents."""
     if ctx.invoked_subcommand is None:
         click.echo(ctx.get_help())
+
+
+@main.group(name="config")
+def config_group() -> None:
+    """Gère la configuration persistante de la CLI."""
+
+
+@config_group.group(name="set")
+def config_set() -> None:
+    """Définit un paramètre de configuration."""
+
+
+@config_set.command(name="referentiel")
+@click.argument("uri")
+def config_set_referentiel(uri: str) -> None:
+    """Copie le référentiel dans le dossier app data et enregistre son URI."""
+    _require_file_uri(uri, "referentiel")
+    try:
+        installed_uri = install_referentiel(uri)
+    except FileNotFoundError as e:
+        raise click.ClickException(str(e))
+    cfg = load_config()
+    save_config(AppConfig(referentiel=installed_uri, root=cfg.root, llm=cfg.llm))
+    click.echo(json.dumps({"referentiel": installed_uri}))
+
+
+@config_set.command(name="root")
+@click.argument("uri")
+def config_set_root(uri: str) -> None:
+    """Enregistre le dossier racine de l'archive dans la config."""
+    _require_file_uri(uri, "root")
+    cfg = load_config()
+    save_config(AppConfig(referentiel=cfg.referentiel, root=uri, llm=cfg.llm))
+    click.echo(json.dumps({"root": uri}))
+
+
+@config_set.command(name="llm")
+@click.argument("nom")
+def config_set_llm(nom: str) -> None:
+    """Enregistre l'adaptateur LLM dans la config."""
+    cfg = load_config()
+    save_config(AppConfig(referentiel=cfg.referentiel, root=cfg.root, llm=nom))
+    click.echo(json.dumps({"llm": nom}))
+
+
+@config_group.command(name="show")
+def config_show() -> None:
+    """Affiche la configuration persistée en JSON."""
+    cfg = load_config()
+    data: dict[str, str] = {}
+    if cfg.referentiel is not None:
+        data["referentiel"] = cfg.referentiel
+    if cfg.root is not None:
+        data["root"] = cfg.root
+    if cfg.llm is not None:
+        data["llm"] = cfg.llm
+    click.echo(json.dumps(data))
 
 
 @main.command(name="scaffold")
