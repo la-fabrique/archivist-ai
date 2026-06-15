@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import yaml
+
 from archivist_cli.config import AppConfig, load_config, save_config
 
 
@@ -44,10 +46,15 @@ def test_save_omits_none_fields(tmp_path: Path):
     assert loaded.referentiel is None
     assert loaded.root is None
     assert loaded.llm == "claude-cli"
+    # verify keys are literally absent from the YAML file
+    raw = yaml.safe_load((tmp_path / "config.yaml").read_text(encoding="utf-8")) or {}
+    assert "referentiel" not in raw
+    assert "root" not in raw
 
 
 def test_save_overwrites_existing(tmp_path: Path):
-    save_config(AppConfig(llm="claude-cli"), data_dir=tmp_path)
+    save_config(AppConfig(llm="claude-cli", root="file:///docs"), data_dir=tmp_path)
     save_config(AppConfig(llm="openai"), data_dir=tmp_path)
     loaded = load_config(data_dir=tmp_path)
     assert loaded.llm == "openai"
+    assert loaded.root is None  # must be gone, not merged
