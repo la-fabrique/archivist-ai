@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-import pytest
 from pathlib import Path
 
+import pytest
 import yaml
 
-from archivist_cli.config import AppConfig, load_config, save_config, install_referentiel
+from archivist_cli.config import AppConfig, install_referentiel, load_config, save_config
 
 
 def test_load_config_returns_empty_when_no_file(tmp_path: Path):
@@ -85,3 +85,8 @@ def test_install_referentiel_creates_app_dir(tmp_path: Path):
 def test_install_referentiel_raises_when_source_missing(tmp_path: Path):
     with pytest.raises(FileNotFoundError):
         install_referentiel("file:///nonexistent/referentiel.yaml", data_dir=tmp_path)
+
+
+def test_install_referentiel_raises_on_non_file_uri(tmp_path: Path):
+    with pytest.raises(ValueError, match="file://"):
+        install_referentiel("https://example.com/ref.yaml", data_dir=tmp_path)

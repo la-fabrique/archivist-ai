@@ -50,9 +50,12 @@ def save_config(config: AppConfig, data_dir: Path | None = None) -> None:
 
 def install_referentiel(source_uri: str, data_dir: Path | None = None) -> str:
     dir_ = data_dir or app_data_dir()
-    source_path = Path(urlparse(source_uri).path)
+    parsed = urlparse(source_uri)
+    if parsed.scheme != "file":
+        raise ValueError(f"URI non supporté : {source_uri!r}. Seuls les URI file:// sont acceptés.")
+    source_path = Path(parsed.path)
     if not source_path.exists():
-        raise FileNotFoundError(f"Référentiel source introuvable : {source_path}")
+        raise FileNotFoundError(f"Référentiel source introuvable : {source_uri}")
     dir_.mkdir(parents=True, exist_ok=True)
     dest = dir_ / "referentiel.yaml"
     shutil.copy2(source_path, dest)
