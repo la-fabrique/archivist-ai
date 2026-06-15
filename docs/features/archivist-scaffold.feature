@@ -7,7 +7,7 @@ Feature: Créer l'arborescence de dossiers depuis le référentiel
   Scenario: Création nominale dans un répertoire vide
     Given un fichier referentiel.yaml valide
     And un répertoire cible vide
-    When je lance "archivist scaffold --referentiel file://<chemin>/referentiel.yaml --target file://<cible>"
+    When je lance "archivist scaffold --referentiel file://<chemin>/referentiel.yaml --root file://<cible>"
     Then les dossiers statiques du référentiel sont créés dans le répertoire cible
     And la sortie JSON sur stdout indique le nombre de dossiers créés
 
