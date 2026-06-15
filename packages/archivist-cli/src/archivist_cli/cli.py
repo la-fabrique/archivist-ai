@@ -174,9 +174,9 @@ def scan_cmd(referentiel: str, root: str) -> None:
     reception_path = _find_role("reception")
     backup_path = _find_role("conservation_brut")
 
-    target_base = root.rstrip("/")
-    reception_uri = f"{target_base}/{reception_path}"
-    backup_uri = f"{target_base}/{backup_path}"
+    root_base = root.rstrip("/")
+    reception_uri = f"{root_base}/{reception_path}"
+    backup_uri = f"{root_base}/{backup_path}"
 
     if not fs.is_dir(reception_uri):
         raise click.UsageError(
