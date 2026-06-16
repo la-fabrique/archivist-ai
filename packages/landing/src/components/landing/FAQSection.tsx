@@ -8,24 +8,24 @@ import {
 
 const faqs = [
   {
-    question: "Est-ce que l'archiviste peut supprimer mes documents ?",
-    answer: "Non, jamais. L'archiviste range et organise uniquement. Aucune suppression n'est possible. Chaque action est tracée dans un historique consultable."
+    question: "C'est quoi le référentiel ?",
+    answer: "Un corpus de règles d'archivage professionnel — plan de classement, conventions de nommage, durées de conservation légales — adapté au droit fiscal français (TVA, URSSAF, CFE…). Ces règles sont lisibles, documentées, co-construites avec des experts. Votre agent IA les applique fidèlement."
   },
   {
-    question: "Dois-je changer ma façon de travailler ?",
-    answer: "Non ! L'archiviste s'adapte à VOTRE méthode existante. Il apprend votre logique de classement et l'applique automatiquement."
+    question: "Le code est-il open source ?",
+    answer: "Oui. Archivist et son référentiel sont publiés sous licence Apache 2.0 sur GitHub. Vous pouvez lire le code, contribuer, et l'héberger vous-même. Une offre avec support dédié et accompagnement est prévue pour les organisations qui préfèrent déléguer."
   },
   {
-    question: "Mes données sont-elles en sécurité ?",
-    answer: "Vos fichiers restent sur VOS systèmes (Google Drive, Office 365, etc.). L'archiviste ne stocke rien. Données hébergées en Europe, conformité RGPD."
+    question: "Comment mon agent IA utilise Archivist ?",
+    answer: "Archivist est conçu pour être appelé comme un outil par un agent IA. Votre LLM — Claude, ChatGPT, Copilot ou autre — appelle Archivist pour créer une arborescence, classer un document, ou traiter un dossier entier, sans que vous ayez à ouvrir un terminal."
   },
   {
-    question: "Et si l'archiviste se trompe ?",
-    answer: "Pour les cas simples, il agit en autonomie. Pour les cas complexes ou risqués, il vous demande validation AVANT d'agir. Vous gardez toujours le contrôle."
+    question: "Est-ce que mes fichiers quittent mon ordinateur ?",
+    answer: "Non. Archivist tourne localement sur votre machine ou votre serveur. Vos fichiers ne sont jamais envoyés à un service externe. Seul le contenu textuel extrait d'un document peut transiter vers le LLM pour la classification."
   },
   {
-    question: "Combien de temps pour configurer ?",
-    answer: "5 minutes. Connectez vos outils, l'archiviste apprend vos habitudes au fil du temps. Zéro configuration complexe."
+    question: "Est-ce que l'agent peut se tromper ?",
+    answer: "Oui — et c'est pour ça qu'Archivist intègre une validation humaine. Pour les classements évidents, il agit. Pour les cas ambigus, il vous soumet une proposition avant d'agir. Aucune suppression n'est jamais possible."
   }
 ];
 

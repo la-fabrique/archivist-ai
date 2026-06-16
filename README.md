@@ -1,99 +1,79 @@
 # Archivist AI
 
-Mono-repo de classement automatique de documents pour TPE/micro-entreprises.
+[![Licence Apache 2.0](https://img.shields.io/badge/licence-Apache%202.0-blue.svg)](LICENCE.md)
+[![GitHub](https://img.shields.io/badge/GitHub-la--fabrique%2Farchivist--ai-black?logo=github)](https://github.com/la-fabrique/archivist-ai)
 
-## Vue d'ensemble
+Un archiviste professionnel pour votre agent IA — classement automatique de documents pour TPE et indépendants français.
 
-```
-referentiel  ──►  referentiel-cli  ──►  archivist-cli
- (contenu)        (génération,          (classement
-                   validation,           automatique
-                   export)               de documents)
+**Open source sous licence Apache 2.0.** Vous pouvez l'utiliser, le modifier, l'héberger et le redistribuer librement.
 
-landing  (site vitrine, indépendant)
-```
+Archivist applique un [référentiel de règles professionnelles](packages/referentiel/_index.md) (plan de classement, nommage, archivage) via une CLI conçue pour être appelée par un agent IA.
 
-| Package | Nature | Stack |
-|---|---|---|
-| `packages/referentiel/` | Contenu documentaire (Markdown + YAML) | Aucun code |
-| `packages/referentiel-cli/` | CLI développeur | TypeScript, Node ≥ 24 |
-| `packages/archivist-cli/` | CLI utilisateur final | Python ≥ 3.12, uv |
-| `packages/landing/` | Site vitrine | React 19, Vite, Tailwind |
+## Installation
 
-## Prérequis
+### Prérequis
 
-- Node ≥ 24
-- Python ≥ 3.12 + [uv](https://docs.astral.sh/uv/)
-- Docker (pour la stack monitoring)
+- Python ≥ 3.12
+- [uv](https://docs.astral.sh/uv/) (gestionnaire de paquets Python)
 
-## Démarrage rapide
-
-### archivist-cli (Python)
+### Installer
 
 ```bash
 cd packages/archivist-cli
-uv run pytest tests/          # tous les tests
-uv run archivist --help       # CLI
+uv sync
 ```
 
-Build du binaire :
+Vérifier l'installation :
 
 ```bash
-npm run archivist-cli:build
+uv run archivist --help
 ```
 
-Utilisation :
+## Utilisation
+
+### 1. Initialiser l'arborescence (`scaffold`)
+
+Génère la structure de dossiers adaptée à votre profil (SASU, artisan, TPE…) :
 
 ```bash
-./packages/archivist-cli/dist/archivist scaffold \
-  --referentiel file:./packages/referentiel/referentiel.yaml \
-  --target file:./dist/root \
+uv run archivist scaffold \
+  --referentiel file:../referentiel/referentiel.yaml \
+  --target file:./mes-documents \
   --dry-run
+```
 
-./packages/archivist-cli/dist/archivist classify \
-  --referentiel file:./packages/referentiel/referentiel.yaml \
+Retirer `--dry-run` pour créer les dossiers.
+
+Options disponibles : `core` (toujours actif), `dirigeant-assimile-salarie`, `assurances`. Voir le [plan de classement](packages/referentiel/classement/__index.md) pour le détail des dossiers générés.
+
+### 2. Classer un document (`classify`)
+
+Place un document dans le bon dossier avec le bon nom :
+
+```bash
+uv run archivist classify \
+  --referentiel file:../referentiel/referentiel.yaml \
+  --source file:./inbox/facture.pdf \
+  --target file:./mes-documents
+```
+
+Archivist lit le contenu (OCR inclus), identifie le type de document, et propose un emplacement. Il demande confirmation avant d'agir sur les cas ambigus.
+
+### 3. Scanner un dossier entier (`scan`)
+
+Traite tous les fichiers d'un dossier en une passe :
+
+```bash
+uv run archivist scan \
+  --referentiel file:../referentiel/referentiel.yaml \
   --source file:./inbox \
-  --target file:./dist/root
+  --target file:./mes-documents
 ```
 
-### referentiel-cli (TypeScript)
+## Pour les développeurs et contributeurs
 
-```bash
-npm run referentiel-cli:install
-npm run referentiel-cli:build
-npm run referentiel-cli:test
-npm run referentiel-cli:export-frontmatters   # génère referentiel.yaml
-npm run referentiel-cli:generate-pdf          # génère referentiel.pdf
-```
-
-### landing (React)
-
-```bash
-npm run landing:install
-npm run landing:dev      # serveur dev sur localhost
-npm run landing:build    # build production
-```
-
-### Monitoring (optionnel)
-
-```bash
-npm run monitoring:up    # Otel Collector + Prometheus + Grafana + Tempo
-npm run monitoring:down
-```
-
-Grafana : http://localhost:3000 — Prometheus : http://localhost:9090
-
-## Architecture
-
-- [Vue d'ensemble](docs/architecture/index.md)
+- [Architecture technique](docs/architecture/index.md) — vue d'ensemble, packages, conventions
 - [Architecture archivist-cli (hexagonale)](docs/architecture/archivist-cli.md)
 - [ADRs — décisions d'architecture](docs/architecture/adrs/)
 - [Features — comportements attendus (Gherkin)](docs/features/)
-
-## Conventions de développement
-
-- Lire le `CLAUDE.md` du package concerné avant de toucher au code
-- Toute décision d'architecture structurante → ADR dans `docs/architecture/adrs/` **avant** le code
-- Toute feature → spec Gherkin dans `docs/features/`
-- Ne jamais travailler directement sur `main` — créer un worktree isolé
-- Tests archivist-cli : `cd packages/archivist-cli && uv run pytest tests/`
+- [Référentiel — contenu et règles](packages/referentiel/_index.md)

@@ -3,77 +3,94 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
+
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-PD8QND9P');</script>
+    <!-- End Google Tag Manager -->
+
+    <!--
+      ⚙️  CONFIG — À renseigner avant mise en production
+      Toutes les valeurs TODO ci-dessous correspondent aux champs de src/config/site.ts
+    -->
+
     <!-- Primary Meta Tags -->
-    <title>Archiviste IA - Vos documents se rangent. Vous respirez.</title>
-    <meta name="description" content="Un archiviste virtuel pour tous vos fichiers. Connecté à Google Drive, Office 365, serveur local. Zéro nouvelle interface à apprendre. Compatible RGPD." />
-    <meta name="author" content="Archiviste IA" />
-    <meta name="keywords" content="archiviste IA, gestion documentaire, classement automatique, GED, intelligence artificielle, Google Drive, Office 365, RGPD, France" />
-    <link rel="canonical" href="https://archiviste-ia.com/" />
-    
-    <!-- GEO SEO -->
+    <title>Archivist AI — Classement automatique de documents pour TPE et indépendants</title>
+    <meta name="description" content="Archivist donne à votre agent IA l'expertise d'un archiviste professionnel. Classement et nommage automatiques selon les règles du droit fiscal français. Compatible Claude, ChatGPT, Copilot. Sur votre poste, en cloud, ou sur serveur." />
+    <meta name="author" content="Archivist AI" />
+    <meta name="keywords" content="classement documentaire automatique, gestion documentaire TPE, archivage documents freelance, agent IA documents, classement fichiers automatique France, nommage fichiers intelligent, archivist AI, documents fiscaux France, outil archivage indépendant, SASU documents" />
+    <link rel="canonical" href="TODO:siteConfig.url" /><!-- TODO: renseigner siteConfig.url -->
+    <meta name="robots" content="index, follow" />
+
+    <!-- Geo targeting -->
     <meta name="geo.region" content="FR" />
     <meta name="geo.country" content="France" />
-    <meta name="geo.placename" content="France" />
     <meta name="language" content="French" />
     <meta name="content-language" content="fr-FR" />
-    <link rel="alternate" hreflang="fr" href="https://archiviste-ia.com/" />
-    <link rel="alternate" hreflang="x-default" href="https://archiviste-ia.com/" />
+    <link rel="alternate" hreflang="fr" href="TODO:siteConfig.url" /><!-- TODO: renseigner siteConfig.url -->
+    <link rel="alternate" hreflang="x-default" href="TODO:siteConfig.url" /><!-- TODO: renseigner siteConfig.url -->
 
-    <!-- Open Graph / Facebook -->
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://archiviste-ia.com/" />
-    <meta property="og:title" content="Archiviste IA - Un archiviste pour tous vos fichiers" />
-    <meta property="og:description" content="Google Drive, Office 365, serveur local... Un seul assistant pour tout organiser. Données souveraines, hébergé en Europe, compatible RGPD." />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta property="og:url" content="TODO:siteConfig.url" /><!-- TODO: renseigner siteConfig.url -->
+    <meta property="og:title" content="Archivist AI — Classement automatique de documents pour TPE et indépendants" />
+    <meta property="og:description" content="Archivist donne à votre agent IA l'expertise d'un archiviste professionnel. Classement et nommage automatiques selon les règles du droit fiscal français. Compatible Claude, ChatGPT, Copilot." />
+    <meta property="og:image" content="TODO:siteConfig.url/og-image.png" /><!-- TODO: renseigner + créer og-image.png -->
     <meta property="og:locale" content="fr_FR" />
-    <meta property="og:site_name" content="Archiviste IA" />
+    <meta property="og:site_name" content="Archivist AI" />
 
-    <!-- Twitter -->
+    <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@ArchivisteIA" />
-    <meta name="twitter:title" content="Archiviste IA - Un archiviste pour tous vos fichiers" />
-    <meta name="twitter:description" content="Google Drive, Office 365, serveur local... Un seul assistant pour tout organiser." />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta name="twitter:site" content="TODO:@siteConfig.twitter" /><!-- TODO: renseigner siteConfig.twitter -->
+    <meta name="twitter:title" content="Archivist AI — Classement automatique de documents pour TPE et indépendants" />
+    <meta name="twitter:description" content="Votre agent IA classe vos documents selon les règles du droit fiscal français. Compatible Claude, ChatGPT, Copilot. Zéro nouvelle interface." />
+    <meta name="twitter:image" content="TODO:siteConfig.url/og-image.png" /><!-- TODO: renseigner -->
 
-    <!-- JSON-LD Structured Data -->
+    <!-- SoftwareApplication Schema -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
-      "name": "Archiviste IA",
+      "name": "Archivist AI",
+      "alternateName": "Archiviste IA",
       "applicationCategory": "BusinessApplication",
-      "operatingSystem": "Web",
-      "description": "Un archiviste virtuel intelligent qui organise automatiquement vos documents professionnels. Connecté à Google Drive, Office 365, OneDrive et serveurs locaux.",
-      "url": "https://archiviste-ia.com",
+      "applicationSubCategory": "Document Management",
+      "operatingSystem": "macOS, Linux, Windows, Cloud",
+      "description": "Archivist est un outil de classement documentaire conçu pour être piloté par un agent IA. Il applique un référentiel professionnel de règles d'archivage adapté au droit fiscal français pour scaffolter une arborescence de dossiers, classifier des documents et les nommer automatiquement. Compatible avec Claude, ChatGPT, Copilot et tout agent supportant le tool use.",
+      "codeRepository": "https://github.com/la-fabrique/archivist-ai",
+      "license": "https://www.apache.org/licenses/LICENSE-2.0",
+      "inLanguage": "fr-FR",
       "author": {
         "@type": "Organization",
-        "name": "Archiviste IA",
-        "url": "https://archiviste-ia.com"
+        "name": "La Fabrique",
+        "url": "https://github.com/la-fabrique"
       },
       "offers": {
         "@type": "Offer",
         "availability": "https://schema.org/PreOrder",
         "price": "0",
         "priceCurrency": "EUR",
-        "description": "Liste d'attente - Accès prioritaire et tarif early adopter"
+        "description": "Early access — liste d'attente ouverte. 3 mois offerts pour les 100 premiers inscrits, tarif bloqué à vie."
       },
       "featureList": [
-        "Classement automatique de documents",
-        "Nommage intelligent des fichiers",
-        "Recherche en langage naturel",
-        "Intégration Google Drive",
-        "Intégration Office 365",
-        "Intégration OneDrive",
-        "Compatible RGPD",
-        "Hébergement Europe"
+        "Scaffold automatique d'arborescence de dossiers selon profil (SASU, artisan, TPE)",
+        "Classement automatique de documents avec OCR intégré",
+        "Nommage intelligent des fichiers (date, émetteur, objet)",
+        "Traitement en lot d'un dossier entier",
+        "Référentiel de règles adapté au droit fiscal français",
+        "Human-in-the-loop sur les cas ambigus",
+        "Traçabilité complète des actions",
+        "Déploiement local, cloud ou serveur",
+        "Compatible avec tous les agents IA (Claude, ChatGPT, Copilot)",
+        "Open source Apache 2.0",
+        "Données souveraines, hébergement Europe, conformité RGPD"
       ],
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "5",
-        "ratingCount": "1",
-        "bestRating": "5",
-        "worstRating": "1"
+      "audience": {
+        "@type": "Audience",
+        "audienceType": "Freelances, indépendants, dirigeants de TPE, SASU, artisans, professions libérales"
       }
     }
     </script>
@@ -83,31 +100,55 @@
     {
       "@context": "https://schema.org",
       "@type": "Organization",
-      "name": "Archiviste IA",
-      "url": "https://archiviste-ia.com",
-      "logo": "https://archiviste-ia.com/logo.png",
-      "description": "Solution d'archivage intelligent par IA pour professionnels",
-      "address": {
-        "@type": "PostalAddress",
-        "addressCountry": "FR"
-      },
-      "areaServed": {
-        "@type": "GeoCircle",
-        "geoMidpoint": {
-          "@type": "GeoCoordinates",
-          "latitude": 46.603354,
-          "longitude": 1.888334
-        },
-        "geoRadius": "1000 km"
-      },
+      "name": "La Fabrique",
+      "url": "https://github.com/la-fabrique",
+      "description": "Éditeur d'Archivist AI, outil open source de classement documentaire piloté par agent IA pour les TPE et indépendants français.",
+      "foundingDate": "2026",
+      "address": { "@type": "PostalAddress", "addressCountry": "FR" },
+      "areaServed": "FR",
       "sameAs": [
-        "https://twitter.com/ArchivisteIA",
-        "https://linkedin.com/company/archiviste-ia"
+        "https://github.com/la-fabrique/archivist-ai"
       ]
     }
     </script>
 
-    <!-- FAQ Schema -->
+    <!-- HowTo Schema — 3 étapes de classement -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      "name": "Comment utiliser Archivist AI pour classer ses documents",
+      "description": "Archivist AI permet de classer automatiquement des documents professionnels via un agent IA en trois étapes.",
+      "totalTime": "PT5M",
+      "tool": {
+        "@type": "HowToTool",
+        "name": "Archivist AI",
+        "url": "https://github.com/la-fabrique/archivist-ai"
+      },
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "Initialiser l'arborescence de dossiers",
+          "text": "Votre agent IA génère une structure de dossiers professionnelle adaptée à votre profil (SASU, artisan, profession libérale) selon les règles du référentiel Archivist."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "Classifier et nommer chaque document",
+          "text": "Votre agent lit le contenu du document (OCR intégré pour les PDF scannés), identifie le type de document, le place dans le bon dossier et lui attribue un nom structuré (date, émetteur, objet)."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "Traiter un dossier entier en une passe",
+          "text": "Votre agent passe en revue tous les fichiers d'un dossier, propose un plan de classement complet, et n'agit qu'après validation. Aucun fichier n'est supprimé."
+        }
+      ]
+    }
+    </script>
+
+    <!-- FAQ Schema — aligné sur le contenu de la page -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -115,50 +156,72 @@
       "mainEntity": [
         {
           "@type": "Question",
-          "name": "Est-ce que l'archiviste peut supprimer mes documents ?",
+          "name": "C'est quoi le référentiel d'Archivist AI ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Non, jamais. L'archiviste range et organise uniquement. Aucune suppression n'est possible. Chaque action est tracée dans un historique consultable."
+            "text": "Le référentiel est un corpus de règles d'archivage professionnel — plan de classement, conventions de nommage, durées de conservation légales — adapté au droit fiscal français (TVA, URSSAF, CFE). Ces règles sont lisibles, documentées et co-construites avec des experts. Votre agent IA les applique fidèlement."
           }
         },
         {
           "@type": "Question",
-          "name": "Dois-je changer ma façon de travailler ?",
+          "name": "Archivist AI est-il open source ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Non ! L'archiviste s'adapte à VOTRE méthode existante. Il apprend votre logique de classement et l'applique automatiquement."
+            "text": "Oui. Archivist AI et son référentiel sont publiés sous licence Apache 2.0 sur GitHub (https://github.com/la-fabrique/archivist-ai). Vous pouvez lire le code, contribuer, et l'héberger vous-même. Une offre avec support dédié est prévue pour les organisations qui préfèrent déléguer."
           }
         },
         {
           "@type": "Question",
-          "name": "Mes données sont-elles en sécurité ?",
+          "name": "Comment mon agent IA utilise Archivist AI ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Vos fichiers restent sur VOS systèmes (Google Drive, Office 365, etc.). L'archiviste ne stocke rien. Données hébergées en Europe, conformité RGPD."
+            "text": "Archivist AI est conçu pour être appelé comme un outil par un agent IA. Votre LLM — Claude, ChatGPT, Copilot ou autre — appelle Archivist pour créer une arborescence, classer un document, ou traiter un dossier entier, sans que vous ayez à ouvrir un terminal."
           }
         },
         {
           "@type": "Question",
-          "name": "Et si l'archiviste se trompe ?",
+          "name": "Est-ce que mes fichiers quittent mon ordinateur avec Archivist AI ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Pour les cas simples, il agit en autonomie. Pour les cas complexes ou risqués, il vous demande validation AVANT d'agir. Vous gardez toujours le contrôle."
+            "text": "Non. Archivist tourne localement sur votre machine ou votre serveur. Vos fichiers ne sont jamais envoyés à un service externe. Seul le contenu textuel extrait d'un document peut transiter vers le LLM pour la classification."
           }
         },
         {
           "@type": "Question",
-          "name": "Combien de temps pour configurer ?",
+          "name": "Est-ce qu'Archivist AI peut supprimer des documents ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "5 minutes. Connectez vos outils, l'archiviste apprend vos habitudes au fil du temps. Zéro configuration complexe."
+            "text": "Non, jamais. Archivist range et organise uniquement — aucune suppression n'est possible. Pour les cas ambigus, l'agent vous soumet une proposition avant d'agir. Chaque action est tracée."
           }
         }
       ]
     }
     </script>
+
+    <!-- Speakable — pour les moteurs IA (Google AI Overview, Perplexity…) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Archivist AI — Classement automatique de documents pour TPE et indépendants",
+      "speakable": {
+        "@type": "SpeakableSpecification",
+        "cssSelector": ["h1", "h2", ".speakable"]
+      },
+      "mainEntity": {
+        "@type": "SoftwareApplication",
+        "name": "Archivist AI"
+      }
+    }
+    </script>
   </head>
 
   <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PD8QND9P"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

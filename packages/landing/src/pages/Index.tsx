@@ -6,7 +6,7 @@ import IntegrationsSection from "@/components/landing/IntegrationsSection";
 import TrustSection from "@/components/landing/TrustSection";
 import UseCasesSection from "@/components/landing/UseCasesSection";
 import FAQSection from "@/components/landing/FAQSection";
-import WaitlistSection from "@/components/landing/WaitlistSection";
+import CtaSection from "@/components/landing/CtaSection";
 import Footer from "@/components/landing/Footer";
 
 const Index = () => {
@@ -21,7 +21,7 @@ const Index = () => {
         <TrustSection />
         <UseCasesSection />
         <FAQSection />
-        <WaitlistSection />
+        <CtaSection />
       </main>
       <Footer />
     </div>

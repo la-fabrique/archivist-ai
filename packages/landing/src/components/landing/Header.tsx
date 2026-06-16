@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
-import { FileArchive } from "lucide-react";
+import { FileArchive, Github } from "lucide-react";
+import { siteConfig } from "@/config/site";
 
 const Header = () => {
   return (
@@ -15,26 +16,29 @@ const Header = () => {
             <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
               <FileArchive className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-semibold text-lg text-foreground">Archiviste IA</span>
+            <span className="font-semibold text-lg text-foreground">Archivist AI</span>
           </div>
-          
+
           <nav className="hidden md:flex items-center gap-8">
             <a href="#solution" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-              Solution
+              Fonctionnement
             </a>
-            <a href="#integrations" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-              Intégrations
+            <a href="#deploiement" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Déploiement
             </a>
             <a href="#faq" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               FAQ
             </a>
           </nav>
-          
+
           <a
-            href="#waitlist"
-            className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+            href={siteConfig.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-foreground text-background rounded-lg hover:bg-foreground/90 transition-colors"
           >
-            Rejoindre
+            <Github className="w-4 h-4" />
+            GitHub
           </a>
         </div>
       </div>
