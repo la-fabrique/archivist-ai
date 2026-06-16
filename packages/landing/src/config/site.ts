@@ -3,6 +3,7 @@ export const siteConfig = {
   // Connus
   github: "https://github.com/la-fabrique/archivist-ai",
   dekaUrl: "https://deka.github.io/?utm_source=archivist-ai&utm_medium=landing&utm_campaign=cta",
+  gtmId: "GTM-PD8QND9P",
 
   // À renseigner
   url: "https://la-fabrique.github.io/archivist-ai/",       // URL de production (ex: "https://archivist-ai.com")
