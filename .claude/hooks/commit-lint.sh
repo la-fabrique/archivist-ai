@@ -16,8 +16,10 @@ CMD=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
 # Seulement si c'est un git commit
 if ! echo "$CMD" | grep -q "git commit"; then exit 0; fi
 
-# Extraire le message de commit (flag -m "..." ou -m '...')
-MSG=$(echo "$CMD" | grep -oP '(?<=-m )["\x27][^\x27"]+["\x27]' | head -1 | tr -d '"'"'")
+# Extraire le message de commit. Couvre les formes courantes :
+#   -m "msg"  -m 'msg'  -m=msg  --message "msg"  --message='msg'
+# (chaque lookbehind est de largeur fixe, contrainte de grep -P).
+MSG=$(echo "$CMD" | grep -oP "(?<=-m )[\"\x27][^\x27\"]+[\"\x27]|(?<=--message )[\"\x27][^\x27\"]+[\"\x27]|(?<=-m=)[\"\x27][^\x27\"]+[\"\x27]|(?<=--message=)[\"\x27][^\x27\"]+[\"\x27]" | head -1 | tr -d '"'"'")
 
 # Fallback : heredoc ou message en variable (on ne peut pas l'extraire ici — laisser passer)
 if [[ -z "$MSG" ]]; then exit 0; fi

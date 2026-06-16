@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
-# SessionStart hook: starts monitoring stack, generates OTEL trace context,
-# emits root GenAI span, and reminds to create a worktree if on main.
+# SessionStart hook: generates OTEL trace context, emits the root GenAI span,
+# reminds to create a worktree when on main, and reports collector reachability.
+# It does NOT start the monitoring stack — that is the devcontainer's job
+# (.devcontainer/compose.yml). This hook only observes and reminds.
 
 COLLECTOR_HOST="localhost"
 COLLECTOR_PORT="4317"
@@ -52,14 +54,29 @@ _init_session() {
 # Always initialize session IDs (emit_* functions handle collector-down gracefully)
 _init_session
 
-if nc -z -w1 "$COLLECTOR_HOST" "$COLLECTOR_PORT" 2>/dev/null; then
-  BRANCH=$(git branch --show-current 2>/dev/null)
-  if [[ "$BRANCH" == "main" || "$BRANCH" == "master" ]]; then
-    jq -n '{"systemMessage": "HARNAIS: tu es sur main. Si tu démarres une feature (brainstorming inclus), invoke superpowers:using-git-worktrees pour créer un worktree isolé AVANT de commencer."}'
-  elif [[ -z "$BRANCH" ]]; then
-    jq -n '{"systemMessage": "HARNAIS: branche indéterminée (detached HEAD ?). Vérifie ton contexte git avant de commencer."}'
-  fi
-  exit 0
+# Branch-state reminder runs ALWAYS — independent of collector reachability.
+# The worktree rule is a hard project invariant; gating it behind monitoring
+# would silently disable the harness's most important guardrail when the
+# collector is down (exactly when the environment is already degraded).
+REMINDER=""
+BRANCH=$(git branch --show-current 2>/dev/null)
+if [[ "$BRANCH" == "main" || "$BRANCH" == "master" ]]; then
+  REMINDER="HARNAIS: tu es sur main. Si tu démarres une feature (brainstorming inclus), invoke superpowers:using-git-worktrees pour créer un worktree isolé AVANT de commencer."
+elif [[ -z "$BRANCH" ]]; then
+  REMINDER="HARNAIS: branche indéterminée (detached HEAD ?). Vérifie ton contexte git avant de commencer."
 fi
 
-jq -n '{"systemMessage": "HARNAIS: Collector inaccessible sur localhost:4317 — la stack monitoring démarre normalement avec le devcontainer (otel-collector, grafana:3000, prometheus:9090, tempo:3200)"}'
+# Collector reachability is informational and only surfaced when it is down.
+COLLECTOR_MSG=""
+if ! nc -z -w1 "$COLLECTOR_HOST" "$COLLECTOR_PORT" 2>/dev/null; then
+  COLLECTOR_MSG="HARNAIS: Collector inaccessible sur localhost:4317 — la stack monitoring démarre normalement avec le devcontainer (otel-collector, grafana:3000, prometheus:9090, tempo:3200)"
+fi
+
+# Emit a single systemMessage combining whichever notices apply.
+MSG="$REMINDER"
+if [[ -n "$COLLECTOR_MSG" ]]; then
+  if [[ -n "$MSG" ]]; then MSG="${MSG}"$'\n\n'"${COLLECTOR_MSG}"; else MSG="$COLLECTOR_MSG"; fi
+fi
+if [[ -n "$MSG" ]]; then
+  jq -n --arg m "$MSG" '{"systemMessage": $m}'
+fi

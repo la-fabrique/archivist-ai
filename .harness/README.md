@@ -47,7 +47,7 @@ SessionStart
                 → 4 étapes : qualifier → impact cross-fichiers → CLI build → tests
            │
            ▼
-    Commits
+    Commits  (règle : TOUJOURS committer — jamais de travail non committé en fin de session)
         │
         ├─ [hook PreToolUse] no-commit-on-main.sh
         │       → BLOQUE git commit sur main (decision: block, exit 2)
@@ -92,7 +92,9 @@ SessionStart
 
 SessionStop
     └─ [hook] dev-cycle-reminder.sh
-            → si branche ≠ main → rappel : invoquer /simplify + harness-cleaner
+            → si branche ≠ main :
+                → si modifications non committées → rappel OBLIGATOIRE : committer avant de terminer
+                → rappel : invoquer /simplify + harness-cleaner
 ```
 
 ---
@@ -101,13 +103,13 @@ SessionStop
 
 | Événement | Fichier | Déclencheur | Effet |
 |-----------|---------|-------------|-------|
-| `SessionStart` | `.harness/scripts/session-start.sh` | Toujours | Vérifie que le Collector répond (stack démarrée avec le devcontainer) ; rappel worktree si sur main |
+| `SessionStart` | `.harness/scripts/session-start.sh` | Toujours | Rappel worktree si sur main (toujours, même Collector injoignable) ; émet le root span OTEL ; signale si le Collector est injoignable. **Ne démarre pas** la stack — c'est le devcontainer qui le fait |
 | `PreToolUse` (Write\|Edit) | `.claude/hooks/referentiel-guard.sh` | Fichier dans `packages/referentiel/` | Rappel d'invoquer `referentiel-update` |
 | `PreToolUse` (Bash) | `.claude/hooks/no-commit-on-main.sh` | Commande `git commit` sur main | **Bloque** le commit (`decision: block`) |
 | `PostToolUse` (Bash) | `.claude/hooks/commit-lint.sh` | Commande `git commit` | Valide le format Conventional Commits |
 | `PostToolUse` (Bash) | `.claude/hooks/feat-commit-cleanup.sh` | Commit `feat()` détecté | Injection `additionalContext` obligatoire : invoquer harness-cleaner |
 | `PostToolUse` (Skill) | `.harness/scripts/skill-trace.sh` | Invocation d'un skill | Émet span OTEL GenAI `execute_tool {skill}` + métrique `skill_invoked` vers Tempo/Prometheus |
-| `Stop` | `.claude/hooks/dev-cycle-reminder.sh` | Fin de session sur branche feature | Rappel : `/simplify` + harness-cleaner |
+| `Stop` | `.claude/hooks/dev-cycle-reminder.sh` | Fin de session sur branche feature | Rappel **obligatoire de committer** si modifications non committées ; rappel `/simplify` + harness-cleaner |
 
 ---
 
@@ -184,7 +186,7 @@ Spec complète : [`docs/architecture/specs/2026-05-03-harness-monitoring-design.
 
 | Script | Usage |
 |--------|-------|
-| `session-start.sh` | Hook SessionStart — démarre monitoring si absent, rappel worktree sur main, émet root span OTEL GenAI `invoke_agent claude-code` |
+| `session-start.sh` | Hook SessionStart — rappel worktree sur main (inconditionnel), émet le root span OTEL GenAI `invoke_agent claude-code`, signale si le Collector est injoignable (ne démarre pas la stack — rôle du devcontainer) |
 | `skill-trace.sh` | Hook PostToolUse(Skill) — émet span OTEL GenAI `execute_tool {skill}` + métrique `skill_invoked` |
 | `harness-trace.sh` | Lib partagée — `emit_span`, `emit_session_metric`, `emit_skill_metric` via OTLP/HTTP JSON `:4318` |
 | `check_claude_coverage.py` | Vérifie que chaque `packages/*` est documenté dans CLAUDE.md |
@@ -193,6 +195,7 @@ Spec complète : [`docs/architecture/specs/2026-05-03-harness-monitoring-design.
 
 ## Règles absolues (résumé)
 
+- **Toujours committer** — aucun travail non committé en fin de session (le hook `Stop` le rappelle si l'arbre de travail est sale)
 - **Jamais de commit sur `main`** — le hook bloque, le worktree est obligatoire
 - **Brainstorming dans un worktree** — pas de travail feature sur main, même exploratoire
 - **harness-cleaner avant la PR** — les commits de nettoyage font partie de la PR
