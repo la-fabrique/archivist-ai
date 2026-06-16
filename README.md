@@ -16,13 +16,13 @@ landing  (site vitrine, indépendant)
 | Package | Nature | Stack |
 |---|---|---|
 | `packages/referentiel/` | Contenu documentaire (Markdown + YAML) | Aucun code |
-| `packages/referentiel-cli/` | CLI développeur | TypeScript, Node ≥ 20 |
+| `packages/referentiel-cli/` | CLI développeur | TypeScript, Node ≥ 24 |
 | `packages/archivist-cli/` | CLI utilisateur final | Python ≥ 3.12, uv |
 | `packages/landing/` | Site vitrine | React 19, Vite, Tailwind |
 
 ## Prérequis
 
-- Node ≥ 20
+- Node ≥ 24
 - Python ≥ 3.12 + [uv](https://docs.astral.sh/uv/)
 - Docker (pour la stack monitoring)
 
