@@ -6,6 +6,7 @@ dependencies = [
     "click>=8.1.0",
     "duckdb>=1.0",
     "kreuzberg>=3.0",
+    "platformdirs>=4.0",
     "pyyaml>=6.0",
 ]
 

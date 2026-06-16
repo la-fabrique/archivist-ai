@@ -10,7 +10,6 @@
     "OTEL_LOGS_EXPORT_INTERVAL": "5000"
   },
   "permissions": {
-    "defaultMode": "bypassPermissions",
     "allow": [
       "Bash(xargs cat:*)",
       "Bash(git checkout:*)",
@@ -33,7 +32,8 @@
       "Bash(curl *)",
       "Bash(git worktree *)",
       "Bash(npm install *)"
-    ]
+    ],
+    "defaultMode": "bypassPermissions"
   },
   "model": "claude-sonnet-4-6",
   "hooks": {
@@ -43,7 +43,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/deka/sources/github/archivist-ai/.claude/hooks/referentiel-guard.sh"
+            "command": ".claude/hooks/referentiel-guard.sh"
           }
         ]
       },
@@ -52,7 +52,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/deka/sources/github/archivist-ai/.claude/hooks/no-commit-on-main.sh"
+            "command": ".claude/hooks/no-commit-on-main.sh"
           }
         ]
       }
@@ -63,11 +63,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/deka/sources/github/archivist-ai/.claude/hooks/commit-lint.sh"
+            "command": ".claude/hooks/commit-lint.sh"
           },
           {
             "type": "command",
-            "command": "/home/deka/sources/github/archivist-ai/.claude/hooks/feat-commit-cleanup.sh"
+            "command": ".claude/hooks/feat-commit-cleanup.sh"
           }
         ]
       },

@@ -1,5 +1,33 @@
 # Usage — archivist-cli
 
+## Configuration persistante
+
+La CLI peut mémoriser les paramètres récurrents pour éviter de les passer à chaque commande.
+
+### archivist config set
+
+```
+archivist config set referentiel <uri>   # Copie le référentiel et mémorise son URI
+archivist config set root <uri>          # Mémorise le dossier racine de l'archive
+archivist config set llm <nom>           # Mémorise l'adaptateur LLM
+```
+
+### archivist config show
+
+Affiche la configuration persistée en JSON :
+
+```
+archivist config show
+```
+
+**Emplacement** : la config est stockée dans le dossier app data de l'utilisateur
+(Linux : `~/.local/share/archivist/`, macOS : `~/Library/Application Support/archivist/`).
+
+Une fois configuré, les options `--referentiel`, `--root` et `--llm` deviennent optionnelles
+dans toutes les commandes.
+
+---
+
 ## `archivist scaffold` — Créer l'arborescence de dossiers
 
 Crée l'arborescence cible à partir du référentiel, prête à accueillir vos documents classés.
@@ -7,17 +35,19 @@ Crée l'arborescence cible à partir du référentiel, prête à accueillir vos 
 ```bash
 archivist scaffold \
   --referentiel file:///chemin/vers/referentiel.yaml \
-  --target file:///chemin/vers/mon/drive
+  --root file:///chemin/vers/mon/drive
 ```
 
 ### Options
 
 | Flag | Requis | Description |
 |------|--------|-------------|
-| `--referentiel URI` | oui | Chemin vers le fichier `referentiel.yaml` (format `file:///…`) |
-| `--target URI` | oui | Dossier cible où créer l'arborescence (format `file:///…`) |
+| `--referentiel URI` | non* | Chemin vers le fichier `referentiel.yaml` (format `file:///…`) |
+| `--root URI` | non* | Dossier racine de l'archive où créer l'arborescence (format `file:///…`) |
 | `--option NOM` | non | Option supplémentaire à inclure (répétable). `core` est toujours inclus. |
 | `--dry-run` | non | Affiche les dossiers qui seraient créés, sans toucher le disque |
+
+\* Requis si non configuré via `archivist config set`
 
 ### Options du référentiel
 
@@ -50,7 +80,7 @@ Le détail de chaque dossier créé ou ignoré est écrit sur **stderr**.
 ```bash
 archivist scaffold \
   --referentiel file:///Users/alice/referentiel.yaml \
-  --target file:///Users/alice/Documents/Mon-drive
+  --root file:///Users/alice/Documents/Mon-drive
 ```
 
 ### SASU avec assurances et régime salarié
@@ -58,7 +88,7 @@ archivist scaffold \
 ```bash
 archivist scaffold \
   --referentiel file:///Users/alice/referentiel.yaml \
-  --target file:///Users/alice/Documents/Mon-drive \
+  --root file:///Users/alice/Documents/Mon-drive \
   --option assurances \
   --option dirigeant-assimile-salarie
 ```
@@ -68,7 +98,7 @@ archivist scaffold \
 ```bash
 archivist scaffold \
   --referentiel file:///Users/alice/referentiel.yaml \
-  --target file:///Users/alice/Documents/Mon-drive \
+  --root file:///Users/alice/Documents/Mon-drive \
   --dry-run
 ```
 
@@ -84,7 +114,7 @@ via un LLM et les déplace + renomme selon les conventions du référentiel.
 ```bash
 archivist classify \
   --referentiel file:///chemin/vers/referentiel.yaml \
-  --target file:///chemin/vers/mon/drive \
+  --root file:///chemin/vers/mon/drive \
   --llm claude-cli
 ```
 
@@ -92,9 +122,11 @@ archivist classify \
 
 | Flag | Requis | Description |
 |------|--------|-------------|
-| `--referentiel URI` | oui | Chemin vers `referentiel.yaml` (`file:///…`) |
-| `--target URI` | oui | Racine de l'archive (même convention que `scaffold`/`scan`) |
-| `--llm NAME` | oui | Adaptateur LLM. Valeur disponible : `claude-cli` |
+| `--referentiel URI` | non* | Chemin vers `referentiel.yaml` (`file:///…`) |
+| `--root URI` | non* | Dossier racine de l'archive (même convention que `scaffold`/`scan`) |
+| `--llm NAME` | non* | Adaptateur LLM. Valeur disponible : `claude-cli` |
+
+\* Requis si non configuré via `archivist config set`
 
 ### Adaptateur `claude-cli`
 

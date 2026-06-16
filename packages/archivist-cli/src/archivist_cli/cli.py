@@ -11,6 +11,7 @@ from archivist_cli.adapters.index.noop import NoopIndex
 from archivist_cli.application.classify import ClassifyConfig, ClassifyUseCase
 from archivist_cli.application.scaffold import scaffold
 from archivist_cli.application.scan import scan
+from archivist_cli.config import AppConfig, install_referentiel, load_config, save_config
 from archivist_cli.registry import default_registry
 
 logger = logging.getLogger(__name__)
@@ -32,16 +33,73 @@ def main(ctx: click.Context) -> None:
         click.echo(ctx.get_help())
 
 
+@main.group(name="config")
+def config_group() -> None:
+    """Gère la configuration persistante de la CLI."""
+
+
+@config_group.group(name="set")
+def config_set() -> None:
+    """Définit un paramètre de configuration."""
+
+
+@config_set.command(name="referentiel")
+@click.argument("uri")
+def config_set_referentiel(uri: str) -> None:
+    """Copie le référentiel dans le dossier app data et enregistre son URI."""
+    _require_file_uri(uri, "referentiel")
+    try:
+        installed_uri = install_referentiel(uri)
+    except (FileNotFoundError, ValueError) as e:
+        raise click.ClickException(str(e))
+    cfg = load_config()
+    save_config(AppConfig(referentiel=installed_uri, root=cfg.root, llm=cfg.llm))
+    click.echo(json.dumps({"referentiel": installed_uri}))
+
+
+@config_set.command(name="root")
+@click.argument("uri")
+def config_set_root(uri: str) -> None:
+    """Enregistre le dossier racine de l'archive dans la config."""
+    _require_file_uri(uri, "root")
+    cfg = load_config()
+    save_config(AppConfig(referentiel=cfg.referentiel, root=uri, llm=cfg.llm))
+    click.echo(json.dumps({"root": uri}))
+
+
+@config_set.command(name="llm")
+@click.argument("nom")
+def config_set_llm(nom: str) -> None:
+    """Enregistre l'adaptateur LLM dans la config."""
+    cfg = load_config()
+    save_config(AppConfig(referentiel=cfg.referentiel, root=cfg.root, llm=nom))
+    click.echo(json.dumps({"llm": nom}))
+
+
+@config_group.command(name="show")
+def config_show() -> None:
+    """Affiche la configuration persistée en JSON."""
+    cfg = load_config()
+    data: dict[str, str] = {}
+    if cfg.referentiel is not None:
+        data["referentiel"] = cfg.referentiel
+    if cfg.root is not None:
+        data["root"] = cfg.root
+    if cfg.llm is not None:
+        data["llm"] = cfg.llm
+    click.echo(json.dumps(data))
+
+
 @main.command(name="scaffold")
 @click.option(
     "--referentiel",
-    required=True,
+    default=None,
     help="URI du fichier référentiel (file:///path/to/referentiel.yaml).",
 )
 @click.option(
-    "--target",
-    required=True,
-    help="URI du dossier cible (file:///path/to/target).",
+    "--root",
+    default=None,
+    help="URI du dossier racine de l'archive (file:///path/to/archive).",
 )
 @click.option(
     "--option",
@@ -56,14 +114,28 @@ def main(ctx: click.Context) -> None:
     help="Affiche les dossiers qui seraient créés sans les créer.",
 )
 def scaffold_cmd(
-    referentiel: str,
-    target: str,
+    referentiel: str | None,
+    root: str | None,
     extra_options: tuple[str, ...],
     dry_run: bool,
 ) -> None:
     """Crée l'arborescence de dossiers cible à partir du référentiel."""
+    if referentiel is None or root is None:
+        cfg = load_config()
+        referentiel = referentiel or cfg.referentiel
+        root = root or cfg.root
+    if referentiel is None:
+        raise click.UsageError(
+            "--referentiel manquant. Configurez-le avec :\n"
+            "  archivist config set referentiel file:///path/to/referentiel.yaml"
+        )
+    if root is None:
+        raise click.UsageError(
+            "--root manquant. Configurez-le avec :\n"
+            "  archivist config set root file:///path/to/archive"
+        )
     _require_file_uri(referentiel, "referentiel")
-    _require_file_uri(target, "target")
+    _require_file_uri(root, "root")
     options = {"core"} | set(extra_options)
     ref = default_registry.resolve("referentiel", "yaml_file", {"uri": referentiel})
     fs = default_registry.resolve("fs", "local", {})
@@ -71,7 +143,7 @@ def scaffold_cmd(
     result = scaffold(
         referentiel=ref,
         filesystem=fs,
-        target_uri=target,
+        target_uri=root,
         options=options,
         dry_run=dry_run,
     )
@@ -86,18 +158,32 @@ def scaffold_cmd(
 @main.command(name="scan")
 @click.option(
     "--referentiel",
-    required=True,
+    default=None,
     help="URI du fichier référentiel (file:///path/to/referentiel.yaml).",
 )
 @click.option(
-    "--target",
-    required=True,
+    "--root",
+    default=None,
     help="URI du dossier racine de l'archive (file:///path/to/archive).",
 )
-def scan_cmd(referentiel: str, target: str) -> None:
+def scan_cmd(referentiel: str | None, root: str | None) -> None:
     """Scanne _Réception, sauvegarde dans _Conservation brut, extrait les métadonnées."""
+    if referentiel is None or root is None:
+        cfg = load_config()
+        referentiel = referentiel or cfg.referentiel
+        root = root or cfg.root
+    if referentiel is None:
+        raise click.UsageError(
+            "--referentiel manquant. Configurez-le avec :\n"
+            "  archivist config set referentiel file:///path/to/referentiel.yaml"
+        )
+    if root is None:
+        raise click.UsageError(
+            "--root manquant. Configurez-le avec :\n"
+            "  archivist config set root file:///path/to/archive"
+        )
     _require_file_uri(referentiel, "referentiel")
-    _require_file_uri(target, "target")
+    _require_file_uri(root, "root")
 
     ref = default_registry.resolve("referentiel", "yaml_file", {"uri": referentiel})
     fs = default_registry.resolve("fs", "local", {})
@@ -116,9 +202,9 @@ def scan_cmd(referentiel: str, target: str) -> None:
     reception_path = _find_role("reception")
     backup_path = _find_role("conservation_brut")
 
-    target_base = target.rstrip("/")
-    reception_uri = f"{target_base}/{reception_path}"
-    backup_uri = f"{target_base}/{backup_path}"
+    root_base = root.rstrip("/")
+    reception_uri = f"{root_base}/{reception_path}"
+    backup_uri = f"{root_base}/{backup_path}"
 
     if not fs.is_dir(reception_uri):
         raise click.UsageError(
@@ -151,24 +237,44 @@ def scan_cmd(referentiel: str, target: str) -> None:
 @main.command(name="classify")
 @click.option(
     "--referentiel",
-    required=True,
+    default=None,
     help="URI du fichier référentiel (file:///path/to/referentiel.yaml).",
 )
 @click.option(
-    "--target",
-    required=True,
+    "--root",
+    default=None,
     help="URI du dossier racine de l'archive (file:///path/to/archive).",
 )
 @click.option(
     "--llm",
     "llm_name",
-    required=True,
+    default=None,
     help="Adaptateur LLM à utiliser (ex: claude-cli).",
 )
-def classify_cmd(referentiel: str, target: str, llm_name: str) -> None:
+def classify_cmd(referentiel: str | None, root: str | None, llm_name: str | None) -> None:
     """Classe les fichiers de _Réception via LLM et les déplace vers le bon dossier."""
+    if referentiel is None or root is None or llm_name is None:
+        cfg = load_config()
+        referentiel = referentiel or cfg.referentiel
+        root = root or cfg.root
+        llm_name = llm_name or cfg.llm
+    if referentiel is None:
+        raise click.UsageError(
+            "--referentiel manquant. Configurez-le avec :\n"
+            "  archivist config set referentiel file:///path/to/referentiel.yaml"
+        )
+    if root is None:
+        raise click.UsageError(
+            "--root manquant. Configurez-le avec :\n"
+            "  archivist config set root file:///path/to/archive"
+        )
+    if llm_name is None:
+        raise click.UsageError(
+            "--llm manquant. Configurez-le avec :\n"
+            "  archivist config set llm claude-cli"
+        )
     _require_file_uri(referentiel, "referentiel")
-    _require_file_uri(target, "target")
+    _require_file_uri(root, "root")
 
     ref = default_registry.resolve("referentiel", "yaml_file", {"uri": referentiel})
     fs = default_registry.resolve("fs", "local", {})
@@ -187,7 +293,7 @@ def classify_cmd(referentiel: str, target: str, llm_name: str) -> None:
 
     for role in ("reception", "conservation_brut", "non_classe"):
         path = _find_role(role)
-        role_uri = f"{target.rstrip('/')}/{path}"
+        role_uri = f"{root.rstrip('/')}/{path}"
         if not fs.is_dir(role_uri):
             raise click.UsageError(
                 f"Dossier manquant : {role_uri!r} — lancez scaffold d'abord"
@@ -200,7 +306,7 @@ def classify_cmd(referentiel: str, target: str, llm_name: str) -> None:
         llm=llm,
         index=NoopIndex(),
     )
-    result = uc.run(ClassifyConfig(referentiel_uri=referentiel, target_uri=target))
+    result = uc.run(ClassifyConfig(referentiel_uri=referentiel, target_uri=root))
 
     for event in result.events:
         row = {

@@ -13,7 +13,7 @@ CMD=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
 
 if ! echo "$CMD" | grep -qE "git( -C [^ ]+)? commit"; then exit 0; fi
 
-LAST_MSG=$(git -C /home/deka/sources/github/archivist-ai log -1 --pretty=%s 2>/dev/null)
+LAST_MSG=$(git log -1 --pretty=%s 2>/dev/null)
 
 if echo "$LAST_MSG" | grep -qE "^feat\("; then
   jq -n --arg msg "$LAST_MSG" '{
