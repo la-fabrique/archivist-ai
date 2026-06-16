@@ -4,7 +4,7 @@ import { Shield, Globe, Lock, ClipboardList, Ban, Eye } from "lucide-react";
 const badges = [
   { icon: Shield, label: "RGPD Compliant" },
   { icon: Globe, label: "Hébergé en Europe" },
-  { icon: Lock, label: "Chiffrement E2E" },
+  { icon: Eye, label: "Open Source Apache 2.0" },
   { icon: ClipboardList, label: "Audit trail" },
   { icon: Ban, label: "Zéro partage externe" },
   { icon: Shield, label: "Souveraineté" }

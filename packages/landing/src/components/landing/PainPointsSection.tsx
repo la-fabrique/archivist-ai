@@ -84,11 +84,17 @@ const PainPointsSection = () => {
           className="text-center max-w-2xl mx-auto"
         >
           <p className="text-xl md:text-2xl font-semibold text-foreground mb-2">
-            Et si un archiviste professionnel s'occupait de tout ça pour vous ?
+            Pendant ce temps, chaque semaine qui passe coûte des heures.
           </p>
-          <p className="text-muted-foreground italic">
-            Sans embaucher. Sans former. Sans y penser.
+          <p className="text-muted-foreground mb-6">
+            30 à 90 minutes perdues à chercher des fichiers. Multipliées par 52 semaines. Multipliées par votre taux journalier.
           </p>
+          <a
+            href="#solution"
+            className="inline-flex items-center gap-2 px-6 py-3 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+          >
+            Voir comment Archivist règle ça →
+          </a>
         </motion.div>
       </div>
     </section>
