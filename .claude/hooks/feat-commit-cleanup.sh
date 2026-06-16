@@ -13,6 +13,17 @@ CMD=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
 
 if ! echo "$CMD" | grep -qE "git( -C [^ ]+)? commit"; then exit 0; fi
 
+# Only fire when the commit actually succeeded. A successful `git commit` prints
+# "[<branch> <hash>] <subject>" to stdout. If that line is absent (nothing staged,
+# rejected pre-commit hook, failed command), HEAD is unchanged and reading
+# `git log -1` would inspect the WRONG commit — producing a false reminder.
+RESPONSE=$(echo "$INPUT" | jq -r '
+  .tool_response
+  | if type == "object" then (.stdout // .output // .stderr // "")
+    elif type == "string" then .
+    else "" end' 2>/dev/null)
+if ! echo "$RESPONSE" | grep -qE '^\[.+ [0-9a-f]{7,}\]'; then exit 0; fi
+
 LAST_MSG=$(git log -1 --pretty=%s 2>/dev/null)
 
 if echo "$LAST_MSG" | grep -qE "^feat\("; then

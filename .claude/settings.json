@@ -27,7 +27,6 @@
       "Bash(npx vitest *)",
       "Bash(npx tsc *)",
       "Bash(git -C *)",
-      "Bash(git commit -m ' *)",
       "Bash(git reset *)",
       "Bash(curl *)",
       "Bash(git worktree *)",
@@ -130,5 +129,5 @@
     }
   },
   "effortLevel": "medium",
-  "advisorModel": "claude-opus-4-6"
+  "advisorModel": "claude-opus-4-8"
 }
