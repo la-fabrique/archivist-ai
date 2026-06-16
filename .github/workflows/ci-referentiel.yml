@@ -4,21 +4,21 @@ on:
   push:
     branches: [main]
     paths:
-      - 'packages/referentiel/**'
-      - 'scripts/**'
-      - 'docs/**'
-      - 'CLAUDE.md'
-      - '.harness/**'
-      - '.github/workflows/ci-referentiel.yml'
+      - "packages/referentiel/**"
+      - "scripts/**"
+      - "docs/**"
+      - "CLAUDE.md"
+      - ".harness/**"
+      - ".github/workflows/ci-referentiel.yml"
   pull_request:
     branches: [main]
     paths:
-      - 'packages/referentiel/**'
-      - 'scripts/**'
-      - 'docs/**'
-      - 'CLAUDE.md'
-      - '.harness/**'
-      - '.github/workflows/ci-referentiel.yml'
+      - "packages/referentiel/**"
+      - "scripts/**"
+      - "docs/**"
+      - "CLAUDE.md"
+      - ".harness/**"
+      - ".github/workflows/ci-referentiel.yml"
 
 jobs:
   checks:
@@ -30,7 +30,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           cache: "npm"
 
       - name: Install npm dependencies
