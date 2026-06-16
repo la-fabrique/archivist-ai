@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import shutil
 import zipfile
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from urllib.parse import urlparse
 
 from archivist_cli.domain.ports import Filesystem, FilesystemError
@@ -16,6 +16,10 @@ class LocalFilesystem(Filesystem):
             raise FilesystemError(
                 f"unsupported scheme: {parsed.scheme!r} — expected a file URI, e.g. file:///path/to/dir"
             )
+        # RFC 8089 file URIs use POSIX-style paths (forward slashes) on all platforms.
+        # PurePosixPath is intentional here even on Windows so the check is platform-agnostic.
+        if ".." in PurePosixPath(parsed.path).parts:
+            raise FilesystemError(f"path traversal détecté dans l'URI : {uri!r}")
         return Path(parsed.path)
 
     def make_dir(self, uri: str) -> None:

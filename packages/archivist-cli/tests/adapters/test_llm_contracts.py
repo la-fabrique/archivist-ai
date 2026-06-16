@@ -100,3 +100,51 @@ class TestClaudeCliLlmContract(LanguageModelContractSuite):
         with patch("subprocess.run", side_effect=FileNotFoundError("claude not found")):
             with pytest.raises(LlmError):
                 llm.complete("test", {})
+
+    def test_complete_raises_on_missing_required_field(self):
+        llm = ClaudeCliLlm()
+        schema = {
+            "type": "object",
+            "properties": {"answer": {"type": "string"}},
+            "required": ["answer"],
+        }
+        with patch("subprocess.run") as mock_run:
+            mock_run.return_value = MagicMock(returncode=0, stdout='{"other": "value"}', stderr="")
+            with pytest.raises(LlmError, match="requis"):
+                llm.complete("test", schema)
+
+    def test_complete_raises_on_wrong_type(self):
+        llm = ClaudeCliLlm()
+        schema = {
+            "type": "object",
+            "properties": {"count": {"type": "integer"}},
+            "required": ["count"],
+        }
+        with patch("subprocess.run") as mock_run:
+            mock_run.return_value = MagicMock(returncode=0, stdout='{"count": "not-an-int"}', stderr="")
+            with pytest.raises(LlmError, match="type"):
+                llm.complete("test", schema)
+
+    def test_complete_accepts_null_for_nullable_field(self):
+        llm = ClaudeCliLlm()
+        schema = {
+            "type": "object",
+            "properties": {"entry_id": {"type": ["string", "null"]}},
+            "required": ["entry_id"],
+        }
+        with patch("subprocess.run") as mock_run:
+            mock_run.return_value = MagicMock(returncode=0, stdout='{"entry_id": null}', stderr="")
+            result = llm.complete("test", schema)
+        assert result["entry_id"] is None
+
+    def test_complete_accepts_string_for_nullable_field(self):
+        llm = ClaudeCliLlm()
+        schema = {
+            "type": "object",
+            "properties": {"entry_id": {"type": ["string", "null"]}},
+            "required": ["entry_id"],
+        }
+        with patch("subprocess.run") as mock_run:
+            mock_run.return_value = MagicMock(returncode=0, stdout='{"entry_id": "factures"}', stderr="")
+            result = llm.complete("test", schema)
+        assert result["entry_id"] == "factures"

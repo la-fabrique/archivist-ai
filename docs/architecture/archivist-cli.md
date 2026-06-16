@@ -50,33 +50,34 @@ Résultat agrégé : `ScanResult(files: list[ScannedFile], backed_up: int, delet
 
 > Les phases Backup et Delete sont synchrones ; MetadataExtract est asynchrone (semaphore ×4 concurrent).
 
-### Vision cible — `classify` (à implémenter)
+### `classify` ✓ implémenté
 
 ```
-        ┌──────────┐   ┌──────────────┐   ┌─────┐   ┌────────────┐   ┌────────────┐   ┌──────────┐
-source ─►  Ingest  ├──►│  Backup ZIP  ├──►│ OCR ├──►│ Extraction ├──►│ Classement ├──►│  Apply   │─► cible
-        └────┬─────┘   └──────┬───────┘   └──┬──┘   └─────┬──────┘   └─────┬──────┘   └────┬─────┘
-             │                │               │             │                 │                │
-            FS               FS           OcrEngine       LLM             LLM + Référentiel   FS
-                        (_Cons. brut)                                                        (+ Index)
+        ┌──────────┐   ┌──────────────┐   ┌──────────────────┐   ┌────────────┐   ┌──────────┐
+source ─►  Ingest  ├──►│  Backup ZIP  ├──►│ MetadataExtract  ├──►│ Classement ├──►│  Apply   │─► cible
+        └────┬─────┘   └──────┬───────┘   └────────┬─────────┘   └─────┬──────┘   └────┬─────┘
+             │                │                     │                    │                │
+            FS               FS             MetadataExtractor       LLM + Réf.           FS
+                        (_Cons. brut)        (kreuzberg)                            (+ Index noop)
 ```
 
 | Étape | Entrée | Sortie | Port(s) sollicité(s) |
 |---|---|---|---|
-| Ingest | URI source (dossier) | flux de `SourceDocument` | `Filesystem` |
-| Backup ZIP | `SourceDocument` | archive `.zip` dans `_Conservation brut` | `Filesystem` |
-| OCR | `SourceDocument` | `OcrText` | `OcrEngine` |
-| Extraction | `OcrText` | `ExtractedFields` | `LanguageModel` |
-| Classement | `ExtractedFields` + référentiel | `ClassificationDecision` | `LanguageModel`, `Referentiel` |
-| Apply | `ClassificationDecision` + bytes | effet : rename + move | `Filesystem` (cible), `Index` (no-op v1) |
+| Ingest | URI `_Réception` | liste d'URIs fichiers | `Filesystem.list_files` |
+| Backup ZIP | URI fichier source | archive `.zip` horodatée dans `_Conservation brut` | `Filesystem.zip_file` |
+| MetadataExtract | URI fichier source | `ExtractionResult` (texte + métadonnées) | `MetadataExtractor` |
+| Classement | texte + métadonnées + référentiel | `entry_id` + champs nommage | `LanguageModel` (×2 appels) |
+| Apply | `entry_id` + champs | rename + move vers dossier cible | `Filesystem`, `Index` |
 
-### Famille « outils référentiel » — `scaffold`, `audit`
-Ces commandes n'utilisent que les ports `Filesystem` et `Referentiel`.
+> Note : pas d'étape OCR séparée. `MetadataExtractor` (kreuzberg) extrait le texte et les métadonnées en une passe. Un port `OcrEngine` dédié peut être ajouté ultérieurement sans modifier le pipeline.
 
-### Trois propriétés que la vision impose au pipeline
+### Famille « outils référentiel » — `scaffold`
+Cette commande utilise uniquement les ports `Filesystem` et `Referentiel`.
+
+### Trois propriétés du pipeline
 1. **Étapes pures et typées.** Chaque étape est une fonction `(in) -> out`, sans I/O caché en dehors de ses ports déclarés.
-2. **Ports injectés depuis le bord.** La CLI assemble les adaptateurs choisis par flags ; le cœur ne les construit jamais lui-même.
-3. **Pas de raccourci entre étapes.** L'OCR ne « sait » rien de la classification ; on peut remplacer un moteur sans toucher à la suite.
+2. **Ports injectés depuis le bord.** La CLI assemble les adaptateurs via le registre ; le cœur ne les construit jamais lui-même.
+3. **Pas de raccourci entre étapes.** `MetadataExtractor` ne « sait » rien de la classification ; on peut remplacer un extracteur sans toucher à la suite.
 
 ---
 
@@ -89,19 +90,20 @@ Trois cercles concentriques, façon hexagonale.
 │  Frontière CLI  (Click)                              │
 │  ┌────────────────────────────────────────────────┐  │
 │  │  Application  (use cases : classify/scaffold/  │  │
-│  │                audit)                          │  │
+│  │                scan)                           │  │
 │  │  ┌──────────────────────────────────────────┐  │  │
 │  │  │  Domain  (entités + ports = ABC)         │  │  │
-│  │  │  SourceDocument, OcrText, …              │  │  │
-│  │  │  Filesystem, OcrEngine, LanguageModel,   │  │  │
-│  │  │  Referentiel, Index                      │  │  │
+│  │  │  FileMetadata, ExtractionResult, …       │  │  │
+│  │  │  Filesystem, MetadataExtractor,          │  │  │
+│  │  │  LanguageModel, Referentiel, Index       │  │  │
 │  │  └──────────────────────────────────────────┘  │  │
 │  └────────────────────────────────────────────────┘  │
 │  Adapters  (impls concrètes des ports)               │
-│  fs/local, fs/s3*, ocr/tesseract, ocr/mistral*,      │
-│  llm/openai, llm/ollama, index/noop, …               │
+│  fs/local, metadata/kreuzberg, llm/claude-cli,       │
+│  referentiel/yaml_file, index/noop, index/duckdb     │
+│  fs/s3*, llm/openai* …                               │
 └──────────────────────────────────────────────────────┘
-                  * = futur, pas v1
+                  * = futur
 ```
 
 ### Règles de dépendance (la seule règle dure)
@@ -111,19 +113,18 @@ Trois cercles concentriques, façon hexagonale.
 - `cli` dépend de `application` + `adapters` — c'est le seul endroit où l'on **câble**.
 - **Aucune flèche inverse.** Un adaptateur n'importe jamais un use case ; le domain n'importe jamais un adaptateur.
 
-### Layout (`src/archivist_cli/`) — état actuel + cible
+### Layout (`src/archivist_cli/`)
 
 ```
 domain/          ports.py, models.py
-application/     scan.py, scaffold.py          ← implémentés
-                 classify.py, audit.py         ← cible
+application/     scan.py, scaffold.py, classify.py
 adapters/
   fs/            local.py
-  metadata/      kreuzberg.py                  ← implémenté
+  metadata/      kreuzberg.py
   referentiel/   yaml_file.py
-  ocr/           tesseract.py                  ← cible
-  llm/           openai.py                     ← cible
-  index/         noop.py                       ← cible
+  llm/           claude_cli.py
+  index/         noop.py, duckdb.py
+config.py
 cli.py
 registry.py
 ```
@@ -150,20 +151,20 @@ Adaptateurs : `kreuzberg` (implémenté — extraction synchrone via `extract_fi
 Accès au référentiel de classement. Expose les entrées avec leur `role` (`reception`, `conservation_brut`, …) pour que la CLI puisse résoudre les dossiers sans logique métier.
 Adaptateurs : `yaml_file` (implémenté, pointe sur l'artefact du package `referentiel`), puis `http`, `git`, `versioned`.
 
-### `OcrEngine` — cible
-Extraction de texte depuis des bytes. Le port porte les **capacités** (langues, tabulaire, …) pour qu'un use case puisse rejeter tôt un moteur incompatible.
-Adaptateurs : `tesseract`, puis `mistral-ocr`, `azure-di`, `gcp-docai`.
+### `LanguageModel` ✓ implémenté
+Un seul port couvre **extraction structurée** et **classement** — deux usages, un même contrat. Le schéma de sortie attendu est porté par l'appelant ; l'adaptateur valide que la réponse y est conforme avant de la retourner.
+Adaptateurs : `claude-cli` (implémenté — appelle la CLI `claude -p` en subprocess, parse JSON, valide le schéma), puis `openai`, `ollama`.
 
-### `LanguageModel` — cible
-Un seul port couvre **extraction structurée** et **classement** — deux usages, un même contrat. Le schéma de sortie attendu est porté par l'appelant, pas par l'adaptateur.
-Adaptateurs : `openai` ou `ollama`, puis `mistral-api`, `anthropic`.
+### `Index` ✓ implémenté (noop + duckdb)
+Mémoire des décisions. Présent dans le pipeline dès le départ pour ne pas réécrire le câblage quand on branchera un vrai stockage.
+Adaptateurs : `noop` (aucune persistance, utilisé par défaut), `duckdb` (persistance locale dans un fichier `.db`, upsert sur URI).
 
-### `Index` — cible
-Mémoire des décisions. **Port à définir, no-op à livrer.** Présent dans le pipeline dès le départ pour éviter de réécrire le câblage le jour où on branche un vrai stockage.
-Adaptateurs : `noop`, puis `sqlite`, `tantivy`, `elastic`.
+### `OcrEngine` — futur
+Port optionnel pour l'extraction de texte depuis des bytes bruts (langues, tabulaire…). Pas encore nécessaire : `MetadataExtractor` (kreuzberg) couvre le besoin actuel.
+Adaptateurs futurs : `tesseract`, `mistral-ocr`, `azure-di`.
 
 ### Règle transverse
-Chaque port définit ses **erreurs propres** (`MetadataExtractorError`, `FilesystemError`, `ReferentielError`, `OcrError`, `LlmError`, …). Aucune ABC ne renvoie d'exception non documentée. Le use case décide de la politique.
+Chaque port définit ses **erreurs propres** (`MetadataExtractorError`, `FilesystemError`, `ReferentielError`, `LlmError`, `IndexError`, …). Aucune ABC ne renvoie d'exception non documentée. Le use case décide de la politique.
 
 ---
 
@@ -171,7 +172,7 @@ Chaque port définit ses **erreurs propres** (`MetadataExtractorError`, `Filesys
 
 Le **registre** est la seule pièce qui bougera quand on ouvrira aux tiers. Tout le reste — ports, use cases, adaptateurs — est déjà prêt.
 
-- **v1.** Le registre est une **table interne** mappant un nom court (`tesseract`, `local`, `openai`…) à une fabrique d'adaptateur. La CLI lit les flags, résout, injecte. Un seul fichier à modifier pour ajouter un adaptateur en interne.
+- **v1.** Le registre est une **table interne** mappant un nom court (`claude-cli`, `local`, `kreuzberg`…) à une fabrique d'adaptateur. La CLI lit les flags, résout, injecte. Un seul fichier à modifier pour ajouter un adaptateur en interne.
 - **Plus tard.** Le registre fusionne sa table interne avec une **liste découverte automatiquement** parmi les paquets Python installés. Aucun changement dans le cœur, les use cases ou les ports.
 
 ### Décision irréversible dès la v1
@@ -196,18 +197,18 @@ archivist <commande> [--source URI] [--target URI]
 ```
 
 ### Commandes implémentées
-- `archivist scan` — réception → backup ZIP dans `_Conservation brut` → extraction métadonnées (kreuzberg) → suppression source.
+- `archivist scan` — réception → backup ZIP dans `_Conservation brut` → extraction métadonnées (kreuzberg async ×4) → suppression source.
 - `archivist scaffold` — crée l'arborescence cible à partir du référentiel.
+- `archivist classify` — backup → extraction métadonnées → classement LLM → renommage + déplacement.
+- `archivist config set {referentiel|root|llm}` / `archivist config show` — gestion de la config persistante.
 
-### Commandes cibles (non livrées)
-- `archivist classify` — pipeline complet OCR + LLM, déplace + renomme.
+### Commandes futures
 - `archivist audit` — vérifie la cohérence entre arborescence et référentiel.
 
-### Configuration v1
-**Flags CLI uniquement.** Pas de fichier, pas de profils, pas d'environnement. Une seule source de vérité tant que l'usage n'est pas stabilisé.
+### Configuration persistante
+La CLI maintient un fichier `config.yaml` dans le répertoire de données utilisateur (`platformdirs.user_data_dir("archivist", "archivist")`). Les clés `referentiel`, `root` et `llm` peuvent être fixées via `archivist config set` et sont lues comme valeurs par défaut par toutes les commandes. Un flag CLI explicite prend toujours le dessus sur la config.
 
-### Évolution prévue (non livrée)
-Le jour où l'on ajoute un fichier de config ou des profils, **seule la frontière CLI change**. Les use cases reçoivent toujours des adaptateurs déjà construits ; ils n'ont pas à savoir d'où viennent les choix.
+Le référentiel est **copié** dans le répertoire app data au moment du `config set referentiel` — la CLI travaille toujours sur sa propre copie.
 
 ### Sortie
 La commande `classify` écrit sur stdout un **journal structuré** (une ligne JSON par fichier traité) décrivant la décision prise et l'action effectuée. Permet de piper, rejouer, auditer un run sans dépendre d'un index.
@@ -217,7 +218,7 @@ La commande `classify` écrit sur stdout un **journal structuré** (une ligne JS
 ## 7. Tests & observabilité
 
 ### Testabilité garantie par l'archi
-- **Domain et application testables sans I/O** via des adaptateurs *fakes* (`FakeFilesystem` en mémoire, `FakeOcr` à texte fixe, `FakeLlm` scripté). Aucun test unitaire ne touche disque, réseau ou modèle.
+- **Domain et application testables sans I/O** via des adaptateurs *fakes* (`FakeFilesystem` en mémoire, `FakeLlm` scripté, `FakeMetadataExtractor` à contenu fixe). Aucun test unitaire ne touche disque, réseau ou modèle.
 - **Suite par adaptateur réel**, isolée, validant le respect du contrat. Marquable `slow`/`integration` quand elle requiert des ressources externes.
 - **Test de contrat générique**, paramétré par le port, rejoué sur **tous** les adaptateurs — built-in et, demain, tiers. C'est ce qui rend l'évolutivité plugins sûre.
 - **Use cases** : tests bout-en-bout sur fakes ; c'est là que le pipeline est validé comme un tout.

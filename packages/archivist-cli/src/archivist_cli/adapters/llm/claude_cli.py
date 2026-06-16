@@ -6,6 +6,35 @@ from typing import ClassVar
 
 from archivist_cli.domain.ports import LanguageModel, LlmError
 
+_JSON_TYPE_MAP: dict[str, type | tuple[type, ...]] = {
+    "string": str,
+    "null": type(None),
+    "integer": int,
+    "number": (int, float),
+    "boolean": bool,
+    "array": list,
+    "object": dict,
+}
+
+
+def _validate_output(data: dict, schema: dict) -> None:
+    required = schema.get("required", [])
+    missing = [k for k in required if k not in data]
+    if missing:
+        raise LlmError(f"champs requis absents de la réponse LLM : {missing}")
+    for key, prop_schema in schema.get("properties", {}).items():
+        if key not in data:
+            continue
+        value = data[key]
+        raw_types = prop_schema.get("type", [])
+        if isinstance(raw_types, str):
+            raw_types = [raw_types]
+        expected = tuple(t for name in raw_types if (t := _JSON_TYPE_MAP.get(name)))
+        if expected and not isinstance(value, expected):
+            raise LlmError(
+                f"champ {key!r} : type {type(value).__name__!r} inattendu (attendu : {raw_types})"
+            )
+
 
 class ClaudeCliLlm(LanguageModel):
     VERSION: ClassVar[int] = 1
@@ -41,8 +70,11 @@ class ClaudeCliLlm(LanguageModel):
             output = "\n".join(lines[1:end])
 
         try:
-            return json.loads(output)
+            parsed = json.loads(output)
         except json.JSONDecodeError as exc:
             raise LlmError(
                 f"failed to parse LLM output as JSON: {exc}\nOutput: {output!r}"
             ) from exc
+
+        _validate_output(parsed, output_schema)
+        return parsed
