@@ -97,7 +97,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/dev-cycle-reminder.sh",
+            "command": "bash -c 'cd \"$(git rev-parse --show-toplevel 2>/dev/null)\" && .claude/hooks/dev-cycle-reminder.sh'",
             "timeout": 5
           }
         ]
@@ -111,13 +111,21 @@
   "enabledPlugins": {
     "superpowers@claude-plugins-official": false,
     "code-simplifier@claude-plugins-official": true,
-    "superpowers@superpowers-dev": true
+    "superpowers@superpowers-dev": true,
+    "pm-product-strategy@pm-skills": true,
+    "pm-ai-shipping@pm-skills": true
   },
   "extraKnownMarketplaces": {
     "superpowers-dev": {
       "source": {
         "source": "github",
         "repo": "obra/superpowers"
+      }
+    },
+    "pm-skills": {
+      "source": { 
+        "source": "github",
+        "repo": "phuryn/pm-skills"
       }
     }
   },

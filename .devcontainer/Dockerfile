@@ -19,8 +19,8 @@ RUN add-apt-repository ppa:deadsnakes/ppa && \
 # uv (installed system-wide)
 RUN curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/bin sh
 
-# Node 20
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+# Node 24
+RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && \
     apt-get install -y nodejs && \
     rm -rf /var/lib/apt/lists/*
 

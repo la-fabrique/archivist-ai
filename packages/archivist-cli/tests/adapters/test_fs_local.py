@@ -55,3 +55,52 @@ def test_rejects_non_file_scheme():
     fs = LocalFilesystem()
     with pytest.raises(FilesystemError, match="unsupported scheme"):
         fs.make_dir("s3://bucket/path")
+
+
+@pytest.mark.parametrize("traversal_uri", [
+    "file:///archive/../../../etc/passwd",
+    "file:///archive/sub/../../secret",
+    "file:///docs/../.ssh/id_rsa",
+    "file:///../root",
+])
+def test_rejects_path_traversal_make_dir(traversal_uri: str):
+    fs = LocalFilesystem()
+    with pytest.raises(FilesystemError, match="traversal"):
+        fs.make_dir(traversal_uri)
+
+
+def test_rejects_path_traversal_zip_src():
+    fs = LocalFilesystem()
+    with pytest.raises(FilesystemError, match="traversal"):
+        fs.zip_file("file:///archive/../secret.pdf", "file:///archive/out.zip")
+
+
+def test_rejects_path_traversal_zip_dest():
+    fs = LocalFilesystem()
+    with pytest.raises(FilesystemError, match="traversal"):
+        fs.zip_file("file:///archive/src.pdf", "file:///archive/../../out.zip")
+
+
+def test_rejects_path_traversal_move_src():
+    fs = LocalFilesystem()
+    with pytest.raises(FilesystemError, match="traversal"):
+        fs.move_file("file:///archive/../../../etc/hosts", "file:///archive/dest.txt")
+
+
+def test_rejects_path_traversal_move_dest():
+    fs = LocalFilesystem()
+    with pytest.raises(FilesystemError, match="traversal"):
+        fs.move_file("file:///archive/src.txt", "file:///archive/../../../etc/hosts")
+
+
+def test_rejects_path_traversal_delete():
+    fs = LocalFilesystem()
+    with pytest.raises(FilesystemError, match="traversal"):
+        fs.delete_file("file:///archive/../../../etc/hosts")
+
+
+def test_normal_nested_path_accepted(tmp_path: Path):
+    fs = LocalFilesystem()
+    uri = f"file://{tmp_path}/a/b/c"
+    fs.make_dir(uri)
+    assert (tmp_path / "a" / "b" / "c").is_dir()
