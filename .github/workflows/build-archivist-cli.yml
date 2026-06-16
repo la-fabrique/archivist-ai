@@ -2,6 +2,10 @@ name: Build archivist-cli
 
 on:
   push:
+    branches: [main]
+    paths:
+      - 'packages/archivist-cli/**'
+      - '.github/workflows/build-archivist-cli.yml'
     tags:
       - '[0-9]+.[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9].[0-9]+'
   workflow_dispatch:
@@ -27,8 +31,8 @@ jobs:
       - name: Compute tag
         id: compute-tag
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            MAJOR="${{ inputs.major }}"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "${{ github.event_name }}" = "push" ]; then
+            MAJOR="${{ inputs.major || '0' }}"
             DATE=$(date -u +%Y%m%d)
             EXISTING=$(git tag --list "${MAJOR}.${DATE}.*" | sort -V | tail -1)
             if [ -z "$EXISTING" ]; then

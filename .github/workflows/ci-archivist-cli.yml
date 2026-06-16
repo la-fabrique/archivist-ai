@@ -1,0 +1,33 @@
+name: CI — archivist-cli
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/archivist-cli/**'
+      - '.github/workflows/ci-archivist-cli.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'packages/archivist-cli/**'
+      - '.github/workflows/ci-archivist-cli.yml'
+
+jobs:
+  tests:
+    name: Tests archivist-cli
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --frozen
+        working-directory: packages/archivist-cli
+
+      - name: Run tests
+        run: uv run pytest tests/ -v
+        working-directory: packages/archivist-cli

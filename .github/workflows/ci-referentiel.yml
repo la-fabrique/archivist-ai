@@ -1,0 +1,54 @@
+name: CI — Référentiel
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/referentiel/**'
+      - 'scripts/**'
+      - 'docs/**'
+      - 'CLAUDE.md'
+      - '.harness/**'
+      - '.github/workflows/ci-referentiel.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'packages/referentiel/**'
+      - 'scripts/**'
+      - 'docs/**'
+      - 'CLAUDE.md'
+      - '.harness/**'
+      - '.github/workflows/ci-referentiel.yml'
+
+jobs:
+  checks:
+    name: Vérifications mécaniques
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install PyYAML
+        run: pip install pyyaml
+
+      - name: Valider referentiel.yaml
+        run: python scripts/check_referentiel_yaml.py
+
+      - name: Vérifier liens markdown
+        run: npm run check:links
+
+      - name: Vérifier couverture CLAUDE.md
+        run: python .harness/scripts/check_claude_coverage.py
