@@ -8,93 +8,85 @@ Infrastructure qui cadre l'agent de dev pour garantir qualité, traçabilité et
 
 Chaque étape ci-dessous est déclenchée ou renforcée par un mécanisme du harnais (hook, skill, agent).
 
-```
-SessionStart
-    │
-    ▼
-[hook] session-start.sh
-    ├─ vérifie que le Collector répond (démarre avec le devcontainer)
-    └─ si branche = main → message : invoquer superpowers:using-git-worktrees
-           │
-           ▼
-    [skill] superpowers:using-git-worktrees
-        → crée .claude/worktrees/<feature-name> (git worktree)
-        → TOUTE la session feature se déroule dans ce worktree
-           │
-           ▼
-    [skill] superpowers:brainstorming
-        → explore l'intention, le périmètre et les contraintes
-        → OBLIGATOIRE avant toute création ou modification de comportement
-           │
-           ▼
-    [skill] superpowers:writing-plans
-        → rédige un plan d'implémentation dans docs/superpowers/plans/
-        → spec fonctionnelle dans docs/superpowers/specs/
-           │
-           ▼
-    Implémentation (TDD)
-        │
-        ├─ [skill] superpowers:test-driven-development
-        │       → tests avant code, pas d'exception
-        │
-        ├─ [skill] archivist-cli-dev  (si touch packages/archivist-cli/)
-        │       → qualification couche, tests, vérif archi hexagonale
-        │
-        ├─ [hook PreToolUse] referentiel-guard.sh  (si Write/Edit dans packages/referentiel/)
-        │       → rappel d'invoquer le skill referentiel-update
-        │
-        └─ [skill] referentiel-update  (si touch packages/referentiel/)
-                → 4 étapes : qualifier → impact cross-fichiers → CLI build → tests
-           │
-           ▼
-    Commits  (règle : TOUJOURS committer — jamais de travail non committé en fin de session)
-        │
-        ├─ [hook PreToolUse] no-commit-on-main.sh
-        │       → BLOQUE git commit sur main (decision: block, exit 2)
-        │
-        ├─ [hook PostToolUse] commit-lint.sh
-        │       → valide le format Conventional Commits après chaque git commit
-        │       → format : type(scope): description
-        │
-        └─ [hook PostToolUse] feat-commit-cleanup.sh
-                → détecte les commits feat() → injection additionalContext OBLIGATOIRE
-                → rappel d'invoquer le harness-cleaner avant fin de session
-           │
-           ▼
-    Finalisation
-        │
-        ├─ [skill] superpowers:verification-before-completion
-        │       → vérification runs + preuves avant toute déclaration de succès
-        │
-        ├─ [skill] simplify
-        │       → revue du code modifié pour qualité et simplicité
-        │
-        ├─ [skill] superpowers:finishing-a-development-branch
-        │       → guide le choix : merge / PR / cleanup
-        │
-        └─ [skill] superpowers:requesting-code-review
-                → validation avant merge
-           │
-           ▼
-    Avant PR — nettoyage obligatoire
-        │
-        └─ [agent] harness-cleaner
-                → [skill] superpowers-harvest : extrait features et ADRs de docs/superpowers/
-                → [skill] docs-gardening : détecte les dérives de documentation
-                → génère les .feature Gherkin dans docs/features/
-                → supprime les fichiers traités dans docs/superpowers/
-                → La PR DOIT inclure ces commits de nettoyage
-           │
-           ▼
-    PR
-        └─ [skill] pr-checklist
-                → tests, intégrité YAML, imports, message de commit
+```mermaid
+flowchart TD
+    SS([SessionStart]) --> H1
 
-SessionStop
-    └─ [hook] dev-cycle-reminder.sh
-            → si branche ≠ main :
-                → si modifications non committées → rappel OBLIGATOIRE : committer avant de terminer
-                → rappel : invoquer /simplify + harness-cleaner
+    H1["🪝 hook: session-start.sh
+    • vérifie que le Collector répond
+    • si branche = main → rappel worktree"]
+    H1 --> SK1
+
+    SK1["⚡ skill: superpowers:using-git-worktrees
+    • crée .claude/worktrees/&lt;feature-name&gt;
+    • toute la session feature se déroule dans ce worktree"]
+    SK1 --> SK2
+
+    SK2["⚡ skill: superpowers:brainstorming
+    • explore l'intention, le périmètre et les contraintes
+    • OBLIGATOIRE avant toute création ou modification"]
+    SK2 --> SK3
+
+    SK3["⚡ skill: superpowers:writing-plans
+    • plan d'implémentation → docs/superpowers/plans/
+    • spec fonctionnelle → docs/superpowers/specs/"]
+    SK3 --> IMPL
+
+    subgraph IMPL["Implémentation (TDD)"]
+        direction TB
+        SK4["⚡ skill: superpowers:test-driven-development
+        tests avant code, pas d'exception"]
+        SK5["⚡ skill: archivist-cli-dev
+        (si touch packages/archivist-cli/)"]
+        H2["🪝 hook PreToolUse: referentiel-guard.sh
+        (si Write/Edit dans packages/referentiel/)"]
+        SK6["⚡ skill: referentiel-update
+        qualifier → impact → CLI build → tests"]
+        SK4 -.->|parallèle| SK5
+        H2 -->|déclenche| SK6
+    end
+
+    IMPL --> COMMITS
+
+    subgraph COMMITS["Commits — jamais de travail non committé en fin de session"]
+        direction TB
+        H3["🪝 hook PreToolUse: no-commit-on-main.sh
+        BLOQUE git commit sur main"]
+        H4["🪝 hook PostToolUse: commit-lint.sh
+        valide le format Conventional Commits"]
+        H5["🪝 hook PostToolUse: feat-commit-cleanup.sh
+        feat() détecté → rappel harness-cleaner"]
+    end
+
+    COMMITS --> FINAL
+
+    subgraph FINAL["Finalisation"]
+        direction TB
+        SK7["⚡ skill: superpowers:verification-before-completion"]
+        SK8["⚡ skill: simplify"]
+        SK9["⚡ skill: superpowers:finishing-a-development-branch"]
+        SK10["⚡ skill: superpowers:requesting-code-review"]
+        SK7 --> SK8 --> SK9 --> SK10
+    end
+
+    FINAL --> CLEAN
+
+    CLEAN["🤖 agent: harness-cleaner
+    • superpowers-harvest : extrait features + ADRs de docs/superpowers/
+    • docs-gardening : détecte les dérives de documentation
+    • génère les .feature Gherkin dans docs/features/
+    • supprime les fichiers traités
+    • La PR DOIT inclure ces commits de nettoyage"]
+    CLEAN --> PR
+
+    PR["⚡ skill: pr-checklist
+    tests, intégrité YAML, imports, message de commit"]
+    PR --> SE
+
+    SE([SessionStop]) --> H6
+    H6["🪝 hook: dev-cycle-reminder.sh
+    • si modifications non committées → rappel OBLIGATOIRE
+    • rappel : invoquer /simplify + harness-cleaner"]
 ```
 
 ---
