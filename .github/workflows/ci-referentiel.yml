@@ -33,8 +33,17 @@ jobs:
           node-version: "24"
           cache: "npm"
 
-      - name: Install npm dependencies
+      - name: Install npm dependencies (root)
         run: npm ci
+
+      - name: Install npm dependencies (referentiel-cli)
+        run: npm ci --prefix packages/referentiel-cli
+
+      - name: Build referentiel-cli
+        run: npm run referentiel-cli:build
+
+      - name: Générer referentiel.yaml
+        run: npm run referentiel-cli:export-frontmatters
 
       - name: Install Python
         uses: actions/setup-python@v5
@@ -52,3 +61,9 @@ jobs:
 
       - name: Vérifier couverture CLAUDE.md
         run: python .harness/scripts/check_claude_coverage.py
+
+      - name: Upload referentiel.yaml
+        uses: actions/upload-artifact@v4
+        with:
+          name: referentiel
+          path: packages/referentiel/referentiel.yaml
