@@ -4,7 +4,6 @@ import json
 import logging
 import re
 from dataclasses import dataclass
-from datetime import datetime
 
 from archivist_cli.domain.models import (
     ClassifyEvent,
@@ -14,7 +13,6 @@ from archivist_cli.domain.models import (
 )
 from archivist_cli.domain.ports import (
     Filesystem,
-    FilesystemError,
     Index,
     LanguageModel,
     LlmError,
@@ -50,16 +48,12 @@ class ClassifyUseCase:
     def run(self, config: ClassifyConfig) -> ClassifyResult:
         entries = self._referentiel.load_entries()
         reception_uri = _resolve_role(entries, "reception", config.target_uri)
-        conservation_uri = _resolve_role(entries, "conservation_brut", config.target_uri)
-        non_classe_uri = _resolve_role(entries, "non_classe", config.target_uri)
         classifiable = [e for e in entries if e.file_naming is not None]
 
         files = self._fs.list_files(reception_uri)
         events: list[ClassifyEvent] = []
         for file_uri in files:
-            event = self._process(
-                file_uri, conservation_uri, non_classe_uri, config.target_uri, classifiable
-            )
+            event = self._process(file_uri, config.target_uri, classifiable)
             events.append(event)
             logger.info(json.dumps({"event": event.status.value, "name": event.name}))
         return ClassifyResult(events=events)
@@ -67,32 +61,16 @@ class ClassifyUseCase:
     def _process(
         self,
         file_uri: str,
-        conservation_uri: str,
-        non_classe_uri: str,
         target_uri: str,
         classifiable: list[ReferentielEntry],
     ) -> ClassifyEvent:
         name = file_uri.rsplit("/", 1)[-1]
         actual_ext = name.rsplit(".", 1)[-1] if "." in name else ""
-        stem = name.rsplit(".", 1)[0] if "." in name else name
 
-        # Step 1: backup
-        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-        zip_uri = f"{conservation_uri}/{stem}_{ts}.zip"
-        try:
-            self._fs.zip_file(file_uri, zip_uri)
-        except FilesystemError as exc:
-            return ClassifyEvent(
-                uri=file_uri, name=name,
-                status=ClassifyEventStatus.FAILED,
-                reason=f"backup_error: {exc}",
-            )
-
-        # Step 2: metadata + text extraction
+        # Step 1: metadata + text extraction
         try:
             extraction = self._extractor.extract(file_uri)
         except MetadataExtractorError as exc:
-            _move_best_effort(self._fs, file_uri, f"{non_classe_uri}/{name}")
             return ClassifyEvent(
                 uri=file_uri, name=name,
                 status=ClassifyEventStatus.FAILED,
@@ -102,7 +80,7 @@ class ClassifyUseCase:
         text_excerpt = extraction.content[:3000]
         metadata_json = json.dumps(dict(extraction.metadata))
 
-        # Step 3: LLM classify
+        # Step 2: LLM classify
         classification_schema = {
             "type": "object",
             "properties": {
@@ -125,7 +103,6 @@ class ClassifyUseCase:
         try:
             classification = self._llm.complete(classification_prompt, classification_schema)
         except LlmError as exc:
-            _move_best_effort(self._fs, file_uri, f"{non_classe_uri}/{name}")
             return ClassifyEvent(
                 uri=file_uri, name=name,
                 status=ClassifyEventStatus.FAILED,
@@ -133,10 +110,9 @@ class ClassifyUseCase:
             )
 
         entry_id: str | None = classification.get("entry_id")
-        llm_reason: str = classification.get("reason", "")
+        llm_reason: str = classification.get("reason") or ""
 
         if entry_id is None:
-            _move_best_effort(self._fs, file_uri, f"{non_classe_uri}/{name}")
             return ClassifyEvent(
                 uri=file_uri, name=name,
                 status=ClassifyEventStatus.UNCLASSIFIED,
@@ -145,14 +121,13 @@ class ClassifyUseCase:
 
         entry = next((e for e in classifiable if e.id == entry_id), None)
         if entry is None:
-            _move_best_effort(self._fs, file_uri, f"{non_classe_uri}/{name}")
             return ClassifyEvent(
                 uri=file_uri, name=name,
                 status=ClassifyEventStatus.FAILED,
                 reason=f"llm_error: unknown entry_id {entry_id!r}",
             )
 
-        # Step 4: LLM extract fields
+        # Step 3: LLM extract fields
         extractable_fields = [f for f in entry.file_naming.fields if f.name != "ext"]
         fields_schema = {
             "type": "object",
@@ -172,24 +147,20 @@ class ClassifyUseCase:
                 fields_prompt, fields_schema
             )
         except LlmError as exc:
-            _move_best_effort(self._fs, file_uri, f"{non_classe_uri}/{name}")
             return ClassifyEvent(
                 uri=file_uri, name=name,
                 status=ClassifyEventStatus.FAILED,
                 reason=f"llm_error: {exc}",
             )
 
-        # Step 5: apply
+        # Step 4: compute destination (no file move)
         try:
-            dest_name, dest_uri = _apply(
-                self._fs, file_uri, entry, extracted_fields, actual_ext, target_uri
-            )
-        except (FilesystemError, ValueError) as exc:
-            _move_best_effort(self._fs, file_uri, f"{non_classe_uri}/{name}")
+            dest_name, dest_uri = _compute_destination(entry, extracted_fields, actual_ext, target_uri)
+        except ValueError as exc:
             return ClassifyEvent(
                 uri=file_uri, name=name,
                 status=ClassifyEventStatus.FAILED,
-                reason=f"apply_error: {exc}",
+                reason=f"naming_error: {exc}",
             )
 
         return ClassifyEvent(
@@ -207,13 +178,6 @@ def _resolve_role(entries: list[ReferentielEntry], role: str, target_uri: str) -
         if entry.role == role:
             return f"{target_uri.rstrip('/')}/{entry.path}"
     raise ValueError(f"no entry with role={role!r} in referentiel")
-
-
-def _move_best_effort(fs: Filesystem, src_uri: str, dest_uri: str) -> None:
-    try:
-        fs.move_file(src_uri, dest_uri)
-    except FilesystemError as exc:
-        logger.warning("failed to move %s to %s: %s", src_uri, dest_uri, exc)
 
 
 def _build_filename(
@@ -249,9 +213,7 @@ def _resolve_base_dir(
     return base_dir
 
 
-def _apply(
-    fs: Filesystem,
-    file_uri: str,
+def _compute_destination(
     entry: ReferentielEntry,
     fields: dict[str, str | None],
     actual_ext: str,
@@ -259,7 +221,5 @@ def _apply(
 ) -> tuple[str, str]:
     dest_name = _build_filename(entry.file_naming.pattern, fields, actual_ext)
     dest_dir = _resolve_base_dir(entry, fields, target_uri)
-    fs.make_dir(dest_dir)
     dest_uri = f"{dest_dir}/{dest_name}"
-    fs.move_file(file_uri, dest_uri)
     return dest_name, dest_uri

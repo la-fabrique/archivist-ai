@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import pytest
-
 from archivist_cli.application.classify import ClassifyConfig, ClassifyUseCase
 from archivist_cli.domain.models import (
     ClassifyEventStatus,
@@ -72,10 +70,9 @@ def _factures_entry() -> ReferentielEntry:
 
 
 def test_classify_nominal():
-    """Fichier classifiable — déplacé et renommé selon le pattern du référentiel."""
+    """Fichier classifiable — event CLASSIFIED avec dest_uri, fichier non déplacé."""
     entries = _base_entries() + [_factures_entry()]
     fs = _make_fs(f"{TARGET}/_Réception/facture.pdf")
-    fs.add_dir(f"{TARGET}/Mes achats/Mes factures fournisseurs")
     llm = FakeLlm(responses=[
         {"entry_id": "mes_achats.factures_fournisseurs", "reason": "facture fournisseur"},
         {"AAAA-MM": "2026-03", "Nom fournisseur": "OVH", "Numero": "F001"},
@@ -89,12 +86,13 @@ def test_classify_nominal():
     assert event.status == ClassifyEventStatus.CLASSIFIED
     assert event.dest_name == "2026-03_Facture_OVH_F001.pdf"
     assert event.dest_uri == f"{TARGET}/Mes achats/Mes factures fournisseurs/2026-03/2026-03_Facture_OVH_F001.pdf"
-    assert fs.exists(event.dest_uri)
-    assert not fs.exists(f"{TARGET}/_Réception/facture.pdf")
+    # classify ne déplace pas les fichiers — c'est le rôle de apply
+    assert fs.exists(f"{TARGET}/_Réception/facture.pdf")
+    assert not fs.exists(event.dest_uri)
 
 
-def test_classify_llm_returns_null_goes_to_non_classe():
-    """LLM incertain → fichier dans _Non classé, statut unclassified."""
+def test_classify_llm_returns_null_returns_unclassified():
+    """LLM incertain → event UNCLASSIFIED, fichier reste dans _Réception."""
     entries = _base_entries()
     fs = _make_fs(f"{TARGET}/_Réception/unknown.pdf")
     llm = FakeLlm(responses=[{"entry_id": None, "reason": "type de document inconnu"}])
@@ -105,36 +103,11 @@ def test_classify_llm_returns_null_goes_to_non_classe():
     event = result.events[0]
     assert event.status == ClassifyEventStatus.UNCLASSIFIED
     assert "llm_uncertain" in event.reason
-    assert fs.exists(f"{TARGET}/_Non classé/unknown.pdf")
-    assert not fs.exists(f"{TARGET}/_Réception/unknown.pdf")
+    assert fs.exists(f"{TARGET}/_Réception/unknown.pdf")
 
 
-def test_classify_backup_failure_file_stays_in_reception():
-    """Échec du backup → fichier reste dans _Réception, statut failed."""
-    from archivist_cli.domain.ports import FilesystemError as FSError
-
-    class FailingZipFs(FakeFilesystem):
-        def zip_file(self, src_uri: str, dest_uri: str) -> None:
-            raise FSError("disque plein")
-
-    entries = _base_entries()
-    fs = FailingZipFs()
-    fs.add_dir(f"{TARGET}/_Réception")
-    fs.add_dir(f"{TARGET}/_Conservation brut")
-    fs.add_dir(f"{TARGET}/_Non classé")
-    fs.add_file(f"{TARGET}/_Réception/facture.pdf")
-
-    uc = ClassifyUseCase(fs, FakeReferentiel(entries), FakeMetadataExtractor(), FakeLlm(), FakeIndex())
-    result = uc.run(ClassifyConfig(referentiel_uri="", target_uri=TARGET))
-
-    event = result.events[0]
-    assert event.status == ClassifyEventStatus.FAILED
-    assert "backup_error" in event.reason
-    assert fs.exists(f"{TARGET}/_Réception/facture.pdf")
-
-
-def test_classify_metadata_error_goes_to_non_classe():
-    """Échec extraction métadonnées → fichier dans _Non classé."""
+def test_classify_metadata_error_returns_failed():
+    """Échec extraction métadonnées → event FAILED, fichier reste dans _Réception."""
     entries = _base_entries()
     fs = _make_fs(f"{TARGET}/_Réception/broken.pdf")
     extractor = FakeMetadataExtractor(fail_on={f"{TARGET}/_Réception/broken.pdf"})
@@ -145,12 +118,11 @@ def test_classify_metadata_error_goes_to_non_classe():
     event = result.events[0]
     assert event.status == ClassifyEventStatus.FAILED
     assert "metadata_error" in event.reason
-    assert fs.exists(f"{TARGET}/_Non classé/broken.pdf")
-    assert not fs.exists(f"{TARGET}/_Réception/broken.pdf")
+    assert fs.exists(f"{TARGET}/_Réception/broken.pdf")
 
 
-def test_classify_llm_error_on_classify_goes_to_non_classe():
-    """Erreur LLM (appel 1) → fichier dans _Non classé."""
+def test_classify_llm_error_on_classify_returns_failed():
+    """Erreur LLM (appel 1) → event FAILED, fichier reste dans _Réception."""
     entries = _base_entries() + [_factures_entry()]
     fs = _make_fs(f"{TARGET}/_Réception/facture.pdf")
     llm = FakeLlm(fail_on_calls={0})
@@ -161,11 +133,11 @@ def test_classify_llm_error_on_classify_goes_to_non_classe():
     event = result.events[0]
     assert event.status == ClassifyEventStatus.FAILED
     assert "llm_error" in event.reason
-    assert fs.exists(f"{TARGET}/_Non classé/facture.pdf")
+    assert fs.exists(f"{TARGET}/_Réception/facture.pdf")
 
 
-def test_classify_llm_error_on_extract_fields_goes_to_non_classe():
-    """Erreur LLM (appel 2 — extraction champs) → fichier dans _Non classé."""
+def test_classify_llm_error_on_extract_fields_returns_failed():
+    """Erreur LLM (appel 2 — extraction champs) → event FAILED, fichier reste dans _Réception."""
     entries = _base_entries() + [_factures_entry()]
     fs = _make_fs(f"{TARGET}/_Réception/facture.pdf")
     llm = FakeLlm(
@@ -179,7 +151,7 @@ def test_classify_llm_error_on_extract_fields_goes_to_non_classe():
     event = result.events[0]
     assert event.status == ClassifyEventStatus.FAILED
     assert "llm_error" in event.reason
-    assert fs.exists(f"{TARGET}/_Non classé/facture.pdf")
+    assert fs.exists(f"{TARGET}/_Réception/facture.pdf")
 
 
 def test_classify_error_does_not_stop_other_files():
@@ -189,7 +161,6 @@ def test_classify_error_does_not_stop_other_files():
         f"{TARGET}/_Réception/broken.pdf",
         f"{TARGET}/_Réception/facture.pdf",
     )
-    fs.add_dir(f"{TARGET}/Mes achats/Mes factures fournisseurs")
     extractor = FakeMetadataExtractor(fail_on={f"{TARGET}/_Réception/broken.pdf"})
     llm = FakeLlm(responses=[
         {"entry_id": "mes_achats.factures_fournisseurs", "reason": "facture"},
@@ -222,7 +193,6 @@ def test_classify_result_summary():
         f"{TARGET}/_Réception/unknown.pdf",
         f"{TARGET}/_Réception/broken.pdf",
     )
-    fs.add_dir(f"{TARGET}/Mes achats/Mes factures fournisseurs")
     extractor = FakeMetadataExtractor(fail_on={f"{TARGET}/_Réception/broken.pdf"})
     llm = FakeLlm(responses=[
         {"entry_id": "mes_achats.factures_fournisseurs", "reason": "facture"},
@@ -237,3 +207,24 @@ def test_classify_result_summary():
     assert result.classified == 1
     assert result.unclassified == 1
     assert result.failed == 1
+
+
+def test_classify_no_llm_all_unclassified():
+    """Sans LLM (NullLlm), tous les fichiers sont déclarés non classés."""
+    from archivist_cli.adapters.llm.null import NullLlm
+
+    entries = _base_entries() + [_factures_entry()]
+    fs = _make_fs(
+        f"{TARGET}/_Réception/facture.pdf",
+        f"{TARGET}/_Réception/contrat.pdf",
+    )
+
+    uc = ClassifyUseCase(fs, FakeReferentiel(entries), FakeMetadataExtractor(), NullLlm(), FakeIndex())
+    result = uc.run(ClassifyConfig(referentiel_uri="", target_uri=TARGET))
+
+    assert result.scanned == 2
+    assert result.classified == 0
+    assert result.unclassified == 2
+    for event in result.events:
+        assert event.status == ClassifyEventStatus.UNCLASSIFIED
+        assert fs.exists(event.uri)

@@ -52,7 +52,8 @@ def test_scan_backed_up_count():
     assert len(fs.zipped) == 2
 
 
-def test_scan_deletes_files_after_processing():
+def test_scan_does_not_delete_files():
+    """scan ne supprime plus les originaux de _Réception — c'est le rôle de apply."""
     fs = FakeFilesystem()
     extractor = FakeMetadataExtractor()
     index = FakeIndex()
@@ -60,7 +61,7 @@ def test_scan_deletes_files_after_processing():
     fs.add_dir("file:///archive/_Conservation brut")
     fs.add_file("file:///archive/_Reception/facture.pdf")
 
-    result = scan(
+    scan(
         filesystem=fs,
         reception_uri="file:///archive/_Reception",
         backup_uri="file:///archive/_Conservation brut",
@@ -68,8 +69,7 @@ def test_scan_deletes_files_after_processing():
         index=index,
     )
 
-    assert result.deleted == 1
-    assert not fs.exists("file:///archive/_Reception/facture.pdf")
+    assert fs.exists("file:///archive/_Reception/facture.pdf")
 
 
 def test_scan_empty_reception():
@@ -89,10 +89,9 @@ def test_scan_empty_reception():
 
     assert result.files == []
     assert result.backed_up == 0
-    assert result.deleted == 0
 
 
-def test_scan_extraction_failure_still_deletes():
+def test_scan_extraction_failure_file_stays_in_reception():
     fs = FakeFilesystem()
     fs.add_dir("file:///archive/_Reception")
     fs.add_dir("file:///archive/_Conservation brut")
@@ -109,9 +108,8 @@ def test_scan_extraction_failure_still_deletes():
     )
 
     assert result.backed_up == 1
-    assert result.deleted == 1
     assert result.files[0].metadata is None
-    assert not fs.exists("file:///archive/_Reception/bad.pdf")
+    assert fs.exists("file:///archive/_Reception/bad.pdf")
 
 
 def test_scan_backup_failure_skips_file():
@@ -135,7 +133,6 @@ def test_scan_backup_failure_skips_file():
     )
 
     assert result.backed_up == 0
-    assert result.deleted == 0
     assert result.files == []
     assert fs.exists("file:///archive/_Reception/facture.pdf")
 
@@ -208,5 +205,4 @@ def test_scan_index_failure_does_not_stop_scan():
     )
 
     assert result.backed_up == 1
-    assert result.deleted == 1
     assert result.files[0].metadata is not None

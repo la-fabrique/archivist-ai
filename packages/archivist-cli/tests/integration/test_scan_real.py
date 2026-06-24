@@ -97,12 +97,13 @@ def test_scan_real_creates_zip_backup(archive_dir: tuple[Path, Path]):
     assert len(zips) == 2
 
 
-def test_scan_real_deletes_from_reception(archive_dir: tuple[Path, Path]):
+def test_scan_real_does_not_delete_from_reception(archive_dir: tuple[Path, Path]):
+    """scan ne supprime plus les fichiers de _Réception — ils restent pour classify/apply."""
     reception, backup = archive_dir
     fs = LocalFilesystem()
     extractor = KreuzbergMetadataExtractor()
 
-    result = scan(
+    scan(
         filesystem=fs,
         reception_uri=reception.as_uri(),
         backup_uri=backup.as_uri(),
@@ -110,6 +111,5 @@ def test_scan_real_deletes_from_reception(archive_dir: tuple[Path, Path]):
         index=NoopIndex(),
     )
 
-    assert result.deleted == 2
     remaining = [f for f in reception.iterdir() if f.is_file()]
-    assert remaining == []
+    assert len(remaining) == 2

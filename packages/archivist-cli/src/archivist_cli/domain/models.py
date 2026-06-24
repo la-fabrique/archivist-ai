@@ -127,3 +127,35 @@ class ClassifyResult:
     @property
     def failed(self) -> int:
         return sum(1 for e in self.events if e.status == ClassifyEventStatus.FAILED)
+
+
+class ApplyEventStatus(str, Enum):
+    MOVED = "moved"
+    SKIPPED = "skipped"
+    FAILED = "failed"
+
+
+@dataclass(frozen=True)
+class ApplyEvent:
+    uri: str
+    name: str
+    status: ApplyEventStatus
+    dest_uri: str | None = None
+    reason: str | None = None
+
+
+@dataclass(frozen=True)
+class ApplyResult:
+    events: list[ApplyEvent]
+
+    @property
+    def moved(self) -> int:
+        return sum(1 for e in self.events if e.status == ApplyEventStatus.MOVED)
+
+    @property
+    def skipped(self) -> int:
+        return sum(1 for e in self.events if e.status == ApplyEventStatus.SKIPPED)
+
+    @property
+    def failed(self) -> int:
+        return sum(1 for e in self.events if e.status == ApplyEventStatus.FAILED)

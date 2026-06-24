@@ -28,6 +28,7 @@ class AdapterRegistry:
 def _build_default_registry() -> AdapterRegistry:
     from archivist_cli.adapters.fs.local import LocalFilesystem
     from archivist_cli.adapters.llm.claude_cli import ClaudeCliLlm
+    from archivist_cli.adapters.llm.null import NullLlm
     from archivist_cli.adapters.metadata.kreuzberg import KreuzbergMetadataExtractor
     from archivist_cli.adapters.referentiel.yaml_file import YamlFileReferentiel
 
@@ -39,6 +40,7 @@ def _build_default_registry() -> AdapterRegistry:
     )
     registry.register("metadata", "kreuzberg", lambda config: KreuzbergMetadataExtractor())
     registry.register("llm", "claude-cli", lambda config: ClaudeCliLlm())
+    registry.register("llm", "null", lambda config: NullLlm())
     return registry
 
 

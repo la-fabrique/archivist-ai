@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 import click
 
 from archivist_cli.adapters.index.noop import NoopIndex
+from archivist_cli.application.apply import apply
 from archivist_cli.application.classify import ClassifyConfig, ClassifyUseCase
 from archivist_cli.application.scaffold import scaffold
 from archivist_cli.application.scan import scan
@@ -178,7 +179,10 @@ def scaffold_cmd(
     help="URI du dossier racine de l'archive (file:///path/to/archive).",
 )
 def scan_cmd(referentiel: str | None, root: str | None) -> None:
-    """Scanne _Réception, sauvegarde dans _Conservation brut, extrait les métadonnées."""
+    """Sauvegarde les fichiers de _Réception dans _Conservation brut et extrait les métadonnées.
+
+    Les fichiers restent dans _Réception après scan. Utilisez classify puis apply pour les classer.
+    """
     if referentiel is None or root is None:
         cfg = load_config()
         referentiel = referentiel or cfg.referentiel
@@ -240,7 +244,6 @@ def scan_cmd(referentiel: str | None, root: str | None) -> None:
     click.echo(json.dumps({
         "scanned": len(result.files),
         "backed_up": result.backed_up,
-        "deleted": result.deleted,
         "files": files_out,
     }))
 
@@ -260,10 +263,14 @@ def scan_cmd(referentiel: str | None, root: str | None) -> None:
     "--llm",
     "llm_name",
     default=None,
-    help="Adaptateur LLM à utiliser (ex: claude-cli).",
+    help="Adaptateur LLM à utiliser (ex: claude-cli). Sans LLM, tous les fichiers sont marqués non classés.",
 )
 def classify_cmd(referentiel: str | None, root: str | None, llm_name: str | None) -> None:
-    """Classe les fichiers de _Réception via LLM et les déplace vers le bon dossier."""
+    """Propose un classement LLM pour les fichiers de _Réception. N'effectue aucun déplacement.
+
+    Sans LLM configuré, tous les fichiers sont déclarés non classés.
+    Redirigez la sortie vers un fichier manifeste, puis lancez apply --manifest <fichier>.
+    """
     if referentiel is None or root is None or llm_name is None:
         cfg = load_config()
         referentiel = referentiel or cfg.referentiel
@@ -279,18 +286,13 @@ def classify_cmd(referentiel: str | None, root: str | None, llm_name: str | None
             "--root manquant. Configurez-le avec :\n"
             "  archivist config set root file:///path/to/archive"
         )
-    if llm_name is None:
-        raise click.UsageError(
-            "--llm manquant. Configurez-le avec :\n"
-            "  archivist config set llm claude-cli"
-        )
     _require_file_uri(referentiel, "referentiel")
     _require_file_uri(root, "root")
 
     ref = default_registry.resolve("referentiel", "yaml_file", {"uri": referentiel})
     fs = default_registry.resolve("fs", "local", {})
     extractor = default_registry.resolve("metadata", "kreuzberg", {})
-    llm = default_registry.resolve("llm", llm_name, {})
+    llm = default_registry.resolve("llm", llm_name if llm_name is not None else "null", {})
 
     entries = ref.load_entries()
 
@@ -302,13 +304,15 @@ def classify_cmd(referentiel: str | None, root: str | None, llm_name: str | None
             )
         return matches[0].path
 
-    for role in ("reception", "conservation_brut", "non_classe"):
-        path = _find_role(role)
-        role_uri = f"{root.rstrip('/')}/{path}"
-        if not fs.is_dir(role_uri):
-            raise click.UsageError(
-                f"Dossier manquant : {role_uri!r} — lancez scaffold d'abord"
-            )
+    reception_path = _find_role("reception")
+    reception_uri = f"{root.rstrip('/')}/{reception_path}"
+    if not fs.is_dir(reception_uri):
+        raise click.UsageError(
+            f"Dossier _Réception introuvable à {reception_uri!r} — lancez scaffold d'abord"
+        )
+
+    if llm_name is None:
+        logger.warning("Aucun LLM configuré — tous les fichiers seront marqués non classés")
 
     uc = ClassifyUseCase(
         fs=fs,
@@ -342,3 +346,100 @@ def classify_cmd(referentiel: str | None, root: str | None, llm_name: str | None
         "failed": result.failed,
     }
     click.echo(json.dumps(summary))
+
+
+@main.command(name="apply")
+@click.option(
+    "--manifest",
+    required=True,
+    type=click.Path(exists=True, dir_okay=False),
+    help="Fichier manifeste JSON issu de la commande classify.",
+)
+@click.option(
+    "--referentiel",
+    default=None,
+    help="URI du fichier référentiel (file:///path/to/referentiel.yaml).",
+)
+@click.option(
+    "--root",
+    default=None,
+    help="URI du dossier racine de l'archive (file:///path/to/archive).",
+)
+def apply_cmd(manifest: str, referentiel: str | None, root: str | None) -> None:
+    """Déplace les fichiers de _Réception vers leur destination selon le manifeste classify.
+
+    Les fichiers classifiés sont déplacés vers leur dossier cible.
+    Les fichiers non classés ou en erreur sont déplacés vers _Non classé.
+    Les fichiers déjà absents sont signalés comme skipped sans erreur.
+    """
+    if referentiel is None or root is None:
+        cfg = load_config()
+        referentiel = referentiel or cfg.referentiel
+        root = root or cfg.root
+    if referentiel is None:
+        raise click.UsageError(
+            "--referentiel manquant. Configurez-le avec :\n"
+            "  archivist config set referentiel file:///path/to/referentiel.yaml"
+        )
+    if root is None:
+        raise click.UsageError(
+            "--root manquant. Configurez-le avec :\n"
+            "  archivist config set root file:///path/to/archive"
+        )
+    _require_file_uri(referentiel, "referentiel")
+    _require_file_uri(root, "root")
+
+    ref = default_registry.resolve("referentiel", "yaml_file", {"uri": referentiel})
+    fs = default_registry.resolve("fs", "local", {})
+
+    entries = ref.load_entries()
+
+    def _find_role(role: str) -> str:
+        matches = [e for e in entries if e.role == role]
+        if len(matches) != 1:
+            raise click.UsageError(
+                f"Le référentiel contient {len(matches)} entrée(s) role={role!r} — exactement 1 attendue"
+            )
+        return matches[0].path
+
+    non_classe_path = _find_role("non_classe")
+    non_classe_uri = f"{root.rstrip('/')}/{non_classe_path}"
+    if not fs.is_dir(non_classe_uri):
+        raise click.UsageError(
+            f"Dossier _Non classé introuvable à {non_classe_uri!r} — lancez scaffold d'abord"
+        )
+
+    decisions: list[dict] = []
+    with open(manifest, encoding="utf-8") as fh:
+        for line in fh:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                decisions.append(json.loads(line))
+            except json.JSONDecodeError:
+                logger.warning("ligne manifeste ignorée (JSON invalide) : %r", line)
+
+    result = apply(filesystem=fs, decisions=decisions, non_classe_uri=non_classe_uri)
+
+    for event in result.events:
+        row: dict = {
+            "uri": event.uri,
+            "name": event.name,
+            "status": event.status.value,
+        }
+        if event.dest_uri is not None:
+            row["dest_uri"] = event.dest_uri
+        if event.reason is not None:
+            row["reason"] = event.reason
+        click.echo(json.dumps(row, ensure_ascii=False))
+
+    summary = {
+        "moved": result.moved,
+        "skipped": result.skipped,
+        "failed": result.failed,
+    }
+    click.echo(json.dumps(summary))
+
+    if result.failed > 0:
+        raise SystemExit(1)

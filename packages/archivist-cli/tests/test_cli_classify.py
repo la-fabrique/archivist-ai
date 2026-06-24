@@ -76,12 +76,33 @@ def test_classify_missing_root(tmp_path: Path, monkeypatch):
     assert "root" in result.output.lower()
 
 
-def test_classify_missing_llm(tmp_path: Path, monkeypatch):
-    monkeypatch.setattr("archivist_cli.config.app_data_dir", lambda: tmp_path / "app")
-    runner = CliRunner()
-    result = runner.invoke(main, ["classify", "--referentiel", "file:///tmp/ref.yaml", "--root", "file:///tmp"])
-    assert result.exit_code != 0
-    assert "llm" in result.output.lower()
+def test_classify_no_llm_uses_null_llm(tmp_path: Path):
+    """Sans LLM configuré, classify tourne avec NullLlm et marque tout comme non classé."""
+    ref_path, target = _setup(tmp_path)
+    (target / "_Réception" / "doc.pdf").write_bytes(b"%PDF-1.4 content")
+
+    mock_kreuzberg = MagicMock()
+    mock_kreuzberg.content = "Contenu"
+    mock_kreuzberg.mime_type = "application/pdf"
+    mock_kreuzberg.metadata = {"page_count": None, "language": None, "title": None, "authors": None}
+    mock_kreuzberg.get_page_count.return_value = 0
+    mock_kreuzberg.get_detected_language.return_value = None
+
+    with patch("archivist_cli.adapters.metadata.kreuzberg.extract_file_sync", return_value=mock_kreuzberg):
+        runner = CliRunner()
+        result = runner.invoke(main, [
+            "classify",
+            "--referentiel", ref_path.as_uri(),
+            "--root", target.as_uri(),
+        ])
+
+    assert result.exit_code == 0
+    summary = json.loads(result.output.strip().splitlines()[-1])
+    assert summary["scanned"] == 1
+    assert summary["classified"] == 0
+    assert summary["unclassified"] == 1
+    # fichier reste dans _Réception — classify ne déplace pas
+    assert (target / "_Réception" / "doc.pdf").exists()
 
 
 def test_classify_missing_scaffold_dirs(tmp_path: Path):
@@ -164,16 +185,16 @@ def test_classify_nominal(tmp_path: Path):
 
     assert result.exit_code == 0
     lines = [l for l in result.output.strip().splitlines() if l.strip()]
-    # avant-dernière ligne : event, dernière : summary
     event = json.loads(lines[0])
     summary = json.loads(lines[-1])
     assert event["status"] == "classified"
     assert event["name"] == "facture.pdf"
+    assert "dest_uri" in event
     assert summary["classified"] == 1
     assert summary["scanned"] == 1
-    # fichier déplacé dans Factures/
-    assert not src_file.exists()
-    assert any((target / "Factures").rglob("*.pdf"))
+    # classify ne déplace pas les fichiers — la source reste dans _Réception
+    assert src_file.exists()
+    assert not any((target / "Factures").rglob("*.pdf"))
 
 
 def test_classify_llm_uncertain(tmp_path: Path):
@@ -206,6 +227,6 @@ def test_classify_llm_uncertain(tmp_path: Path):
     summary = json.loads(lines[-1])
     assert event["status"] == "unclassified"
     assert summary["unclassified"] == 1
-    # fichier déplacé vers _Non classé
-    assert not src_file.exists()
-    assert (target / "_Non classé" / "doc_inconnu.pdf").exists()
+    # classify ne déplace pas les fichiers — la source reste dans _Réception
+    assert src_file.exists()
+    assert not (target / "_Non classé" / "doc_inconnu.pdf").exists()

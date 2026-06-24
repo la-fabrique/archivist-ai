@@ -23,7 +23,6 @@ def _uri_name(uri: str) -> str:
 class ScanResult:
     files: list[ScannedFile]
     backed_up: int
-    deleted: int
 
 
 async def _extract_file(
@@ -85,13 +84,4 @@ def scan(
 
     files = asyncio.run(_pipeline()) if backed_up_uris else []
 
-    deleted = 0
-    for uri in backed_up_uris:
-        name = _uri_name(uri)
-        try:
-            filesystem.delete_file(uri)
-            deleted += 1
-        except FilesystemError as e:
-            logger.error("%s — suppression échouée : %s", name, e)
-
-    return ScanResult(files=files, backed_up=len(backed_up_uris), deleted=deleted)
+    return ScanResult(files=files, backed_up=len(backed_up_uris))
