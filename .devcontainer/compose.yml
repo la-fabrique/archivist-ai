@@ -6,6 +6,8 @@ services:
     volumes:
       - ..:/workspace:cached
     command: sleep infinity
+    environment:
+      - GH_TOKEN=${GH_TOKEN}
     # network_mode: host lets the dev container reach otel-collector, grafana, etc. via localhost
     network_mode: host
 

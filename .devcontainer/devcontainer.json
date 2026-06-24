@@ -12,8 +12,7 @@
   "postCreateCommand": "npm config set prefix ~/.npm-global && uv sync --directory packages/archivist-cli && npm install --prefix packages/referentiel-cli",
   "postStartCommand": "npm install -g @anthropic-ai/claude-code@latest 2>&1 | tail -1",
   "remoteEnv": {
-    "PATH": "${containerEnv:PATH}:/home/vscode/.npm-global/bin",
-    "GH_TOKEN": "${localEnv:GH_TOKEN}"
+    "PATH": "${containerEnv:PATH}:/home/vscode/.npm-global/bin"
   },
   "customizations": {
     "vscode": {
