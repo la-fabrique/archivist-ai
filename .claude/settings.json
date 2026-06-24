@@ -11,28 +11,29 @@
   },
   "permissions": {
     "allow": [
-      "Bash(xargs cat:*)",
+      "Read(/workspace/**)",
+      "Edit(/workspace/**)",
+      "Write(/workspace/**)",
+      "Bash(xargs cat:*)",     
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Bash(uv *)",
+      "Bash(echo *)",
+      "Bash(grep *)", 
       "Bash(git checkout:*)",
       "Bash(git add:*)",
-      "Bash(npm test *)",
-      "Bash(npm run *)",
-      "Bash(uv run *)",
-      "Bash(uv sync *)",
-      "Bash(git commit *)",
-      "Edit(/.claude/skills/**)",
-      "Bash(echo *)",
-      "Bash(grep *)",
+      "Bash(git commit *)",      
       "Bash(git pull *)",
       "Bash(git merge *)",
-      "Bash(npx vitest *)",
-      "Bash(npx tsc *)",
       "Bash(git -C *)",
       "Bash(git reset *)",
-      "Bash(curl *)",
       "Bash(git worktree *)",
-      "Bash(npm install *)"
+      "Bash(git push *)",
+      "Bash(curl *)",
+      "Bash(gh pr *)",
+      "Bash(gh api *)"      
     ],
-    "defaultMode": "bypassPermissions"
+    "defaultMode": "dontAsk"
   },
   "model": "claude-sonnet-4-6",
   "hooks": {
