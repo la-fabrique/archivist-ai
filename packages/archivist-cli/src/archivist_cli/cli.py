@@ -17,6 +17,17 @@ from archivist_cli.registry import default_registry
 logger = logging.getLogger(__name__)
 
 
+_SUPPORTED_REFERENTIEL_SCHEMES = {"file", "http", "https"}
+
+
+def _require_referentiel_uri(value: str, param_name: str) -> None:
+    if urlparse(value).scheme not in _SUPPORTED_REFERENTIEL_SCHEMES:
+        raise click.BadParameter(
+            f"{value!r} n'est pas un URI valide. Utilisez file://, http:// ou https://.",
+            param_hint=f"'--{param_name}'",
+        )
+
+
 def _require_file_uri(value: str, param_name: str) -> None:
     if urlparse(value).scheme != "file":
         raise click.BadParameter(
@@ -46,8 +57,8 @@ def config_set() -> None:
 @config_set.command(name="referentiel")
 @click.argument("uri")
 def config_set_referentiel(uri: str) -> None:
-    """Copie le référentiel dans le dossier app data et enregistre son URI."""
-    _require_file_uri(uri, "referentiel")
+    """Installe le référentiel (file://, http://, https://) et enregistre son URI."""
+    _require_referentiel_uri(uri, "referentiel")
     try:
         installed_uri = install_referentiel(uri)
     except (FileNotFoundError, ValueError) as e:
