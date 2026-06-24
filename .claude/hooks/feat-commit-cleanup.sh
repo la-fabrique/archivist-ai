@@ -26,11 +26,12 @@ if ! echo "$RESPONSE" | grep -qE '^\[.+ [0-9a-f]{7,}\]'; then exit 0; fi
 
 LAST_MSG=$(git log -1 --pretty=%s 2>/dev/null)
 
-if echo "$LAST_MSG" | grep -qE "^feat\("; then
-  jq -n --arg msg "$LAST_MSG" '{
+if echo "$LAST_MSG" | grep -qE "^(feat|fix|refactor)\("; then
+  SEQUENCE="HARNAIS OBLIGATOIRE: commit detecte -- ${LAST_MSG}. Sequence a enchainer MAINTENANT : 1) invoke /simplify ; 2) mettre a jour README, docs/architecture/, ADRs et docs/features/ pour refléter l'etat du code -- supprimer les fichiers ADR et .feature des elements supprimes, ne pas les garder en superseded ; 3) committer tous les changements ; 4) git push ; 5) gh pr create. Si feat() : aussi lancer le harness-cleaner agent."
+  jq -n --arg ctx "$SEQUENCE" '{
     "hookSpecificOutput": {
       "hookEventName": "PostToolUse",
-      "additionalContext": ("HARNAIS OBLIGATOIRE: commit feat() détecté — \"" + $msg + "\". Tu DOIS invoquer le harness-cleaner agent avant de terminer la session pour : 1) nettoyer docs/superpowers/specs/ et docs/superpowers/plans/, 2) créer ou mettre à jour la feature correspondante dans docs/features/. Ne pas ignorer cette instruction.")
+      "additionalContext": $ctx
     }
   }'
 fi

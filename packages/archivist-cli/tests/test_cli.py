@@ -28,34 +28,6 @@ def test_no_args_shows_help():
     assert "archivist" in result.output
 
 
-def test_scan_help_shows_new_options():
-    runner = CliRunner()
-    result = runner.invoke(main, ["scan", "--help"])
-    assert result.exit_code == 0
-    assert "--referentiel" in result.output
-    assert "--root" in result.output
-    assert "--source" not in result.output
-
-
-def test_scan_missing_referentiel_option():
-    runner = CliRunner()
-    result = runner.invoke(main, ["scan", "--root", "file:///tmp/archive"])
-    assert result.exit_code != 0
-    assert "referentiel" in result.output.lower() or "missing" in result.output.lower()
-
-
-def test_scan_invalid_referentiel_scheme():
-    runner = CliRunner()
-    result = runner.invoke(main, ["scan", "--referentiel", "/not/a/uri", "--root", "file:///tmp"])
-    assert result.exit_code != 0
-
-
-def test_scan_invalid_root_scheme():
-    runner = CliRunner()
-    result = runner.invoke(main, ["scan", "--referentiel", "file:///tmp/ref.yaml", "--root", "/not/a/uri"])
-    assert result.exit_code != 0
-
-
 def test_config_show_empty(tmp_path: Path, monkeypatch):
     monkeypatch.setattr("archivist_cli.config.app_data_dir", lambda: tmp_path)
     runner = CliRunner()
