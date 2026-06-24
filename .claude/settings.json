@@ -30,9 +30,10 @@
       "Bash(git reset *)",
       "Bash(curl *)",
       "Bash(git worktree *)",
-      "Bash(npm install *)"
+      "Bash(npm install *)",
+      "Bash(python3 *)"
     ],
-    "defaultMode": "bypassPermissions"
+    "defaultMode": "dontAsk"
   },
   "model": "claude-sonnet-4-6",
   "hooks": {
