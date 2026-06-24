@@ -66,10 +66,10 @@ def test_install_referentiel_copies_file(tmp_path: Path):
     source.write_text("entries: []\n", encoding="utf-8")
     data_dir = tmp_path / "app"
 
-    uri = install_referentiel(f"file://{source}", data_dir=data_dir)
+    uri = install_referentiel(source.as_uri(), data_dir=data_dir)
 
     assert (data_dir / "referentiel.yaml").read_text() == "entries: []\n"
-    assert uri == f"file://{data_dir / 'referentiel.yaml'}"
+    assert uri == (data_dir / "referentiel.yaml").as_uri()
 
 
 def test_install_referentiel_creates_app_dir(tmp_path: Path):
@@ -77,7 +77,7 @@ def test_install_referentiel_creates_app_dir(tmp_path: Path):
     source.write_text("entries: []\n", encoding="utf-8")
     data_dir = tmp_path / "nested" / "app"
 
-    install_referentiel(f"file://{source}", data_dir=data_dir)
+    install_referentiel(source.as_uri(), data_dir=data_dir)
 
     assert data_dir.is_dir()
 

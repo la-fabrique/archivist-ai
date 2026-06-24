@@ -26,7 +26,7 @@ def test_load_entries_from_yaml(tmp_path: Path):
     yaml_path = tmp_path / "referentiel.yaml"
     yaml_path.write_text(yaml_content, encoding="utf-8")
 
-    ref = YamlFileReferentiel(uri=f"file://{yaml_path}")
+    ref = YamlFileReferentiel(uri=yaml_path.as_uri())
     entries = ref.load_entries()
 
     assert len(entries) == 2
@@ -44,7 +44,7 @@ def test_load_entries_invalid_yaml(tmp_path: Path):
     yaml_path = tmp_path / "bad.yaml"
     yaml_path.write_text("{{invalid", encoding="utf-8")
 
-    ref = YamlFileReferentiel(uri=f"file://{yaml_path}")
+    ref = YamlFileReferentiel(uri=yaml_path.as_uri())
     with pytest.raises(ReferentielError, match="parse"):
         ref.load_entries()
 
@@ -68,7 +68,7 @@ def test_load_entries_with_role(tmp_path: Path):
     yaml_path = tmp_path / "referentiel.yaml"
     yaml_path.write_text(yaml_content, encoding="utf-8")
 
-    ref = YamlFileReferentiel(uri=f"file://{yaml_path}")
+    ref = YamlFileReferentiel(uri=yaml_path.as_uri())
     entries = ref.load_entries()
 
     by_id = {e.id: e for e in entries}

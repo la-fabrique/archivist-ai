@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import ClassVar
 from urllib.parse import urlparse
+from urllib.request import url2pathname
 
 import duckdb
 
@@ -20,7 +21,7 @@ class DuckDbIndex(Index):
             raise IndexError(
                 f"unsupported scheme: {parsed.scheme!r} — expected file://"
             )
-        self._conn = duckdb.connect(parsed.path)
+        self._conn = duckdb.connect(url2pathname(parsed.path))
         self._create_schema()
 
     def _create_schema(self) -> None:

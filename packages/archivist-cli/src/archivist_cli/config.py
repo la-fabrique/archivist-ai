@@ -4,6 +4,7 @@ import shutil
 from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import urlparse
+from urllib.request import url2pathname
 
 import yaml
 from platformdirs import user_data_dir
@@ -53,10 +54,10 @@ def install_referentiel(source_uri: str, data_dir: Path | None = None) -> str:
     parsed = urlparse(source_uri)
     if parsed.scheme != "file":
         raise ValueError(f"URI non supporté : {source_uri!r}. Seuls les URI file:// sont acceptés.")
-    source_path = Path(parsed.path)
+    source_path = Path(url2pathname(parsed.path))
     if not source_path.exists():
         raise FileNotFoundError(f"Référentiel source introuvable : {source_uri}")
     dir_.mkdir(parents=True, exist_ok=True)
     dest = dir_ / "referentiel.yaml"
     shutil.copy2(source_path, dest)
-    return f"file://{dest}"
+    return dest.as_uri()

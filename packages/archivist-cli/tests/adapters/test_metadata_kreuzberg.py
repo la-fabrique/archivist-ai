@@ -18,4 +18,4 @@ class TestKreuzbergMetadataExtractorContract(MetadataExtractorContractSuite):
     def valid_file_uri(self, tmp_path: Path) -> str:
         f = tmp_path / "sample.txt"
         f.write_text("Ceci est un document de test.\n", encoding="utf-8")
-        return f"file://{f}"
+        return f.as_uri()

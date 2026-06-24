@@ -120,12 +120,13 @@ class TestLocalFilesystemContract(FilesystemContractSuite):
 
     @pytest.fixture
     def base_uri(self, tmp_path: Path) -> str:
-        return f"file://{tmp_path}"
+        return tmp_path.as_uri()
 
     @pytest.fixture
     def create_file(self):
+        from urllib.request import url2pathname
         def _create(uri: str) -> None:
-            Path(urlparse(uri).path).touch()
+            Path(url2pathname(urlparse(uri).path)).touch()
         return _create
 
 
@@ -178,7 +179,7 @@ class TestYamlFileReferentielContract(ReferentielContractSuite):
         """)
         yaml_path = tmp_path / "ref.yaml"
         yaml_path.write_text(yaml_content, encoding="utf-8")
-        return YamlFileReferentiel(uri=f"file://{yaml_path}")
+        return YamlFileReferentiel(uri=yaml_path.as_uri())
 
 
 class TestFakeReferentielContract(ReferentielContractSuite):
@@ -300,6 +301,6 @@ class TestNoopIndexContract(IndexContractSuite):
 class TestDuckDbIndexContract(IndexContractSuite):
     @pytest.fixture
     def index(self, tmp_path: Path):
-        idx = DuckDbIndex(db_uri=f"file://{tmp_path}/test.db")
+        idx = DuckDbIndex(db_uri=(tmp_path / "test.db").as_uri())
         yield idx
         idx._conn.close()
