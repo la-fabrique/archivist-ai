@@ -4,6 +4,7 @@ import shutil
 import zipfile
 from pathlib import Path, PurePosixPath
 from urllib.parse import urlparse
+from urllib.request import url2pathname
 
 from archivist_cli.domain.ports import Filesystem, FilesystemError
 
@@ -20,7 +21,8 @@ class LocalFilesystem(Filesystem):
         # PurePosixPath is intentional here even on Windows so the check is platform-agnostic.
         if ".." in PurePosixPath(parsed.path).parts:
             raise FilesystemError(f"path traversal détecté dans l'URI : {uri!r}")
-        return Path(parsed.path)
+        # url2pathname handles Windows drive letters: /C:/path -> C:\path
+        return Path(url2pathname(parsed.path))
 
     def make_dir(self, uri: str) -> None:
         path = self._to_path(uri)
@@ -38,7 +40,7 @@ class LocalFilesystem(Filesystem):
         path = self._to_path(uri)
         if not path.is_dir():
             raise FilesystemError(f"not a directory: {uri}")
-        return [f"file://{entry}" for entry in path.iterdir() if entry.is_file()]
+        return [entry.as_uri() for entry in path.iterdir() if entry.is_file()]
 
     def zip_file(self, src_uri: str, dest_uri: str) -> None:
         src = self._to_path(src_uri)

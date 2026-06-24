@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from urllib.parse import urlparse
+from urllib.request import url2pathname
 
 import yaml
 
@@ -16,7 +17,7 @@ class YamlFileReferentiel(Referentiel):
             raise ReferentielError(
                 f"unsupported scheme: {parsed.scheme!r} — expected a file URI, e.g. file:///path/to/referentiel.yaml"
             )
-        self._path = Path(parsed.path)
+        self._path = Path(url2pathname(parsed.path))
 
     def load_entries(self) -> list[ReferentielEntry]:
         if not self._path.exists():

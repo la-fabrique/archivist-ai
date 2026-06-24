@@ -11,7 +11,7 @@ from archivist_cli.domain.ports import IndexError
 
 
 def test_duckdb_index_persists_document(tmp_path: Path):
-    db_uri = f"file://{tmp_path}/test.db"
+    db_uri = (tmp_path / "test.db").as_uri()
     index = DuckDbIndex(db_uri=db_uri)
     meta = FileMetadata(
         mime_type="application/pdf",
@@ -36,7 +36,7 @@ def test_duckdb_index_persists_document(tmp_path: Path):
 
 
 def test_duckdb_index_upsert_replaces_content(tmp_path: Path):
-    db_uri = f"file://{tmp_path}/test.db"
+    db_uri = (tmp_path / "test.db").as_uri()
     index = DuckDbIndex(db_uri=db_uri)
     meta = FileMetadata(
         mime_type="application/pdf",

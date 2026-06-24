@@ -68,7 +68,7 @@ fi
 
 # Collector reachability is informational and only surfaced when it is down.
 COLLECTOR_MSG=""
-if ! nc -z -w1 "$COLLECTOR_HOST" "$COLLECTOR_PORT" 2>/dev/null; then
+if ! bash -c "echo >/dev/tcp/${COLLECTOR_HOST}/${COLLECTOR_PORT}" 2>/dev/null; then
   COLLECTOR_MSG="HARNAIS: Collector inaccessible sur localhost:4317 — la stack monitoring démarre normalement avec le devcontainer (otel-collector, grafana:3000, prometheus:9090, tempo:3200)"
 fi
 

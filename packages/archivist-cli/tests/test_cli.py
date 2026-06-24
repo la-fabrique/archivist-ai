@@ -79,10 +79,10 @@ def test_config_show_with_values(tmp_path: Path, monkeypatch):
 def test_config_set_root(tmp_path: Path, monkeypatch):
     monkeypatch.setattr("archivist_cli.config.app_data_dir", lambda: tmp_path)
     runner = CliRunner()
-    result = runner.invoke(main, ["config", "set", "root", f"file://{tmp_path}"])
+    result = runner.invoke(main, ["config", "set", "root", tmp_path.as_uri()])
     assert result.exit_code == 0
     cfg = load_config(data_dir=tmp_path)
-    assert cfg.root == f"file://{tmp_path}"
+    assert cfg.root == tmp_path.as_uri()
 
 
 def test_config_set_llm(tmp_path: Path, monkeypatch):
@@ -99,11 +99,11 @@ def test_config_set_referentiel(tmp_path: Path, monkeypatch):
     source = tmp_path / "ref.yaml"
     source.write_text("entries: []\n", encoding="utf-8")
     runner = CliRunner()
-    result = runner.invoke(main, ["config", "set", "referentiel", f"file://{source}"])
+    result = runner.invoke(main, ["config", "set", "referentiel", source.as_uri()])
     assert result.exit_code == 0
     assert (tmp_path / "referentiel.yaml").exists()
     cfg = load_config(data_dir=tmp_path)
-    assert cfg.referentiel == f"file://{tmp_path / 'referentiel.yaml'}"
+    assert cfg.referentiel == (tmp_path / "referentiel.yaml").as_uri()
 
 
 def test_config_set_referentiel_missing_file(tmp_path: Path, monkeypatch):

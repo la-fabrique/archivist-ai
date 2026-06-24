@@ -8,14 +8,14 @@ from archivist_cli.domain.ports import FilesystemError
 
 def test_make_dir_creates_nested(tmp_path: Path):
     fs = LocalFilesystem()
-    uri = f"file://{tmp_path}/a/b/c"
+    uri = (tmp_path / "a/b/c").as_uri()
     fs.make_dir(uri)
     assert (tmp_path / "a" / "b" / "c").is_dir()
 
 
 def test_make_dir_idempotent(tmp_path: Path):
     fs = LocalFilesystem()
-    uri = f"file://{tmp_path}/a"
+    uri = (tmp_path / "a").as_uri()
     fs.make_dir(uri)
     fs.make_dir(uri)
     assert (tmp_path / "a").is_dir()
@@ -24,31 +24,31 @@ def test_make_dir_idempotent(tmp_path: Path):
 def test_exists_true(tmp_path: Path):
     fs = LocalFilesystem()
     (tmp_path / "x").mkdir()
-    assert fs.exists(f"file://{tmp_path}/x") is True
+    assert fs.exists((tmp_path / "x").as_uri()) is True
 
 
 def test_exists_false(tmp_path: Path):
     fs = LocalFilesystem()
-    assert fs.exists(f"file://{tmp_path}/nope") is False
+    assert fs.exists((tmp_path / "nope").as_uri()) is False
 
 
 def test_is_dir_true(tmp_path: Path):
     fs = LocalFilesystem()
     (tmp_path / "d").mkdir()
-    assert fs.is_dir(f"file://{tmp_path}/d") is True
+    assert fs.is_dir((tmp_path / "d").as_uri()) is True
 
 
 def test_is_dir_false_on_file(tmp_path: Path):
     fs = LocalFilesystem()
     (tmp_path / "f").write_text("x")
-    assert fs.is_dir(f"file://{tmp_path}/f") is False
+    assert fs.is_dir((tmp_path / "f").as_uri()) is False
 
 
 def test_make_dir_raises_on_file_conflict(tmp_path: Path):
     fs = LocalFilesystem()
     (tmp_path / "conflict").write_text("x")
     with pytest.raises(FilesystemError, match="exists.*not a directory"):
-        fs.make_dir(f"file://{tmp_path}/conflict")
+        fs.make_dir((tmp_path / "conflict").as_uri())
 
 
 def test_rejects_non_file_scheme():
@@ -101,6 +101,6 @@ def test_rejects_path_traversal_delete():
 
 def test_normal_nested_path_accepted(tmp_path: Path):
     fs = LocalFilesystem()
-    uri = f"file://{tmp_path}/a/b/c"
+    uri = (tmp_path / "a/b/c").as_uri()
     fs.make_dir(uri)
     assert (tmp_path / "a" / "b" / "c").is_dir()

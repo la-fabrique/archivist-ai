@@ -92,8 +92,8 @@ def test_classify_missing_scaffold_dirs(tmp_path: Path):
     runner = CliRunner()
     result = runner.invoke(main, [
         "classify",
-        "--referentiel", f"file://{ref_path}",
-        "--root", f"file://{target}",
+        "--referentiel", ref_path.as_uri(),
+        "--root", target.as_uri(),
         "--llm", "claude-cli",
     ])
     assert result.exit_code != 0
@@ -105,7 +105,7 @@ def test_classify_uses_config_when_no_args(tmp_path: Path, monkeypatch):
     ref_path, target = _setup(tmp_path)
     from archivist_cli.config import AppConfig, save_config
     save_config(
-        AppConfig(referentiel=f"file://{ref_path}", root=f"file://{target}", llm="claude-cli"),
+        AppConfig(referentiel=ref_path.as_uri(), root=target.as_uri(), llm="claude-cli"),
         data_dir=tmp_path / "app",
     )
     runner = CliRunner()
@@ -121,8 +121,8 @@ def test_classify_empty_reception(tmp_path: Path):
     runner = CliRunner()
     result = runner.invoke(main, [
         "classify",
-        "--referentiel", f"file://{ref_path}",
-        "--root", f"file://{target}",
+        "--referentiel", ref_path.as_uri(),
+        "--root", target.as_uri(),
         "--llm", "claude-cli",
     ])
     assert result.exit_code == 0
@@ -157,8 +157,8 @@ def test_classify_nominal(tmp_path: Path):
         ]
         result = runner.invoke(main, [
             "classify",
-            "--referentiel", f"file://{ref_path}",
-            "--root", f"file://{target}",
+            "--referentiel", ref_path.as_uri(),
+            "--root", target.as_uri(),
             "--llm", "claude-cli",
         ])
 
@@ -195,8 +195,8 @@ def test_classify_llm_uncertain(tmp_path: Path):
         runner = CliRunner()
         result = runner.invoke(main, [
             "classify",
-            "--referentiel", f"file://{ref_path}",
-            "--root", f"file://{target}",
+            "--referentiel", ref_path.as_uri(),
+            "--root", target.as_uri(),
             "--llm", "claude-cli",
         ])
 
