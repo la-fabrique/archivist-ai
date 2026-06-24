@@ -87,6 +87,19 @@ def test_install_referentiel_raises_when_source_missing(tmp_path: Path):
         install_referentiel("file:///nonexistent/referentiel.yaml", data_dir=tmp_path)
 
 
-def test_install_referentiel_raises_on_non_file_uri(tmp_path: Path):
-    with pytest.raises(ValueError, match="file://"):
-        install_referentiel("https://example.com/ref.yaml", data_dir=tmp_path)
+def test_install_referentiel_raises_on_unsupported_scheme(tmp_path: Path):
+    with pytest.raises(ValueError, match="non supporté"):
+        install_referentiel("ftp://example.com/ref.yaml", data_dir=tmp_path)
+
+
+def test_install_referentiel_https_downloads_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    dest = tmp_path / "referentiel.yaml"
+
+    def fake_urlretrieve(url: str, filename: str) -> None:
+        Path(filename).write_text("- id: test\n", encoding="utf-8")
+
+    monkeypatch.setattr("urllib.request.urlretrieve", fake_urlretrieve)
+    uri = install_referentiel("https://example.com/referentiel.yaml", data_dir=tmp_path)
+
+    assert dest.read_text() == "- id: test\n"
+    assert uri == dest.as_uri()
