@@ -7,7 +7,7 @@ from archivist_cli.domain.models import (
     FileNamingField,
     ReferentielEntry,
 )
-from tests.fakes import FakeFilesystem, FakeIndex, FakeLlm, FakeMetadataExtractor, FakeReferentiel
+from tests.fakes import FakeFilesystem, FakeLlm, FakeMetadataExtractor, FakeReferentiel
 
 TARGET = "file:///archive"
 
@@ -78,7 +78,7 @@ def test_classify_nominal():
         {"AAAA-MM": "2026-03", "Nom fournisseur": "OVH", "Numero": "F001"},
     ])
 
-    uc = ClassifyUseCase(fs, FakeReferentiel(entries), FakeMetadataExtractor(), llm, FakeIndex())
+    uc = ClassifyUseCase(fs, FakeReferentiel(entries), FakeMetadataExtractor(), llm)
     result = uc.run(ClassifyConfig(referentiel_uri="", target_uri=TARGET))
 
     assert len(result.events) == 1
@@ -97,7 +97,7 @@ def test_classify_llm_returns_null_returns_unclassified():
     fs = _make_fs(f"{TARGET}/_Réception/unknown.pdf")
     llm = FakeLlm(responses=[{"entry_id": None, "reason": "type de document inconnu"}])
 
-    uc = ClassifyUseCase(fs, FakeReferentiel(entries), FakeMetadataExtractor(), llm, FakeIndex())
+    uc = ClassifyUseCase(fs, FakeReferentiel(entries), FakeMetadataExtractor(), llm)
     result = uc.run(ClassifyConfig(referentiel_uri="", target_uri=TARGET))
 
     event = result.events[0]
@@ -112,7 +112,7 @@ def test_classify_metadata_error_returns_failed():
     fs = _make_fs(f"{TARGET}/_Réception/broken.pdf")
     extractor = FakeMetadataExtractor(fail_on={f"{TARGET}/_Réception/broken.pdf"})
 
-    uc = ClassifyUseCase(fs, FakeReferentiel(entries), extractor, FakeLlm(), FakeIndex())
+    uc = ClassifyUseCase(fs, FakeReferentiel(entries), extractor, FakeLlm())
     result = uc.run(ClassifyConfig(referentiel_uri="", target_uri=TARGET))
 
     event = result.events[0]
@@ -127,7 +127,7 @@ def test_classify_llm_error_on_classify_returns_failed():
     fs = _make_fs(f"{TARGET}/_Réception/facture.pdf")
     llm = FakeLlm(fail_on_calls={0})
 
-    uc = ClassifyUseCase(fs, FakeReferentiel(entries), FakeMetadataExtractor(), llm, FakeIndex())
+    uc = ClassifyUseCase(fs, FakeReferentiel(entries), FakeMetadataExtractor(), llm)
     result = uc.run(ClassifyConfig(referentiel_uri="", target_uri=TARGET))
 
     event = result.events[0]
@@ -145,7 +145,7 @@ def test_classify_llm_error_on_extract_fields_returns_failed():
         fail_on_calls={1},
     )
 
-    uc = ClassifyUseCase(fs, FakeReferentiel(entries), FakeMetadataExtractor(), llm, FakeIndex())
+    uc = ClassifyUseCase(fs, FakeReferentiel(entries), FakeMetadataExtractor(), llm)
     result = uc.run(ClassifyConfig(referentiel_uri="", target_uri=TARGET))
 
     event = result.events[0]
@@ -167,7 +167,7 @@ def test_classify_error_does_not_stop_other_files():
         {"AAAA-MM": "2026-03", "Nom fournisseur": "OVH", "Numero": "F001"},
     ])
 
-    uc = ClassifyUseCase(fs, FakeReferentiel(entries), extractor, llm, FakeIndex())
+    uc = ClassifyUseCase(fs, FakeReferentiel(entries), extractor, llm)
     result = uc.run(ClassifyConfig(referentiel_uri="", target_uri=TARGET))
 
     assert result.scanned == 2
@@ -179,7 +179,7 @@ def test_classify_empty_reception():
     """_Réception vide → aucun événement."""
     fs = _make_fs()
     uc = ClassifyUseCase(
-        fs, FakeReferentiel(_base_entries()), FakeMetadataExtractor(), FakeLlm(), FakeIndex()
+        fs, FakeReferentiel(_base_entries()), FakeMetadataExtractor(), FakeLlm()
     )
     result = uc.run(ClassifyConfig(referentiel_uri="", target_uri=TARGET))
     assert result.scanned == 0
@@ -200,7 +200,7 @@ def test_classify_result_summary():
         {"entry_id": None, "reason": "inconnu"},
     ])
 
-    uc = ClassifyUseCase(fs, FakeReferentiel(entries), extractor, llm, FakeIndex())
+    uc = ClassifyUseCase(fs, FakeReferentiel(entries), extractor, llm)
     result = uc.run(ClassifyConfig(referentiel_uri="", target_uri=TARGET))
 
     assert result.scanned == 3
@@ -219,7 +219,7 @@ def test_classify_no_llm_all_unclassified():
         f"{TARGET}/_Réception/contrat.pdf",
     )
 
-    uc = ClassifyUseCase(fs, FakeReferentiel(entries), FakeMetadataExtractor(), NullLlm(), FakeIndex())
+    uc = ClassifyUseCase(fs, FakeReferentiel(entries), FakeMetadataExtractor(), NullLlm())
     result = uc.run(ClassifyConfig(referentiel_uri="", target_uri=TARGET))
 
     assert result.scanned == 2

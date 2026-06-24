@@ -13,7 +13,6 @@ from archivist_cli.domain.models import (
 )
 from archivist_cli.domain.ports import (
     Filesystem,
-    Index,
     LanguageModel,
     LlmError,
     MetadataExtractor,
@@ -37,13 +36,11 @@ class ClassifyUseCase:
         referentiel: Referentiel,
         extractor: MetadataExtractor,
         llm: LanguageModel,
-        index: Index,
     ) -> None:
         self._fs = fs
         self._referentiel = referentiel
         self._extractor = extractor
         self._llm = llm
-        self._index = index
 
     def run(self, config: ClassifyConfig) -> ClassifyResult:
         entries = self._referentiel.load_entries()
@@ -78,7 +75,7 @@ class ClassifyUseCase:
             )
 
         text_excerpt = extraction.content[:3000]
-        metadata_json = json.dumps(dict(extraction.metadata))
+        metadata_json = json.dumps(extraction.metadata)
 
         # Step 2: LLM classify
         classification_schema = {

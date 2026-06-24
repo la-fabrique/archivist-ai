@@ -92,22 +92,6 @@ def test_apply_stale_source_skipped():
     assert event.reason == "source_not_found"
 
 
-def test_apply_summary_line_ignored():
-    """La ligne summary de classify (sans uri) est ignorée silencieusement."""
-    src = f"{TARGET}/_Réception/facture.pdf"
-    dest = f"{TARGET}/Mes achats/Mes factures fournisseurs/2026-03/out.pdf"
-    fs = _make_fs(src)
-
-    decisions = [
-        {"scanned": 1, "classified": 1, "unclassified": 0, "failed": 0},  # summary line
-        {"uri": src, "name": "facture.pdf", "status": "classified", "dest_uri": dest},
-    ]
-
-    result = apply(filesystem=fs, decisions=decisions, non_classe_uri=NON_CLASSE)
-
-    assert result.moved == 1
-
-
 def test_apply_missing_dest_uri_fails():
     """Décision classified sans dest_uri → event FAILED."""
     src = f"{TARGET}/_Réception/facture.pdf"

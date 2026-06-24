@@ -21,6 +21,15 @@ logger = logging.getLogger(__name__)
 _SUPPORTED_REFERENTIEL_SCHEMES = {"file", "http", "https"}
 
 
+def _find_role_in_entries(entries: list, role: str) -> str:
+    matches = [e for e in entries if e.role == role]
+    if len(matches) != 1:
+        raise click.UsageError(
+            f"Le référentiel contient {len(matches)} entrée(s) role={role!r} — exactement 1 attendue"
+        )
+    return matches[0].path
+
+
 def _require_referentiel_uri(value: str, param_name: str) -> None:
     if urlparse(value).scheme not in _SUPPORTED_REFERENTIEL_SCHEMES:
         raise click.BadParameter(
@@ -206,16 +215,8 @@ def scan_cmd(referentiel: str | None, root: str | None) -> None:
 
     entries = ref.load_entries()
 
-    def _find_role(role: str) -> str:
-        matches = [e for e in entries if e.role == role]
-        if len(matches) != 1:
-            raise click.UsageError(
-                f"Le référentiel contient {len(matches)} entrée(s) role={role!r} — exactement 1 attendue"
-            )
-        return matches[0].path
-
-    reception_path = _find_role("reception")
-    backup_path = _find_role("conservation_brut")
+    reception_path = _find_role_in_entries(entries, "reception")
+    backup_path = _find_role_in_entries(entries, "conservation_brut")
 
     root_base = root.rstrip("/")
     reception_uri = f"{root_base}/{reception_path}"
@@ -292,19 +293,11 @@ def classify_cmd(referentiel: str | None, root: str | None, llm_name: str | None
     ref = default_registry.resolve("referentiel", "yaml_file", {"uri": referentiel})
     fs = default_registry.resolve("fs", "local", {})
     extractor = default_registry.resolve("metadata", "kreuzberg", {})
-    llm = default_registry.resolve("llm", llm_name if llm_name is not None else "null", {})
+    llm = default_registry.resolve("llm", llm_name or "null", {})
 
     entries = ref.load_entries()
 
-    def _find_role(role: str) -> str:
-        matches = [e for e in entries if e.role == role]
-        if len(matches) != 1:
-            raise click.UsageError(
-                f"Le référentiel contient {len(matches)} entrée(s) role={role!r} — exactement 1 attendue"
-            )
-        return matches[0].path
-
-    reception_path = _find_role("reception")
+    reception_path = _find_role_in_entries(entries, "reception")
     reception_uri = f"{root.rstrip('/')}/{reception_path}"
     if not fs.is_dir(reception_uri):
         raise click.UsageError(
@@ -319,7 +312,6 @@ def classify_cmd(referentiel: str | None, root: str | None, llm_name: str | None
         referentiel=ref,
         extractor=extractor,
         llm=llm,
-        index=NoopIndex(),
     )
     result = uc.run(ClassifyConfig(referentiel_uri=referentiel, target_uri=root))
 
@@ -394,15 +386,7 @@ def apply_cmd(manifest: str, referentiel: str | None, root: str | None) -> None:
 
     entries = ref.load_entries()
 
-    def _find_role(role: str) -> str:
-        matches = [e for e in entries if e.role == role]
-        if len(matches) != 1:
-            raise click.UsageError(
-                f"Le référentiel contient {len(matches)} entrée(s) role={role!r} — exactement 1 attendue"
-            )
-        return matches[0].path
-
-    non_classe_path = _find_role("non_classe")
+    non_classe_path = _find_role_in_entries(entries, "non_classe")
     non_classe_uri = f"{root.rstrip('/')}/{non_classe_path}"
     if not fs.is_dir(non_classe_uri):
         raise click.UsageError(
@@ -416,9 +400,13 @@ def apply_cmd(manifest: str, referentiel: str | None, root: str | None) -> None:
             if not line:
                 continue
             try:
-                decisions.append(json.loads(line))
+                parsed = json.loads(line)
             except json.JSONDecodeError:
                 logger.warning("ligne manifeste ignorée (JSON invalide) : %r", line)
+                continue
+            if not parsed.get("uri"):
+                continue
+            decisions.append(parsed)
 
     result = apply(filesystem=fs, decisions=decisions, non_classe_uri=non_classe_uri)
 
