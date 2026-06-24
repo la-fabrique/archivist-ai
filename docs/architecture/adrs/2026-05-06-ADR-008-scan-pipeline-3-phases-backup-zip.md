@@ -1,7 +1,7 @@
 # ADR-008 : Pipeline scan en 3 phases séquentielles avec backup zip avant traitement
 
 **Date:** 2026-05-06
-**Status:** accepted
+**Status:** superseded by ADR-008 (suppression de la commande scan — remplacée par classify)
 
 ## Context
 

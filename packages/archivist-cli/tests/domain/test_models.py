@@ -1,6 +1,6 @@
 from archivist_cli.domain.models import (
     ClassifyEvent, ClassifyEventStatus, ClassifyResult,
-    FileMetadata, FileNaming, FileNamingField, ReferentielEntry, ScannedFile,
+    FileNaming, FileNamingField, ReferentielEntry,
 )
 
 
@@ -83,27 +83,6 @@ def test_entry_is_not_scaffoldable_when_path_has_placeholder():
         required=True,
     )
     assert entry.is_scaffoldable is False
-
-
-def test_scanned_file_with_metadata():
-    meta: FileMetadata = {
-        "mime_type": "application/pdf",
-        "size_bytes": 1024,
-        "modified_at": "2026-05-04T00:00:00+00:00",
-        "title": "Test",
-        "author": None,
-        "page_count": 2,
-        "language": "fr",
-    }
-    f = ScannedFile(uri="file:///docs/test.pdf", name="test.pdf", metadata=meta)
-    assert f.uri == "file:///docs/test.pdf"
-    assert f.name == "test.pdf"
-    assert f.metadata["mime_type"] == "application/pdf"
-
-
-def test_scanned_file_without_metadata():
-    f = ScannedFile(uri="file:///docs/test.pdf", name="test.pdf", metadata=None)
-    assert f.metadata is None
 
 
 def test_referentiel_entry_loads_file_naming():

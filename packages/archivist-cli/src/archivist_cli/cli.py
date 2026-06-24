@@ -10,7 +10,6 @@ import click
 from archivist_cli.adapters.index.noop import NoopIndex
 from archivist_cli.application.classify import ClassifyConfig, ClassifyUseCase
 from archivist_cli.application.scaffold import scaffold
-from archivist_cli.application.scan import scan
 from archivist_cli.config import AppConfig, install_referentiel, load_config, save_config
 from archivist_cli.registry import default_registry
 
@@ -164,85 +163,6 @@ def scaffold_cmd(
 
     if result.errors > 0:
         raise SystemExit(1)
-
-
-@main.command(name="scan")
-@click.option(
-    "--referentiel",
-    default=None,
-    help="URI du fichier référentiel (file:///path/to/referentiel.yaml).",
-)
-@click.option(
-    "--root",
-    default=None,
-    help="URI du dossier racine de l'archive (file:///path/to/archive).",
-)
-def scan_cmd(referentiel: str | None, root: str | None) -> None:
-    """Scanne _Réception, sauvegarde dans _Conservation brut, extrait les métadonnées."""
-    if referentiel is None or root is None:
-        cfg = load_config()
-        referentiel = referentiel or cfg.referentiel
-        root = root or cfg.root
-    if referentiel is None:
-        raise click.UsageError(
-            "--referentiel manquant. Configurez-le avec :\n"
-            "  archivist config set referentiel file:///path/to/referentiel.yaml"
-        )
-    if root is None:
-        raise click.UsageError(
-            "--root manquant. Configurez-le avec :\n"
-            "  archivist config set root file:///path/to/archive"
-        )
-    _require_file_uri(referentiel, "referentiel")
-    _require_file_uri(root, "root")
-
-    ref = default_registry.resolve("referentiel", "yaml_file", {"uri": referentiel})
-    fs = default_registry.resolve("fs", "local", {})
-    extractor = default_registry.resolve("metadata", "kreuzberg", {})
-
-    entries = ref.load_entries()
-
-    def _find_role(role: str) -> str:
-        matches = [e for e in entries if e.role == role]
-        if len(matches) != 1:
-            raise click.UsageError(
-                f"Le référentiel contient {len(matches)} entrée(s) role={role!r} — exactement 1 attendue"
-            )
-        return matches[0].path
-
-    reception_path = _find_role("reception")
-    backup_path = _find_role("conservation_brut")
-
-    root_base = root.rstrip("/")
-    reception_uri = f"{root_base}/{reception_path}"
-    backup_uri = f"{root_base}/{backup_path}"
-
-    if not fs.is_dir(reception_uri):
-        raise click.UsageError(
-            f"Dossier _Réception introuvable à {reception_uri!r} — lancez scaffold d'abord"
-        )
-    if not fs.is_dir(backup_uri):
-        raise click.UsageError(
-            f"Dossier _Conservation brut introuvable à {backup_uri!r} — lancez scaffold d'abord"
-        )
-
-    result = scan(filesystem=fs, reception_uri=reception_uri, backup_uri=backup_uri, extractor=extractor, index=NoopIndex())
-
-    logger.info("scan terminé : %d fichier(s) traité(s)", len(result.files))
-    files_out = [
-        {
-            "name": f.name,
-            "uri": f.uri,
-            "metadata": dict(f.metadata) if f.metadata is not None else None,
-        }
-        for f in result.files
-    ]
-    click.echo(json.dumps({
-        "scanned": len(result.files),
-        "backed_up": result.backed_up,
-        "deleted": result.deleted,
-        "files": files_out,
-    }))
 
 
 @main.command(name="classify")
