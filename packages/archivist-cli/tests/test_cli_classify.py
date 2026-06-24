@@ -157,8 +157,8 @@ def test_classify_nominal(tmp_path: Path):
         ]
         result = runner.invoke(main, [
             "classify",
-            "--referentiel", f"file://{ref_path}",
-            "--root", f"file://{target}",
+            "--referentiel", ref_path.as_uri(),
+            "--root", target.as_uri(),
             "--llm", "claude-cli",
         ])
 
@@ -195,8 +195,8 @@ def test_classify_llm_uncertain(tmp_path: Path):
         runner = CliRunner()
         result = runner.invoke(main, [
             "classify",
-            "--referentiel", f"file://{ref_path}",
-            "--root", f"file://{target}",
+            "--referentiel", ref_path.as_uri(),
+            "--root", target.as_uri(),
             "--llm", "claude-cli",
         ])
 
