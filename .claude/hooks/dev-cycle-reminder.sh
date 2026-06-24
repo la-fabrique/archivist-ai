@@ -7,12 +7,12 @@ branch=$(git branch --show-current 2>/dev/null)
 [ -n "$branch" ] || exit 0
 [ "$branch" != "main" ] && [ "$branch" != "master" ] || exit 0
 
-cleanup="Dev cycle reminder: invoke /simplify on changed code, then launch the harness-cleaner agent to archive plans and harvest learnings."
+cleanup="Séquence obligatoire de fin de feature : (1) invoke /simplify sur le code modifié — attendre la fin avant de continuer ; (2) committer les changements de simplification si présents ; (3) git push de la branche ; (4) gh pr create pour ouvrir la PR ; (5) lancer le harness-cleaner agent si docs/superpowers/ contient des fichiers liés à la feature."
 
 if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
   msg="HARNAIS: modifications non committées sur '${branch}'. Tu DOIS committer ton travail avant de terminer la session — ne jamais laisser de travail non committé. Ensuite : ${cleanup}"
 else
-  msg="$cleanup"
+  msg="HARNAIS: branche '${branch}' — implémentation terminée. ${cleanup}"
 fi
 
 if command -v jq &>/dev/null; then
