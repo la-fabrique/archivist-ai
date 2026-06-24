@@ -25,6 +25,8 @@ dist-ssr
 *.sw?
 
 client_secret.json
+.env
+.env.*
 
 # Python
 .venv/
