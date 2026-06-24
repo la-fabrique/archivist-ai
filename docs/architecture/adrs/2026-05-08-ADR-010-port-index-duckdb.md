@@ -5,7 +5,7 @@
 
 ## Context
 
-Le pipeline `scan` extrait désormais le texte brut des documents via `ExtractionResult`. Ce texte doit être persisté pour une future recherche plein-texte BM25, sans bloquer le scan si l'indexation échoue.
+La commande `classify` extrait le texte brut des documents via `ExtractionResult`. Ce texte doit être persisté pour une future recherche plein-texte BM25, sans bloquer le classement si l'indexation échoue.
 
 ## Decision
 
@@ -14,6 +14,6 @@ Ajouter un port `Index` minimal (`index_document(uri, content, metadata) -> None
 ## Consequences
 
 - `Index` est un port du domaine : aucun import DuckDB hors de `adapters/index/duckdb.py`.
-- `scan` attrape `IndexError` en avertissement et ne l'interrompt pas — l'indexation est best-effort.
+- `classify` attrape `IndexError` en avertissement et ne l'interrompt pas — l'indexation est best-effort.
 - Le CLI passe `NoopIndex()` par défaut ; activer `DuckDbIndex` nécessite une modification de `cli.py`.
 - Tout nouvel adaptateur d'index doit passer `IndexContractSuite` dans `tests/adapters/test_contracts.py`.

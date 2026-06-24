@@ -82,14 +82,6 @@ archivist classify --source file:///chemin/vers/inbox/facture.pdf
 
 Archivist lit le contenu (OCR inclus), identifie le type de document, et propose un emplacement. Il demande confirmation avant d'agir sur les cas ambigus.
 
-### 3. Scanner un dossier entier (`scan`)
-
-Traite tous les fichiers d'un dossier en une passe :
-
-```bash
-archivist scan --source file:///chemin/vers/inbox
-```
-
 ## Pour les développeurs et contributeurs
 
 - [Architecture technique](docs/architecture/index.md) — vue d'ensemble, packages, conventions

@@ -25,31 +25,6 @@ Index/DB des décisions, validation humaine, cache OCR/LLM, profils de configura
 
 ## 2. Pipeline & contrats des étapes
 
-### État actuel — `scan` (use case implémenté)
-
-La commande `scan` couvre la réception et la mise en conservation brute. Elle opère sur deux dossiers du référentiel identifiés par leur `role` : `reception` et `conservation_brut`.
-
-```
-        ┌──────────┐   ┌──────────────┐   ┌───────────────────┐   ┌────────────┐
-source ─►  Ingest  ├──►│  Backup ZIP  ├──►│ MetadataExtract   ├──►│   Delete   │
-(_Réception)       │   │(_Cons. brut) │   │   (async ×4)      │   │ (source)   │
-        └────┬─────┘   └──────┬───────┘   └────────┬──────────┘   └─────┬──────┘
-             │                │                     │                    │
-            FS               FS                MetadataExtractor        FS
-                                               (kreuzberg)
-```
-
-| Phase | Entrée | Sortie | Port(s) sollicité(s) |
-|---|---|---|---|
-| Ingest | URI `_Réception` | liste d'URIs fichiers | `Filesystem.list_files` |
-| Backup ZIP | URI fichier source | archive `.zip` horodatée dans `_Conservation brut` | `Filesystem.zip_file` |
-| MetadataExtract | URI fichier source | `FileMetadata` (mime, taille, titre, auteur, pages, langue) | `MetadataExtractor` |
-| Delete | URI fichier source | suppression du fichier de réception | `Filesystem.delete_file` |
-
-Résultat agrégé : `ScanResult(files: list[ScannedFile], backed_up: int, deleted: int)`.
-
-> Les phases Backup et Delete sont synchrones ; MetadataExtract est asynchrone (semaphore ×4 concurrent).
-
 ### `classify` ✓ implémenté
 
 ```
@@ -89,8 +64,7 @@ Trois cercles concentriques, façon hexagonale.
 ┌──────────────────────────────────────────────────────┐
 │  Frontière CLI  (Click)                              │
 │  ┌────────────────────────────────────────────────┐  │
-│  │  Application  (use cases : classify/scaffold/  │  │
-│  │                scan)                           │  │
+│  │  Application  (use cases : classify/scaffold)   │  │
 │  │  ┌──────────────────────────────────────────┐  │  │
 │  │  │  Domain  (entités + ports = ABC)         │  │  │
 │  │  │  FileMetadata, ExtractionResult, …       │  │  │
@@ -117,7 +91,7 @@ Trois cercles concentriques, façon hexagonale.
 
 ```
 domain/          ports.py, models.py
-application/     scan.py, scaffold.py, classify.py
+application/     scaffold.py, classify.py
 adapters/
   fs/            local.py
   metadata/      kreuzberg.py
@@ -197,7 +171,6 @@ archivist <commande> [--source URI] [--target URI]
 ```
 
 ### Commandes implémentées
-- `archivist scan` — réception → backup ZIP dans `_Conservation brut` → extraction métadonnées (kreuzberg async ×4) → suppression source.
 - `archivist scaffold` — crée l'arborescence cible à partir du référentiel.
 - `archivist classify` — backup → extraction métadonnées → classement LLM → renommage + déplacement.
 - `archivist config set {referentiel|root|llm}` / `archivist config show` — gestion de la config persistante.
