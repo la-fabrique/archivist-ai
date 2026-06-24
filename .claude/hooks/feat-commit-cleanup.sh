@@ -27,10 +27,11 @@ if ! echo "$RESPONSE" | grep -qE '^\[.+ [0-9a-f]{7,}\]'; then exit 0; fi
 LAST_MSG=$(git log -1 --pretty=%s 2>/dev/null)
 
 if echo "$LAST_MSG" | grep -qE "^(feat|fix|refactor)\("; then
-  jq -n --arg msg "$LAST_MSG" '{
+  SEQUENCE="HARNAIS OBLIGATOIRE: commit detecte -- ${LAST_MSG}. Sequence a enchainer MAINTENANT : 1) invoke /simplify ; 2) mettre a jour README, docs/architecture/, ADRs et docs/features/ pour refléter l'etat du code -- supprimer les fichiers ADR et .feature des elements supprimes, ne pas les garder en superseded ; 3) committer tous les changements ; 4) git push ; 5) gh pr create. Si feat() : aussi lancer le harness-cleaner agent."
+  jq -n --arg ctx "$SEQUENCE" '{
     "hookSpecificOutput": {
       "hookEventName": "PostToolUse",
-      "additionalContext": ("HARNAIS OBLIGATOIRE: commit détecté — \"" + $msg + "\". Séquence à enchaîner MAINTENANT sans attendre : 1) invoke /simplify sur le code modifié ; 2) mettre à jour README, docs/architecture/, ADRs et docs/features/ pour refléter l'état du code — supprimer les fichiers ADR et .feature des éléments supprimés, ne pas les garder en superseded ; 3) committer tous les changements ; 4) git push de la branche courante ; 5) gh pr create pour ouvrir la PR. Si feat() : aussi lancer le harness-cleaner agent.")
+      "additionalContext": $ctx
     }
   }'
 fi
