@@ -29,6 +29,8 @@
       "Bash(git reset *)",
       "Bash(git worktree *)",
       "Bash(git push *)",
+      "Bash(npm install *)",
+      "Bash(python3 *)",
       "Bash(curl *)",
       "Bash(gh pr *)",
       "Bash(gh api *)"      
@@ -43,7 +45,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/referentiel-guard.sh"
+            "command": "bash -c 'cd \"$(git rev-parse --show-toplevel 2>/dev/null || echo /workspace)\" && .claude/hooks/referentiel-guard.sh'"
           }
         ]
       },
@@ -52,7 +54,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/no-commit-on-main.sh"
+            "command": "bash -c 'cd \"$(git rev-parse --show-toplevel 2>/dev/null || echo /workspace)\" && .claude/hooks/no-commit-on-main.sh'"
           }
         ]
       }
@@ -63,11 +65,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/commit-lint.sh"
+            "command": "bash -c 'cd \"$(git rev-parse --show-toplevel 2>/dev/null || echo /workspace)\" && .claude/hooks/commit-lint.sh'"
           },
           {
             "type": "command",
-            "command": ".claude/hooks/feat-commit-cleanup.sh"
+            "command": "bash -c 'cd \"$(git rev-parse --show-toplevel 2>/dev/null || echo /workspace)\" && .claude/hooks/feat-commit-cleanup.sh'"
           }
         ]
       },
@@ -76,7 +78,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".harness/scripts/skill-trace.sh"
+            "command": "bash -c 'cd \"$(git rev-parse --show-toplevel 2>/dev/null || echo /workspace)\" && .harness/scripts/skill-trace.sh'"
           }
         ]
       }
@@ -86,7 +88,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".harness/scripts/session-start.sh",
+            "command": "bash -c 'cd \"$(git rev-parse --show-toplevel 2>/dev/null || echo /workspace)\" && .harness/scripts/session-start.sh'",
             "timeout": 15
           }
         ]
@@ -123,7 +125,7 @@
       }
     },
     "pm-skills": {
-      "source": { 
+      "source": {
         "source": "github",
         "repo": "phuryn/pm-skills"
       }
