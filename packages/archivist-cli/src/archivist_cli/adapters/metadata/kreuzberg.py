@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import ClassVar
 from urllib.parse import urlparse
+from urllib.request import url2pathname
 
 from kreuzberg import extract_file_sync
 
@@ -20,7 +21,7 @@ class KreuzbergMetadataExtractor(MetadataExtractor):
             raise MetadataExtractorError(
                 f"unsupported scheme: {parsed.scheme!r} — expected file://"
             )
-        path = Path(parsed.path)
+        path = Path(url2pathname(parsed.path))
         if not path.exists():
             raise MetadataExtractorError(f"file not found: {path}")
         try:

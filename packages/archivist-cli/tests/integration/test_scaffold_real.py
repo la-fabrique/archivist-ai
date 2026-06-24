@@ -22,8 +22,8 @@ def test_scaffold_with_real_referentiel(tmp_path: Path):
     runner = CliRunner()
     result = runner.invoke(main, [
         "scaffold",
-        "--referentiel", f"file://{REFERENTIEL_PATH}",
-        "--root", f"file://{target}",
+        "--referentiel", REFERENTIEL_PATH.as_uri(),
+        "--root", target.as_uri(),
     ])
 
     assert result.exit_code == 0, result.output
@@ -52,8 +52,8 @@ def test_scaffold_all_options(tmp_path: Path):
     runner = CliRunner()
     result = runner.invoke(main, [
         "scaffold",
-        "--referentiel", f"file://{REFERENTIEL_PATH}",
-        "--root", f"file://{target}",
+        "--referentiel", REFERENTIEL_PATH.as_uri(),
+        "--root", target.as_uri(),
         "--option", "assurances",
         "--option", "dirigeant-assimile-salarie",
     ])

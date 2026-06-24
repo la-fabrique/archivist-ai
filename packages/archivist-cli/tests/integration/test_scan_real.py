@@ -30,8 +30,8 @@ def test_scan_real_lists_files(archive_dir: tuple[Path, Path]):
 
     result = scan(
         filesystem=fs,
-        reception_uri=f"file://{reception}",
-        backup_uri=f"file://{backup}",
+        reception_uri=reception.as_uri(),
+        backup_uri=backup.as_uri(),
         extractor=extractor,
         index=NoopIndex(),
     )
@@ -49,8 +49,8 @@ def test_scan_real_files_have_metadata(archive_dir: tuple[Path, Path]):
 
     result = scan(
         filesystem=fs,
-        reception_uri=f"file://{reception}",
-        backup_uri=f"file://{backup}",
+        reception_uri=reception.as_uri(),
+        backup_uri=backup.as_uri(),
         extractor=extractor,
         index=NoopIndex(),
     )
@@ -69,8 +69,8 @@ def test_scan_real_non_recursive(archive_dir: tuple[Path, Path]):
 
     result = scan(
         filesystem=fs,
-        reception_uri=f"file://{reception}",
-        backup_uri=f"file://{backup}",
+        reception_uri=reception.as_uri(),
+        backup_uri=backup.as_uri(),
         extractor=extractor,
         index=NoopIndex(),
     )
@@ -86,8 +86,8 @@ def test_scan_real_creates_zip_backup(archive_dir: tuple[Path, Path]):
 
     result = scan(
         filesystem=fs,
-        reception_uri=f"file://{reception}",
-        backup_uri=f"file://{backup}",
+        reception_uri=reception.as_uri(),
+        backup_uri=backup.as_uri(),
         extractor=extractor,
         index=NoopIndex(),
     )
@@ -104,8 +104,8 @@ def test_scan_real_deletes_from_reception(archive_dir: tuple[Path, Path]):
 
     result = scan(
         filesystem=fs,
-        reception_uri=f"file://{reception}",
-        backup_uri=f"file://{backup}",
+        reception_uri=reception.as_uri(),
+        backup_uri=backup.as_uri(),
         extractor=extractor,
         index=NoopIndex(),
     )
