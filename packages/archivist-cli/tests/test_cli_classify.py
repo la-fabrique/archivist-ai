@@ -103,6 +103,7 @@ def test_classify_missing_scaffold_dirs(tmp_path: Path):
 
 def test_classify_uses_config_when_no_args(tmp_path: Path, monkeypatch):
     monkeypatch.setattr("archivist_cli.config.app_data_dir", lambda: tmp_path / "app")
+    monkeypatch.setattr("archivist_cli.adapters.audit.sqlite_local.app_data_dir", lambda: tmp_path / "app")
     ref_path, target = _setup(tmp_path)
     from archivist_cli.config import AppConfig, save_config
     save_config(
