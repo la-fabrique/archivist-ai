@@ -26,6 +26,8 @@ class AdapterRegistry:
 
 
 def _build_default_registry() -> AdapterRegistry:
+    from archivist_cli.adapters.audit.noop import NoopAuditLog
+    from archivist_cli.adapters.audit.sqlite_local import SqliteAuditLog
     from archivist_cli.adapters.fs.local import LocalFilesystem
     from archivist_cli.adapters.llm.claude_cli import ClaudeCliLlm
     from archivist_cli.adapters.metadata.kreuzberg import KreuzbergMetadataExtractor
@@ -39,6 +41,8 @@ def _build_default_registry() -> AdapterRegistry:
     )
     registry.register("metadata", "kreuzberg", lambda config: KreuzbergMetadataExtractor())
     registry.register("llm", "claude-cli", lambda config: ClaudeCliLlm())
+    registry.register("audit", "sqlite_local", lambda config: SqliteAuditLog())
+    registry.register("audit", "noop", lambda config: NoopAuditLog())
     return registry
 
 
