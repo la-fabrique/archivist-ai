@@ -125,7 +125,9 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "jq -r '\"[\" + .model.display_name + \"] \" + (.context_window.used_percentage // 0) + \"% context\"'"
+    "command": "bash /workspace/.claude/statusline-command.sh",
+    "padding": 0,
+    "refreshInterval": 10
   },
   "enabledPlugins": {
     "superpowers@claude-plugins-official": false,
