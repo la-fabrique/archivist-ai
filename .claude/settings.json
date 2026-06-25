@@ -44,6 +44,8 @@
       "Bash(git show *)",
       "Bash(git stash *)",
       "Bash(python3 *)",
+      "Bash(find *)",
+      "Bash(ls *)",
       "Bash(curl *)",
       "Bash(gh pr *)",
       "Bash(gh api *)",
