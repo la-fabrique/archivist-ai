@@ -251,8 +251,10 @@ def classify_cmd(referentiel: str | None, root: str | None, llm_name: str | None
             row["dest_name"] = event.dest_name
         if event.dest_uri is not None:
             row["dest_uri"] = event.dest_uri
-        if event.reason is not None:
-            row["reason"] = event.reason
+        if event.error_code is not None:
+            row["error_code"] = event.error_code
+        if event.llm_reason is not None:
+            row["llm_reason"] = event.llm_reason
         click.echo(json.dumps(row, ensure_ascii=False))
 
     summary = {

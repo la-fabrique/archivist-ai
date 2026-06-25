@@ -85,7 +85,8 @@ class ClassifyUseCase:
             return ClassifyEvent(
                 uri=file_uri, name=name,
                 status=ClassifyEventStatus.FAILED,
-                reason=f"backup_error: {exc}",
+                error_code="backup_error",
+                llm_reason=str(exc),
             )
 
         # Step 2: metadata + text extraction
@@ -96,7 +97,8 @@ class ClassifyUseCase:
             return ClassifyEvent(
                 uri=file_uri, name=name,
                 status=ClassifyEventStatus.FAILED,
-                reason=f"metadata_error: {exc}",
+                error_code="metadata_error",
+                llm_reason=str(exc),
             )
 
         text_excerpt = extraction.content[:3000]
@@ -129,18 +131,20 @@ class ClassifyUseCase:
             return ClassifyEvent(
                 uri=file_uri, name=name,
                 status=ClassifyEventStatus.FAILED,
-                reason=f"llm_error: {exc}",
+                error_code="llm_error",
+                llm_reason=str(exc),
             )
 
         entry_id: str | None = classification.get("entry_id")
-        llm_reason: str = classification.get("reason", "")
+        llm_reason_text: str = classification.get("reason", "")
 
         if entry_id is None:
             _move_best_effort(self._fs, file_uri, f"{non_classe_uri}/{name}")
             return ClassifyEvent(
                 uri=file_uri, name=name,
                 status=ClassifyEventStatus.UNCLASSIFIED,
-                reason=f"llm_uncertain: {llm_reason}",
+                error_code="llm_uncertain",
+                llm_reason=llm_reason_text,
             )
 
         entry = next((e for e in classifiable if e.id == entry_id), None)
@@ -149,7 +153,8 @@ class ClassifyUseCase:
             return ClassifyEvent(
                 uri=file_uri, name=name,
                 status=ClassifyEventStatus.FAILED,
-                reason=f"llm_error: unknown entry_id {entry_id!r}",
+                error_code="llm_error",
+                llm_reason=f"unknown entry_id {entry_id!r}",
             )
 
         # Step 4: LLM extract fields
@@ -176,7 +181,8 @@ class ClassifyUseCase:
             return ClassifyEvent(
                 uri=file_uri, name=name,
                 status=ClassifyEventStatus.FAILED,
-                reason=f"llm_error: {exc}",
+                error_code="llm_error",
+                llm_reason=str(exc),
             )
 
         # Step 5: apply
@@ -189,7 +195,8 @@ class ClassifyUseCase:
             return ClassifyEvent(
                 uri=file_uri, name=name,
                 status=ClassifyEventStatus.FAILED,
-                reason=f"apply_error: {exc}",
+                error_code="apply_error",
+                llm_reason=str(exc),
             )
 
         return ClassifyEvent(

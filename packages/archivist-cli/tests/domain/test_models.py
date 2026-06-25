@@ -134,8 +134,8 @@ def test_referentiel_entry_without_file_naming():
 def test_classify_result_counts():
     events = [
         ClassifyEvent(uri="a", name="a.pdf", status=ClassifyEventStatus.CLASSIFIED, entry_id="x", dest_name="y.pdf", dest_uri="file:///y.pdf"),
-        ClassifyEvent(uri="b", name="b.pdf", status=ClassifyEventStatus.UNCLASSIFIED, reason="unknown"),
-        ClassifyEvent(uri="c", name="c.pdf", status=ClassifyEventStatus.FAILED, reason="error"),
+        ClassifyEvent(uri="b", name="b.pdf", status=ClassifyEventStatus.UNCLASSIFIED, error_code="unknown"),
+        ClassifyEvent(uri="c", name="c.pdf", status=ClassifyEventStatus.FAILED, error_code="error"),
     ]
     result = ClassifyResult(events=events)
     assert result.scanned == 3

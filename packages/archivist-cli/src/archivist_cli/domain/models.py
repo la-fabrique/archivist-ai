@@ -98,7 +98,8 @@ class ClassifyEvent:
     entry_id: str | None = None
     dest_name: str | None = None
     dest_uri: str | None = None
-    reason: str | None = None
+    error_code: str | None = None
+    llm_reason: str | None = None
 
 
 @dataclass(frozen=True)
