@@ -41,7 +41,7 @@ Scenario: LLM incertain — fichier déplacé dans _Non classé
   And le LLM retourne "entry_id": null avec une raison d'incertitude
   When l'utilisateur exécute "archivist classify --referentiel ... --target ... --llm claude-cli"
   Then la sortie stdout contient une ligne JSON avec "status": "unclassified"
-  And la ligne JSON contient "reason" commençant par "llm_uncertain:"
+  And la ligne JSON contient "error_code": "llm_uncertain"
   And le fichier est déplacé dans "_Non classé"
   And le fichier n'est plus présent dans "_Réception"
   And "_Conservation brut" contient une archive zip du fichier original
@@ -52,7 +52,7 @@ Scenario: Erreur lors du backup — fichier reste dans _Réception
   And le système de fichiers ne peut pas créer d'archive dans "_Conservation brut"
   When l'utilisateur exécute "archivist classify --referentiel ... --target ... --llm claude-cli"
   Then la sortie stdout contient une ligne JSON avec "status": "failed"
-  And la ligne JSON contient "reason" commençant par "backup_error:"
+  And la ligne JSON contient "error_code": "backup_error"
   And le fichier "facture.pdf" est toujours présent dans "_Réception"
   And le fichier n'est pas déplacé dans "_Non classé"
   And le résumé final contient "failed": 1
@@ -63,7 +63,7 @@ Scenario: Erreur d'extraction de métadonnées — fichier déplacé dans _Non c
   And l'extracteur de métadonnées échoue sur ce fichier
   When l'utilisateur exécute "archivist classify --referentiel ... --target ... --llm claude-cli"
   Then la sortie stdout contient une ligne JSON avec "status": "failed"
-  And la ligne JSON contient "reason" commençant par "metadata_error:"
+  And la ligne JSON contient "error_code": "metadata_error"
   And le fichier est déplacé dans "_Non classé"
   And "_Conservation brut" contient une archive zip du fichier original
 
@@ -72,7 +72,7 @@ Scenario: Erreur LLM — fichier déplacé dans _Non classé
   And le LLM échoue (timeout ou sortie non JSON)
   When l'utilisateur exécute "archivist classify --referentiel ... --target ... --llm claude-cli"
   Then la sortie stdout contient une ligne JSON avec "status": "failed"
-  And la ligne JSON contient "reason" commençant par "llm_error:"
+  And la ligne JSON contient "error_code": "llm_error"
   And le fichier est déplacé dans "_Non classé"
 
 Scenario: Traitement best-effort — une erreur n'arrête pas les autres fichiers
