@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import json
 import logging
+from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlparse
+from uuid import uuid4
 
 import click
 
@@ -11,6 +13,8 @@ from archivist_cli.adapters.index.noop import NoopIndex
 from archivist_cli.application.classify import ClassifyConfig, ClassifyUseCase
 from archivist_cli.application.scaffold import scaffold
 from archivist_cli.config import AppConfig, install_referentiel, load_config, save_config
+from archivist_cli.domain.models import AuditSession
+from archivist_cli.domain.ports import AuditLogError
 from archivist_cli.registry import default_registry
 
 logger = logging.getLogger(__name__)
@@ -237,7 +241,28 @@ def classify_cmd(referentiel: str | None, root: str | None, llm_name: str | None
         llm=llm,
         index=NoopIndex(),
     )
+
+    started_at = datetime.now(timezone.utc).isoformat()
     result = uc.run(ClassifyConfig(referentiel_uri=referentiel, target_uri=root))
+    ended_at = datetime.now(timezone.utc).isoformat()
+
+    audit_log = default_registry.resolve("audit", "sqlite_local", {})
+    audit_session = AuditSession(
+        session_id=str(uuid4()),
+        started_at=started_at,
+        ended_at=ended_at,
+        referentiel_uri=referentiel,
+        root_uri=root,
+        events=tuple(result.events),
+        scanned=result.scanned,
+        classified=result.classified,
+        unclassified=result.unclassified,
+        failed=result.failed,
+    )
+    try:
+        audit_log.write(audit_session)
+    except AuditLogError as e:
+        logger.warning("audit non persisté : %s", e)
 
     for event in result.events:
         row = {
@@ -251,8 +276,10 @@ def classify_cmd(referentiel: str | None, root: str | None, llm_name: str | None
             row["dest_name"] = event.dest_name
         if event.dest_uri is not None:
             row["dest_uri"] = event.dest_uri
-        if event.reason is not None:
-            row["reason"] = event.reason
+        if event.error_code is not None:
+            row["error_code"] = event.error_code
+        if event.llm_reason is not None:
+            row["llm_reason"] = event.llm_reason
         click.echo(json.dumps(row, ensure_ascii=False))
 
     summary = {

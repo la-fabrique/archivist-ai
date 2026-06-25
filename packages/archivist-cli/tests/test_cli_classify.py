@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import sqlite3
 import textwrap
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -102,6 +103,7 @@ def test_classify_missing_scaffold_dirs(tmp_path: Path):
 
 def test_classify_uses_config_when_no_args(tmp_path: Path, monkeypatch):
     monkeypatch.setattr("archivist_cli.config.app_data_dir", lambda: tmp_path / "app")
+    monkeypatch.setattr("archivist_cli.adapters.audit.sqlite_local.app_data_dir", lambda: tmp_path / "app")
     ref_path, target = _setup(tmp_path)
     from archivist_cli.config import AppConfig, save_config
     save_config(
@@ -116,7 +118,8 @@ def test_classify_uses_config_when_no_args(tmp_path: Path, monkeypatch):
     assert summary["scanned"] == 0
 
 
-def test_classify_empty_reception(tmp_path: Path):
+def test_classify_empty_reception(tmp_path: Path, monkeypatch):
+    monkeypatch.setattr("archivist_cli.adapters.audit.sqlite_local.app_data_dir", lambda: tmp_path / "app")
     ref_path, target = _setup(tmp_path)
     runner = CliRunner()
     result = runner.invoke(main, [
@@ -132,7 +135,8 @@ def test_classify_empty_reception(tmp_path: Path):
     assert summary["failed"] == 0
 
 
-def test_classify_nominal(tmp_path: Path):
+def test_classify_nominal(tmp_path: Path, monkeypatch):
+    monkeypatch.setattr("archivist_cli.adapters.audit.sqlite_local.app_data_dir", lambda: tmp_path / "app")
     ref_path, target = _setup(tmp_path)
     src_file = target / "_Réception" / "facture.pdf"
     src_file.write_bytes(b"%PDF-1.4 fake content")
@@ -176,7 +180,8 @@ def test_classify_nominal(tmp_path: Path):
     assert any((target / "Factures").rglob("*.pdf"))
 
 
-def test_classify_llm_uncertain(tmp_path: Path):
+def test_classify_llm_uncertain(tmp_path: Path, monkeypatch):
+    monkeypatch.setattr("archivist_cli.adapters.audit.sqlite_local.app_data_dir", lambda: tmp_path / "app")
     ref_path, target = _setup(tmp_path)
     src_file = target / "_Réception" / "doc_inconnu.pdf"
     src_file.write_bytes(b"%PDF-1.4 content")
@@ -209,3 +214,25 @@ def test_classify_llm_uncertain(tmp_path: Path):
     # fichier déplacé vers _Non classé
     assert not src_file.exists()
     assert (target / "_Non classé" / "doc_inconnu.pdf").exists()
+
+
+def test_classify_audit_persisted(tmp_path: Path, monkeypatch):
+    """Après classify, une session est persistée dans audit.db."""
+    monkeypatch.setattr("archivist_cli.config.app_data_dir", lambda: tmp_path / "app")
+    monkeypatch.setattr("archivist_cli.adapters.audit.sqlite_local.app_data_dir", lambda: tmp_path / "app")
+    ref_path, target = _setup(tmp_path)
+    runner = CliRunner()
+    result = runner.invoke(main, [
+        "classify",
+        "--referentiel", ref_path.as_uri(),
+        "--root", target.as_uri(),
+        "--llm", "claude-cli",
+    ])
+    assert result.exit_code == 0
+    db_path = tmp_path / "app" / "audit.db"
+    assert db_path.exists()
+    con = sqlite3.connect(db_path)
+    rows = con.execute("SELECT scanned FROM audit_sessions").fetchall()
+    con.close()
+    assert len(rows) == 1
+    assert rows[0][0] == 0  # _Réception vide

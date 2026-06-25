@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import ClassVar
 
-from archivist_cli.domain.models import ExtractionResult, FileMetadata, ReferentielEntry
+from archivist_cli.domain.models import AuditSession, ExtractionResult, FileMetadata, ReferentielEntry
 
 
 class ReferentielError(Exception):
@@ -117,5 +117,21 @@ class LanguageModel(ABC):
         """Envoie un prompt et retourne un dict structuré conforme au schéma.
 
         Lève LlmError si l'appel échoue ou si la sortie ne peut pas être parsée.
+        """
+        ...
+
+
+class AuditLogError(Exception):
+    pass
+
+
+class AuditLog(ABC):
+    VERSION: ClassVar[int] = 1
+
+    @abstractmethod
+    def write(self, session: AuditSession) -> None:
+        """Persiste une session d'audit complète (événements + résumé).
+
+        Lève AuditLogError si l'écriture échoue.
         """
         ...

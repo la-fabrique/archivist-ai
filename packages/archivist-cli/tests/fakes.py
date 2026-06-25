@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import ClassVar
 
-from archivist_cli.domain.models import ExtractionResult, FileMetadata, ReferentielEntry
+from archivist_cli.domain.models import AuditSession, ExtractionResult, FileMetadata, ReferentielEntry
 from archivist_cli.domain.ports import (
-    Filesystem, FilesystemError, Index, IndexError,
+    AuditLog, Filesystem, FilesystemError, Index, IndexError,
     LanguageModel, LlmError, MetadataExtractor, MetadataExtractorError, Referentiel,
 )
 
@@ -133,3 +133,13 @@ class FakeLlm(LanguageModel):
         if idx < len(self._responses):
             return self._responses[idx]
         raise LlmError(f"FakeLlm has no response for call #{idx}")
+
+
+class FakeAuditLog(AuditLog):
+    VERSION: ClassVar[int] = 1
+
+    def __init__(self) -> None:
+        self.written: list[AuditSession] = []
+
+    def write(self, session: AuditSession) -> None:
+        self.written.append(session)

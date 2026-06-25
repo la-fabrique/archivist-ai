@@ -104,7 +104,8 @@ def test_classify_llm_returns_null_goes_to_non_classe():
 
     event = result.events[0]
     assert event.status == ClassifyEventStatus.UNCLASSIFIED
-    assert "llm_uncertain" in event.reason
+    assert event.error_code == "llm_uncertain"
+    assert event.llm_reason == "type de document inconnu"
     assert fs.exists(f"{TARGET}/_Non classé/unknown.pdf")
     assert not fs.exists(f"{TARGET}/_Réception/unknown.pdf")
 
@@ -129,7 +130,7 @@ def test_classify_backup_failure_file_stays_in_reception():
 
     event = result.events[0]
     assert event.status == ClassifyEventStatus.FAILED
-    assert "backup_error" in event.reason
+    assert event.error_code == "backup_error"
     assert fs.exists(f"{TARGET}/_Réception/facture.pdf")
 
 
@@ -144,7 +145,7 @@ def test_classify_metadata_error_goes_to_non_classe():
 
     event = result.events[0]
     assert event.status == ClassifyEventStatus.FAILED
-    assert "metadata_error" in event.reason
+    assert event.error_code == "metadata_error"
     assert fs.exists(f"{TARGET}/_Non classé/broken.pdf")
     assert not fs.exists(f"{TARGET}/_Réception/broken.pdf")
 
@@ -160,7 +161,7 @@ def test_classify_llm_error_on_classify_goes_to_non_classe():
 
     event = result.events[0]
     assert event.status == ClassifyEventStatus.FAILED
-    assert "llm_error" in event.reason
+    assert event.error_code == "llm_error"
     assert fs.exists(f"{TARGET}/_Non classé/facture.pdf")
 
 
@@ -178,7 +179,7 @@ def test_classify_llm_error_on_extract_fields_goes_to_non_classe():
 
     event = result.events[0]
     assert event.status == ClassifyEventStatus.FAILED
-    assert "llm_error" in event.reason
+    assert event.error_code == "llm_error"
     assert fs.exists(f"{TARGET}/_Non classé/facture.pdf")
 
 

@@ -98,7 +98,8 @@ class ClassifyEvent:
     entry_id: str | None = None
     dest_name: str | None = None
     dest_uri: str | None = None
-    reason: str | None = None
+    error_code: str | None = None
+    llm_reason: str | None = None
 
 
 @dataclass(frozen=True)
@@ -120,3 +121,17 @@ class ClassifyResult:
     @property
     def failed(self) -> int:
         return sum(1 for e in self.events if e.status == ClassifyEventStatus.FAILED)
+
+
+@dataclass(frozen=True)
+class AuditSession:
+    session_id: str
+    started_at: str
+    ended_at: str
+    referentiel_uri: str
+    root_uri: str
+    events: tuple[ClassifyEvent, ...]
+    scanned: int
+    classified: int
+    unclassified: int
+    failed: int

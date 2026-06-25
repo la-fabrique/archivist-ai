@@ -13,9 +13,9 @@ from archivist_cli.adapters.fs.local import LocalFilesystem
 from archivist_cli.adapters.index.duckdb import DuckDbIndex
 from archivist_cli.adapters.index.noop import NoopIndex
 from archivist_cli.adapters.referentiel.yaml_file import YamlFileReferentiel
-from archivist_cli.domain.ports import Filesystem, FilesystemError, Index, IndexError, MetadataExtractor, MetadataExtractorError, Referentiel
+from archivist_cli.domain.models import AuditSession, ClassifyEvent, ClassifyEventStatus, ExtractionResult, FileMetadata, ReferentielEntry
+from archivist_cli.domain.ports import AuditLog, Filesystem, FilesystemError, Index, IndexError, MetadataExtractor, MetadataExtractorError, Referentiel
 from tests.fakes import FakeFilesystem, FakeIndex, FakeMetadataExtractor, FakeReferentiel
-from archivist_cli.domain.models import ExtractionResult, FileMetadata, ReferentielEntry
 
 
 # --- Filesystem contract ---
@@ -304,3 +304,76 @@ class TestDuckDbIndexContract(IndexContractSuite):
         idx = DuckDbIndex(db_uri=(tmp_path / "test.db").as_uri())
         yield idx
         idx._conn.close()
+
+
+# --- AuditLog contract ---
+
+_DEFAULT_EVENTS = (
+    ClassifyEvent(
+        uri="file:///archive/_Réception/facture.pdf",
+        name="facture.pdf",
+        status=ClassifyEventStatus.CLASSIFIED,
+        entry_id="factures",
+        dest_name="2026-06_facture.pdf",
+        dest_uri="file:///archive/Factures/2026-06/2026-06_facture.pdf",
+    ),
+    ClassifyEvent(
+        uri="file:///archive/_Réception/doc.pdf",
+        name="doc.pdf",
+        status=ClassifyEventStatus.UNCLASSIFIED,
+        error_code="llm_uncertain",
+        llm_reason="type inconnu",
+    ),
+)
+
+
+def _make_audit_session(
+    session_id: str = "sess-001",
+    events: tuple[ClassifyEvent, ...] | None = None,
+) -> AuditSession:
+    if events is None:
+        events = _DEFAULT_EVENTS
+    return AuditSession(
+        session_id=session_id,
+        started_at="2026-06-25T10:00:00+00:00",
+        ended_at="2026-06-25T10:00:05+00:00",
+        referentiel_uri="file:///ref.yaml",
+        root_uri="file:///archive",
+        events=events,
+        scanned=len(events),
+        classified=sum(1 for e in events if e.status == ClassifyEventStatus.CLASSIFIED),
+        unclassified=sum(1 for e in events if e.status == ClassifyEventStatus.UNCLASSIFIED),
+        failed=sum(1 for e in events if e.status == ClassifyEventStatus.FAILED),
+    )
+
+
+class AuditLogContractSuite:
+    """Mixin de tests de contrat pour le port AuditLog."""
+
+    @pytest.fixture
+    def audit_log(self) -> AuditLog:
+        raise NotImplementedError
+
+    def test_write_does_not_raise(self, audit_log: AuditLog):
+        audit_log.write(_make_audit_session())
+
+    def test_write_multiple_sessions(self, audit_log: AuditLog):
+        audit_log.write(_make_audit_session("sess-001"))
+        audit_log.write(_make_audit_session("sess-002"))
+
+    def test_write_empty_events(self, audit_log: AuditLog):
+        audit_log.write(_make_audit_session("sess-empty", events=()))
+
+
+class TestNoopAuditLogContract(AuditLogContractSuite):
+    @pytest.fixture
+    def audit_log(self) -> AuditLog:
+        from archivist_cli.adapters.audit.noop import NoopAuditLog
+        return NoopAuditLog()
+
+
+class TestFakeAuditLogContract(AuditLogContractSuite):
+    @pytest.fixture
+    def audit_log(self) -> AuditLog:
+        from tests.fakes import FakeAuditLog
+        return FakeAuditLog()
