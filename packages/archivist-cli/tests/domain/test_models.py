@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from archivist_cli.domain.models import (
     ClassifyEvent, ClassifyEventStatus, ClassifyResult,
     FileNaming, FileNamingField, ReferentielEntry,
