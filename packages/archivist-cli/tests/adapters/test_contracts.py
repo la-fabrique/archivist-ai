@@ -13,9 +13,9 @@ from archivist_cli.adapters.fs.local import LocalFilesystem
 from archivist_cli.adapters.index.duckdb import DuckDbIndex
 from archivist_cli.adapters.index.noop import NoopIndex
 from archivist_cli.adapters.referentiel.yaml_file import YamlFileReferentiel
-from archivist_cli.domain.ports import Filesystem, FilesystemError, Index, IndexError, MetadataExtractor, MetadataExtractorError, Referentiel
+from archivist_cli.domain.models import AuditSession, ClassifyEvent, ClassifyEventStatus, ExtractionResult, FileMetadata, ReferentielEntry
+from archivist_cli.domain.ports import AuditLog, Filesystem, FilesystemError, Index, IndexError, MetadataExtractor, MetadataExtractorError, Referentiel
 from tests.fakes import FakeFilesystem, FakeIndex, FakeMetadataExtractor, FakeReferentiel
-from archivist_cli.domain.models import ExtractionResult, FileMetadata, ReferentielEntry
 
 
 # --- Filesystem contract ---
@@ -308,38 +308,42 @@ class TestDuckDbIndexContract(IndexContractSuite):
 
 # --- AuditLog contract ---
 
-from archivist_cli.domain.models import AuditSession, ClassifyEvent, ClassifyEventStatus
-from archivist_cli.domain.ports import AuditLog
+_DEFAULT_EVENTS = (
+    ClassifyEvent(
+        uri="file:///archive/_Réception/facture.pdf",
+        name="facture.pdf",
+        status=ClassifyEventStatus.CLASSIFIED,
+        entry_id="factures",
+        dest_name="2026-06_facture.pdf",
+        dest_uri="file:///archive/Factures/2026-06/2026-06_facture.pdf",
+    ),
+    ClassifyEvent(
+        uri="file:///archive/_Réception/doc.pdf",
+        name="doc.pdf",
+        status=ClassifyEventStatus.UNCLASSIFIED,
+        error_code="llm_uncertain",
+        llm_reason="type inconnu",
+    ),
+)
 
 
-def _make_audit_session(session_id: str = "sess-001") -> AuditSession:
+def _make_audit_session(
+    session_id: str = "sess-001",
+    events: tuple[ClassifyEvent, ...] | None = None,
+) -> AuditSession:
+    if events is None:
+        events = _DEFAULT_EVENTS
     return AuditSession(
         session_id=session_id,
         started_at="2026-06-25T10:00:00+00:00",
         ended_at="2026-06-25T10:00:05+00:00",
         referentiel_uri="file:///ref.yaml",
         root_uri="file:///archive",
-        events=(
-            ClassifyEvent(
-                uri="file:///archive/_Réception/facture.pdf",
-                name="facture.pdf",
-                status=ClassifyEventStatus.CLASSIFIED,
-                entry_id="factures",
-                dest_name="2026-06_facture.pdf",
-                dest_uri="file:///archive/Factures/2026-06/2026-06_facture.pdf",
-            ),
-            ClassifyEvent(
-                uri="file:///archive/_Réception/doc.pdf",
-                name="doc.pdf",
-                status=ClassifyEventStatus.UNCLASSIFIED,
-                error_code="llm_uncertain",
-                llm_reason="type inconnu",
-            ),
-        ),
-        scanned=2,
-        classified=1,
-        unclassified=1,
-        failed=0,
+        events=events,
+        scanned=len(events),
+        classified=sum(1 for e in events if e.status == ClassifyEventStatus.CLASSIFIED),
+        unclassified=sum(1 for e in events if e.status == ClassifyEventStatus.UNCLASSIFIED),
+        failed=sum(1 for e in events if e.status == ClassifyEventStatus.FAILED),
     )
 
 
@@ -358,19 +362,7 @@ class AuditLogContractSuite:
         audit_log.write(_make_audit_session("sess-002"))
 
     def test_write_empty_events(self, audit_log: AuditLog):
-        session = AuditSession(
-            session_id="sess-empty",
-            started_at="2026-06-25T10:00:00+00:00",
-            ended_at="2026-06-25T10:00:00+00:00",
-            referentiel_uri="file:///ref.yaml",
-            root_uri="file:///archive",
-            events=(),
-            scanned=0,
-            classified=0,
-            unclassified=0,
-            failed=0,
-        )
-        audit_log.write(session)
+        audit_log.write(_make_audit_session("sess-empty", events=()))
 
 
 class TestNoopAuditLogContract(AuditLogContractSuite):
