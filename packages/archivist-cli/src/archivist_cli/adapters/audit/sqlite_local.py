@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sqlite3
+from contextlib import closing
 from pathlib import Path
 from typing import ClassVar
 
@@ -47,8 +48,7 @@ class SqliteAuditLog(AuditLog):
     def write(self, session: AuditSession) -> None:
         try:
             self._db_path.parent.mkdir(parents=True, exist_ok=True)
-            con = sqlite3.connect(self._db_path)
-            try:
+            with closing(sqlite3.connect(self._db_path)) as con:
                 con.execute("PRAGMA journal_mode=WAL")
                 con.execute(_CREATE_SESSIONS)
                 con.execute(_CREATE_EVENTS)
@@ -87,7 +87,5 @@ class SqliteAuditLog(AuditLog):
                             for e in session.events
                         ],
                     )
-            finally:
-                con.close()
         except sqlite3.Error as exc:
             raise AuditLogError(str(exc)) from exc
