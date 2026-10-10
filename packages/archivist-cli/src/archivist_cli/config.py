@@ -7,7 +7,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 from urllib.request import url2pathname
 
-import yaml
+from cli_core.adapters.config.yaml_file import YamlFileConfigStore
 from platformdirs import user_data_dir
 
 
@@ -22,13 +22,12 @@ def app_data_dir() -> Path:
     return Path(user_data_dir("archivist", "archivist"))
 
 
+def _store(data_dir: Path | None) -> YamlFileConfigStore:
+    return YamlFileConfigStore("archivist", data_dir or app_data_dir())
+
+
 def load_config(data_dir: Path | None = None) -> AppConfig:
-    dir_ = data_dir or app_data_dir()
-    config_file = dir_ / "config.yaml"
-    if not config_file.exists():
-        return AppConfig()
-    with config_file.open(encoding="utf-8") as f:
-        data = yaml.safe_load(f) or {}
+    data = _store(data_dir).load()
     return AppConfig(
         referentiel=data.get("referentiel"),
         root=data.get("root"),
@@ -37,8 +36,6 @@ def load_config(data_dir: Path | None = None) -> AppConfig:
 
 
 def save_config(config: AppConfig, data_dir: Path | None = None) -> None:
-    dir_ = data_dir or app_data_dir()
-    dir_.mkdir(parents=True, exist_ok=True)
     data: dict[str, str] = {}
     if config.referentiel is not None:
         data["referentiel"] = config.referentiel
@@ -46,8 +43,7 @@ def save_config(config: AppConfig, data_dir: Path | None = None) -> None:
         data["root"] = config.root
     if config.llm is not None:
         data["llm"] = config.llm
-    with (dir_ / "config.yaml").open("w", encoding="utf-8") as f:
-        yaml.safe_dump(data, f, allow_unicode=True)
+    _store(data_dir).save(data)
 
 
 def install_referentiel(source_uri: str, data_dir: Path | None = None) -> str:

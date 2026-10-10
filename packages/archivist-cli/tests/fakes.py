@@ -2,10 +2,12 @@ from __future__ import annotations
 
 from typing import ClassVar
 
+from cli_core.testing.fakes import FakeLlm  # noqa: F401
+
 from archivist_cli.domain.models import AuditSession, ExtractionResult, FileMetadata, ReferentielEntry
 from archivist_cli.domain.ports import (
     AuditLog, Filesystem, FilesystemError, Index, IndexError,
-    LanguageModel, LlmError, MetadataExtractor, MetadataExtractorError, Referentiel,
+    MetadataExtractor, MetadataExtractorError, Referentiel,
 )
 
 
@@ -109,30 +111,6 @@ class FakeMetadataExtractor(MetadataExtractor):
                 language=None,
             ),
         )
-
-
-class FakeLlm(LanguageModel):
-    VERSION: ClassVar[int] = 1
-
-    def __init__(
-        self,
-        responses: list[dict] | None = None,
-        fail_on_calls: set[int] | None = None,
-    ) -> None:
-        self._responses: list[dict] = list(responses or [])
-        self._fail_on: set[int] = fail_on_calls or set()
-        self._call_count = 0
-        self.calls: list[str] = []
-
-    def complete(self, prompt: str, output_schema: dict) -> dict:
-        self.calls.append(prompt)
-        idx = self._call_count
-        self._call_count += 1
-        if idx in self._fail_on:
-            raise LlmError(f"FakeLlm injected error on call #{idx}")
-        if idx < len(self._responses):
-            return self._responses[idx]
-        raise LlmError(f"FakeLlm has no response for call #{idx}")
 
 
 class FakeAuditLog(AuditLog):

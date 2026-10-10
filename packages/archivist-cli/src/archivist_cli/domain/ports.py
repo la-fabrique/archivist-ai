@@ -3,6 +3,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import ClassVar
 
+from cli_core.domain.ports import LanguageModel, LlmError
+
 from archivist_cli.domain.models import AuditSession, ExtractionResult, FileMetadata, ReferentielEntry
 
 
@@ -105,22 +107,6 @@ class Index(ABC):
         ...
 
 
-class LlmError(Exception):
-    pass
-
-
-class LanguageModel(ABC):
-    VERSION: ClassVar[int] = 1
-
-    @abstractmethod
-    def complete(self, prompt: str, output_schema: dict) -> dict:
-        """Envoie un prompt et retourne un dict structuré conforme au schéma.
-
-        Lève LlmError si l'appel échoue ou si la sortie ne peut pas être parsée.
-        """
-        ...
-
-
 class AuditLogError(Exception):
     pass
 
@@ -135,3 +121,9 @@ class AuditLog(ABC):
         Lève AuditLogError si l'écriture échoue.
         """
         ...
+
+__all__ = [
+    "AuditLog", "AuditLogError", "Filesystem", "FilesystemError", "Index", "IndexError",
+    "LanguageModel", "LlmError", "MetadataExtractor", "MetadataExtractorError",
+    "Referentiel", "ReferentielError",
+]

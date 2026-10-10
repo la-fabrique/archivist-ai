@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.12"
 
 [[package]]
@@ -16,6 +16,7 @@ name = "archivist-cli"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "cli-core" },
     { name = "click" },
     { name = "duckdb" },
     { name = "kreuzberg" },
@@ -31,6 +32,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "cli-core", editable = "../cli-core" },
     { name = "click", specifier = ">=8.1.0" },
     { name = "duckdb", specifier = ">=1.0" },
     { name = "kreuzberg", specifier = ">=3.0" },
@@ -43,6 +45,24 @@ dev = [
     { name = "pyinstaller", specifier = ">=6.0.0" },
     { name = "pytest", specifier = ">=8.0.0" },
 ]
+
+[[package]]
+name = "cli-core"
+version = "0.1.0"
+source = { editable = "../cli-core" }
+dependencies = [
+    { name = "platformdirs" },
+    { name = "pyyaml" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "platformdirs", specifier = ">=4.0" },
+    { name = "pyyaml", specifier = ">=6.0" },
+]
+
+[package.metadata.requires-dev]
+dev = [{ name = "pytest", specifier = ">=8.0.0" }]
 
 [[package]]
 name = "click"

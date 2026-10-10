@@ -1,37 +1,18 @@
 from __future__ import annotations
 
-from typing import Any, Callable
+from cli_core.registry import AdapterRegistry, UnknownAdapterError
 
-
-class UnknownAdapterError(Exception):
-    pass
-
-
-AdapterFactory = Callable[[dict[str, Any]], Any]
-
-
-class AdapterRegistry:
-    def __init__(self) -> None:
-        self._factories: dict[str, AdapterFactory] = {}
-
-    def register(self, port: str, name: str, factory: AdapterFactory) -> None:
-        self._factories[f"{port}/{name}"] = factory
-
-    def resolve(self, port: str, name: str, config: dict[str, Any]) -> Any:
-        key = f"{port}/{name}"
-        factory = self._factories.get(key)
-        if factory is None:
-            raise UnknownAdapterError(f"unknown adapter: {key}")
-        return factory(config)
+__all__ = ["AdapterRegistry", "UnknownAdapterError", "default_registry"]
 
 
 def _build_default_registry() -> AdapterRegistry:
     from archivist_cli.adapters.audit.noop import NoopAuditLog
     from archivist_cli.adapters.audit.sqlite_local import SqliteAuditLog
     from archivist_cli.adapters.fs.local import LocalFilesystem
-    from archivist_cli.adapters.llm.claude_cli import ClaudeCliLlm
     from archivist_cli.adapters.metadata.kreuzberg import KreuzbergMetadataExtractor
     from archivist_cli.adapters.referentiel.yaml_file import YamlFileReferentiel
+    from cli_core.adapters.config.yaml_file import YamlFileConfigStore
+    from cli_core.adapters.llm.claude_cli import ClaudeCliLlm
 
     registry = AdapterRegistry()
     registry.register("fs", "local", lambda config: LocalFilesystem())
@@ -42,6 +23,10 @@ def _build_default_registry() -> AdapterRegistry:
     registry.register("metadata", "kreuzberg", lambda config: KreuzbergMetadataExtractor())
     registry.register("llm", "claude-cli", lambda config: ClaudeCliLlm())
     registry.register("audit", "sqlite_local", lambda config: SqliteAuditLog())
+    registry.register(
+        "config", "yaml_file",
+        lambda config: YamlFileConfigStore(config["app_name"], config.get("data_dir")),
+    )
     registry.register("audit", "noop", lambda config: NoopAuditLog())
     return registry
 
