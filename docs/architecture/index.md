@@ -12,6 +12,10 @@ referentiel  ──►  referentiel-cli  ──►  archivist-cli  ◄── age
                    validation,           classement)
                    export)
 
+cli-core  (ports & adaptateurs partagés : registre, LanguageModel, ConfigStore)
+   ├──►  archivist-cli
+   └──►  notes-cli
+
 landing  (site vitrine, indépendant)
 ```
 
@@ -20,6 +24,8 @@ landing  (site vitrine, indépendant)
 | `referentiel` | Contenu documentaire (Markdown + YAML), pas de code | Arborescence de fiches avec frontmatter structuré → compilé en `referentiel.yaml` + `referentiel.pdf` |
 | `referentiel-cli` | CLI développeur TypeScript | Commandes : `export-frontmatters`, `generate-pdf`, `push` (sync Drive). Modules : `auth/`, `commands/`, `pdf/`, `sync/` |
 | `archivist-cli` | CLI moteur d'agent Python | [Architecture hexagonale en ports & adaptateurs](archivist-cli.md) — pipeline Ingest → OCR → Extraction → Classement → Apply |
+| `cli-core` | Package Python partagé (bibliothèque) | [Socle hexagonal commun](cli-core.md) : registre, port `LanguageModel` + `ClaudeCliLlm`, port `ConfigStore` + adaptateur YAML, fakes et suites de contrat. |
+| `notes-cli` | CLI Python réduite | [Architecture hexagonale branchée sur `cli-core`](notes-cli.md) — `notes config set llm` / `notes config show` |
 | `landing` | Site vitrine React | Vite + React 19 + shadcn/ui + Tailwind — SPA statique |
 
 ## Commandes de développement
@@ -43,6 +49,22 @@ Build du binaire standalone :
 ```bash
 npm run archivist-cli:build
 # binaire dans packages/archivist-cli/dist/archivist
+```
+
+### cli-core (Python)
+
+```bash
+cd packages/cli-core
+uv run pytest tests/                    # tests registre, adaptateurs et contrats
+```
+
+### notes-cli (Python)
+
+```bash
+cd packages/notes-cli
+uv run pytest tests/
+npm run notes-cli:build
+# binaire dans packages/notes-cli/dist/
 ```
 
 ### referentiel-cli (TypeScript)
@@ -93,6 +115,8 @@ Chaque package a son propre `CLAUDE.md` avec stack, commandes, layout et convent
 - [`packages/referentiel/CLAUDE.md`](../../packages/referentiel/CLAUDE.md)
 - [`packages/referentiel-cli/CLAUDE.md`](../../packages/referentiel-cli/CLAUDE.md)
 - [`packages/archivist-cli/CLAUDE.md`](../../packages/archivist-cli/CLAUDE.md)
+- [`packages/cli-core/CLAUDE.md`](../../packages/cli-core/CLAUDE.md)
+- [`packages/notes-cli/CLAUDE.md`](../../packages/notes-cli/CLAUDE.md)
 - [`packages/landing/CLAUDE.md`](../../packages/landing/CLAUDE.md)
 
 Ne dupliquer aucune info de ces fichiers ici. Les charger uniquement quand on travaille dans le package concerné.
@@ -100,5 +124,7 @@ Ne dupliquer aucune info de ces fichiers ici. Les charger uniquement quand on tr
 ## Ressources
 
 - [Architecture détaillée archivist-cli](archivist-cli.md)
+- [Architecture détaillée cli-core](cli-core.md)
+- [Architecture détaillée notes-cli](notes-cli.md)
 - [ADRs](adrs/) — décisions d'architecture
 - [Features](../features/) — comportement attendu (Gherkin)

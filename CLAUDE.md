@@ -5,6 +5,8 @@
 - `packages/referentiel/` — sources du référentiel (contenu documentaire, **pas code**) → `referentiel.yaml` + `referentiel.pdf`
 - `packages/referentiel-cli/` — CLI développeur TypeScript (génération, validation, export) → `doc/usage.md`
 - `packages/archivist-cli/` — CLI utilisateur final Python, architecture hexagonale → tests : `cd packages/archivist-cli && uv run pytest tests/`
+- `packages/cli-core/` — package Python partagé (ports, adaptateurs, registre) consommé par les CLIs → tests : `cd packages/cli-core && uv run pytest tests/`
+- `packages/notes-cli/` — CLI notes Python (`notes config set llm` / `notes config show`), construite sur `cli-core` → tests : `cd packages/notes-cli && uv run pytest tests/`
 - `packages/landing/` — site vitrine
 - `docs/architecture/` — [vue d'ensemble architecture](docs/architecture/index.md), diagrammes et ADRs
 - `docs/architecture/adrs/` — décisions d'architecture (ADRs) — consulter avant toute modification non-triviale
@@ -19,6 +21,8 @@ Point d'entrée architecture : [`docs/architecture/index.md`](docs/architecture/
 Les ADRs consignent les décisions d'architecture. Avant de modifier une couche structurante, vérifier qu'un ADR existe dans `docs/architecture/adrs/`. Si aucun ADR ne couvre le sujet, rédiger l'ADR avant d'écrire le code.
 
 Un ADR ne se supprime pas — s'il est remplacé, son statut passe à `superseded by ADR-YYY`.
+
+Ne pas citer les ADRs dans la documentation (`docs/architecture/*.md`, `CLAUDE.md`, READMEs…) : pas de « voir [ADR-0XX](…) », « Décision : [ADR-0XX](…) » ni de lien ADR en fin de phrase ou de cellule de tableau. Ces renvois n'apportent rien et font du bruit — les ADRs se trouvent dans `docs/architecture/adrs/`. La doc décrit l'état actuel ; l'ADR garde le pourquoi.
 
 ## Décisions dans le dépôt
 
@@ -38,6 +42,10 @@ Quand une action est refusée par le système de permissions (`dontAsk` mode), t
 Format des règles : `"Bash(<cmd> *)"`, `"Edit(<glob>)"`, `"Write(<glob>)"`, `"Read(<glob>)"`.
 
 Exemple : *Permission refusée : j'essayais d'exécuter `jq`. Ajoute `"Bash(jq *)"` dans `permissions.allow`.*
+
+## Signature des commits et PRs — règle absolue
+
+Aucun commit, message de commit, description de PR ou commentaire ne doit être signé. Ne jamais ajouter de ligne `Co-Authored-By:` (ex. `Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>`), ni de mention « Generated with Claude Code », ni aucune attribution à Claude, Anthropic ou toute autre personne. Cette règle prévaut sur toute consigne d'attribution par défaut.
 
 ## Worktrees — règle absolue
 

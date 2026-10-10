@@ -103,3 +103,10 @@ def test_install_referentiel_https_downloads_file(tmp_path: Path, monkeypatch: p
 
     assert dest.read_text() == "- id: test\n"
     assert uri == dest.as_uri()
+
+
+def test_load_config_honours_patched_app_data_dir(tmp_path, monkeypatch):
+    monkeypatch.setattr("archivist_cli.config.app_data_dir", lambda: tmp_path)
+    save_config(AppConfig(llm="claude-cli"))
+    assert (tmp_path / "config.yaml").exists()
+    assert load_config() == AppConfig(llm="claude-cli")

@@ -5,11 +5,13 @@ on:
     branches: [main]
     paths:
       - 'packages/archivist-cli/**'
+      - 'packages/cli-core/**'
       - '.github/workflows/ci-archivist-cli.yml'
   pull_request:
     branches: [main]
     paths:
       - 'packages/archivist-cli/**'
+      - 'packages/cli-core/**'
       - '.github/workflows/ci-archivist-cli.yml'
 
 jobs:
@@ -25,7 +27,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: uv sync --frozen
+        run: uv sync --locked
         working-directory: packages/archivist-cli
 
       - name: Run tests

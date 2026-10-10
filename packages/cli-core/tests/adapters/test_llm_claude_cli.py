@@ -1,43 +1,13 @@
-"""Tests de contrat pour le port LanguageModel."""
+"""Tests de l'adaptateur ClaudeCliLlm (contrat LanguageModel)."""
 from __future__ import annotations
 
-import json
 from unittest.mock import MagicMock, patch
 
 import pytest
 
-from archivist_cli.adapters.llm.claude_cli import ClaudeCliLlm
-from archivist_cli.domain.ports import LanguageModel, LlmError
-from tests.fakes import FakeLlm
-
-
-class LanguageModelContractSuite:
-    """Mixin de tests de contrat pour le port LanguageModel."""
-
-    @pytest.fixture
-    def llm(self) -> LanguageModel:
-        raise NotImplementedError
-
-    @pytest.fixture
-    def simple_schema(self) -> dict:
-        return {
-            "type": "object",
-            "properties": {"answer": {"type": "string"}},
-            "required": ["answer"],
-        }
-
-    def test_complete_returns_dict(self, llm: LanguageModel, simple_schema: dict):
-        result = llm.complete("Réponds par {\"answer\": \"ok\"}", simple_schema)
-        assert isinstance(result, dict)
-
-    def test_complete_raises_llm_error_on_failure(self, llm: LanguageModel):
-        pass  # tested per-adapter below
-
-
-class TestFakeLlmContract(LanguageModelContractSuite):
-    @pytest.fixture
-    def llm(self) -> LanguageModel:
-        return FakeLlm(responses=[{"answer": "ok"}])
+from cli_core.adapters.llm.claude_cli import ClaudeCliLlm
+from cli_core.domain.ports import LanguageModel, LlmError
+from cli_core.testing.contracts import LanguageModelContractSuite
 
 
 class TestClaudeCliLlmContract(LanguageModelContractSuite):
@@ -95,7 +65,6 @@ class TestClaudeCliLlmContract(LanguageModelContractSuite):
                 llm.complete("test", {})
 
     def test_complete_raises_on_missing_binary(self):
-        import subprocess
         llm = ClaudeCliLlm()
         with patch("subprocess.run", side_effect=FileNotFoundError("claude not found")):
             with pytest.raises(LlmError):

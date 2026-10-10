@@ -6,6 +6,7 @@ CLI Python — classement automatique de documents via architecture hexagonale.
 
 - Python ≥ 3.12
 - Click (CLI), PyYAML (référentiel)
+- Dépend de `packages/cli-core` : ports `LanguageModel`/`ConfigStore`, `AdapterRegistry`, `ClaudeCliLlm`, `YamlFileConfigStore` ; `FakeLlm` vient de `cli_core.testing.fakes`
 - Build : hatchling
 - Tests : pytest
 
@@ -29,7 +30,6 @@ src/archivist_cli/
   adapters/
     fs/            local.py
     ocr/           tesseract.py
-    llm/           openai.py
     referentiel/   yaml_file.py
     index/         noop.py
   cli.py
@@ -46,7 +46,7 @@ src/archivist_cli/
 
 ### Architecture hexagonale
 
-- **domain** ne dépend que de la stdlib
+- **domain** ne dépend que de la stdlib et des ports stdlib ré-exportés depuis `cli_core.domain`
 - **application** dépend de domain uniquement
 - **adapters** implémentent les ABC de domain
 - **cli.py** câble adapters → application — seul point d'assemblage
@@ -54,13 +54,14 @@ src/archivist_cli/
 
 ### Ports
 
+- `LanguageModel`/`LlmError` sont définis dans cli-core et ré-exportés par `domain/ports.py`
 - Chaque port = ABC avec `VERSION: ClassVar[int]`
 - Erreurs propres par port (`FilesystemError`, `OcrError`, `LlmError`…), jamais d'exception générique
 - URI string partout dans le domain, jamais `pathlib.Path`
 
 ### Tests
 
-- Fakes dans `tests/fakes.py`, un fake par port
+- Fakes dans `tests/fakes.py`, un fake par port (`FakeLlm` ré-exporté depuis `cli_core.testing.fakes`)
 - Tests de contrat via mixin `*ContractSuite` dans `tests/adapters/test_contracts.py`
 - Chaque adaptateur (built-in + fake) doit passer la suite de contrat de son port
 - Tests domain/application : uniquement des fakes, aucun I/O

@@ -4,7 +4,7 @@ import json
 import subprocess
 from typing import ClassVar
 
-from archivist_cli.domain.ports import LanguageModel, LlmError
+from cli_core.domain.ports import LanguageModel, LlmError
 
 _JSON_TYPE_MAP: dict[str, type | tuple[type, ...]] = {
     "string": str,

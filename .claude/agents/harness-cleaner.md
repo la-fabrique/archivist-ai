@@ -59,6 +59,7 @@ You operate within the archivist-ai monorepo with this structure:
 ## Key Principles
 
 - **ADRs are permanent**: Never delete an ADR. If superseded, update its status to `superseded by ADR-YYY`
+- **No ADR citations in docs**: When writing or updating documentation (`docs/architecture/*.md`, `CLAUDE.md`, READMEs), never add references like "voir [ADR-0XX](…)" or "Décision : [ADR-0XX](…)" — they are noise. Remove any you encounter.
 - **Features precede code**: Functional behavior lives in `docs/features/`; architectural decisions in `docs/architecture/adrs/`
 - **Execution plans**: Plans in `docs/superpowers/plans/` should be marked complete when all tasks are done
 - **GitHub API**: If you need to update PRs, use `gh api repos/{owner}/{repo}/pulls/{number}` with `--method PATCH`, never `gh pr edit`
