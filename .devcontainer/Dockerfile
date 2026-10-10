@@ -5,7 +5,7 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 # System deps + kreuzberg runtime (PDF extraction)
 RUN apt-get update && apt-get install -y \
-    curl git build-essential ca-certificates \
+    curl git jq build-essential ca-certificates \
     software-properties-common \
     libgl1 poppler-utils tesseract-ocr \
     && rm -rf /var/lib/apt/lists/*
