@@ -10,7 +10,7 @@
 - ADR-005 (port LanguageModel unique)
 
 ## Options Considered
-- **Package path éditable, un `uv.lock` par CLI** : chaque CLI garde son cycle de build et sa CI (`uv sync --frozen`).
+- **Package path éditable, un `uv.lock` par CLI** : chaque CLI garde son cycle de build et sa CI (`uv sync --locked`, qui fait échouer la CI quand un `uv.lock` est périmé).
 - **Workspace uv à la racine** : écarté, couple les lockfiles, la CI et les binaires des deux CLIs.
 
 ## Decision
