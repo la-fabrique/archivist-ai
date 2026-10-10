@@ -1,0 +1,137 @@
+name: Build notes-cli
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/notes-cli/**'
+      - 'packages/cli-core/**'
+      - '.github/workflows/build-notes-cli.yml'
+    tags:
+      - 'notes-cli/*'
+  workflow_dispatch:
+    inputs:
+      major:
+        description: 'Version majeure (défaut : 0)'
+        required: false
+        default: '0'
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      tag: ${{ steps.compute-tag.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+          fetch-depth: 0
+
+      - name: Compute tag
+        id: compute-tag
+        run: |
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            TAG="${{ github.ref_name }}"
+          else
+            MAJOR="${{ inputs.major || '0' }}"
+            DATE=$(date -u +%Y%m%d)
+            EXISTING=$(git tag --list "notes-cli/${MAJOR}.${DATE}.*" | sort -V | tail -1)
+            if [ -z "$EXISTING" ]; then
+              INCREMENT=1
+            else
+              INCREMENT=$(echo "$EXISTING" | awk -F. '{print $NF+1}')
+            fi
+            TAG="notes-cli/${MAJOR}.${DATE}.${INCREMENT}"
+            git tag "$TAG"
+            git push origin "$TAG"
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-14]
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --frozen
+        working-directory: packages/notes-cli
+
+      - name: Run tests
+        run: uv run pytest tests/
+        working-directory: packages/notes-cli
+
+      - name: Build binary
+        run: uv run pyinstaller notes-cli.spec
+        working-directory: packages/notes-cli
+
+      - name: Smoke-test binary (Linux)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: packages/notes-cli/dist/notes --help
+
+      - name: Smoke-test binary (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
+        run: packages/notes-cli/dist/notes --help
+
+      - name: Smoke-test binary (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: packages/notes-cli/dist/notes.exe --help
+
+      - name: Rename binary (Linux)
+        if: runner.os == 'Linux'
+        run: cp packages/notes-cli/dist/notes packages/notes-cli/dist/notes-linux
+
+      - name: Rename binary (macOS)
+        if: runner.os == 'macOS'
+        run: cp packages/notes-cli/dist/notes packages/notes-cli/dist/notes-macos-arm64
+
+      - name: Rename binary (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: cp packages/notes-cli/dist/notes.exe packages/notes-cli/dist/notes-windows.exe
+
+      # The three upload steps run in parallel and may race to create the
+      # GitHub Release. softprops/action-gh-release@v2 tolerates this (upsert).
+      - name: Upload binary (Linux)
+        if: runner.os == 'Linux'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.prepare.outputs.tag }}
+          files: packages/notes-cli/dist/notes-linux
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload binary (macOS)
+        if: runner.os == 'macOS'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.prepare.outputs.tag }}
+          files: packages/notes-cli/dist/notes-macos-arm64
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload binary (Windows)
+        if: runner.os == 'Windows'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.prepare.outputs.tag }}
+          files: packages/notes-cli/dist/notes-windows.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

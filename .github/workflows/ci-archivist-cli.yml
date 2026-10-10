@@ -5,11 +5,13 @@ on:
     branches: [main]
     paths:
       - 'packages/archivist-cli/**'
+      - 'packages/cli-core/**'
       - '.github/workflows/ci-archivist-cli.yml'
   pull_request:
     branches: [main]
     paths:
       - 'packages/archivist-cli/**'
+      - 'packages/cli-core/**'
       - '.github/workflows/ci-archivist-cli.yml'
 
 jobs:
