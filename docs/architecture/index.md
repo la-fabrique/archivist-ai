@@ -55,7 +55,7 @@ npm run archivist-cli:build
 
 ```bash
 cd packages/cli-core
-uv run pytest tests/                    # tests domain, adaptateurs et contrats
+uv run pytest tests/                    # tests registre, adaptateurs et contrats
 ```
 
 ### notes-cli (Python)

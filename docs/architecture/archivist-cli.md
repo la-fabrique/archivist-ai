@@ -96,12 +96,13 @@ adapters/
   fs/            local.py
   metadata/      kreuzberg.py
   referentiel/   yaml_file.py
-  llm/           claude_cli.py
   index/         noop.py, duckdb.py
 config.py
 cli.py
 registry.py
 ```
+
+`LanguageModel`, `ClaudeCliLlm`, le registre et le config store proviennent de `packages/cli-core` (voir [ADR-013](adrs/2026-10-10-ADR-013-package-partage-cli-core.md)).
 
 ### Pourquoi ce layout sert l'évolutivité plugins
 - Les ABC du `domain` **sont le contrat public** que tout adaptateur — interne ou tiers — consommera.

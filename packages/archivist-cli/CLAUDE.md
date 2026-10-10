@@ -46,7 +46,7 @@ src/archivist_cli/
 
 ### Architecture hexagonale
 
-- **domain** ne dépend que de la stdlib
+- **domain** ne dépend que de la stdlib et des ports stdlib ré-exportés depuis `cli_core.domain` (ADR-013)
 - **application** dépend de domain uniquement
 - **adapters** implémentent les ABC de domain
 - **cli.py** câble adapters → application — seul point d'assemblage
