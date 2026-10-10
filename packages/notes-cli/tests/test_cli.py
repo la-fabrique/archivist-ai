@@ -74,6 +74,18 @@ def test_config_show_corrupted_file_exits_1(tmp_path, monkeypatch):
     assert "Traceback" not in r.output
 
 
+def test_config_show_non_string_value_exits_1(tmp_path, monkeypatch):
+    (tmp_path / "config.yaml").write_text("llm: 2024-01-01\n", encoding="utf-8")
+    monkeypatch.setattr(
+        "notes_cli.cli._config_store",
+        lambda: YamlFileConfigStore("notes", tmp_path),
+    )
+    r = CliRunner().invoke(main, ["config", "show"])
+    assert r.exit_code == 1
+    assert isinstance(r.exception, SystemExit)
+    assert "Error" in r.output
+
+
 def test_vault_command_removed(store):
     r = CliRunner().invoke(main, ["config", "set", "vault", "file:///x"])
     assert r.exit_code != 0

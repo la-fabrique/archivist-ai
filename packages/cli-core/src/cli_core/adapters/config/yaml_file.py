@@ -21,11 +21,22 @@ class YamlFileConfigStore(ConfigStore):
                 data = yaml.safe_load(f) or {}
         except yaml.YAMLError as e:
             raise ConfigError(f"Config invalide ({self.path}) : {e}") from e
+        except UnicodeDecodeError as e:
+            raise ConfigError(f"Config invalide ({self.path}) : encodage UTF-8 attendu") from e
         except OSError as e:
             raise ConfigError(f"Lecture impossible ({self.path}) : {e}") from e
         if not isinstance(data, dict):
             raise ConfigError(f"Config invalide ({self.path}) : un mapping est attendu")
-        return data
+        result: dict[str, str] = {}
+        for key, value in data.items():
+            if value is None:
+                continue
+            if not isinstance(key, str) or not isinstance(value, str):
+                raise ConfigError(
+                    f"Config invalide ({self.path}) : la clé {key!r} doit avoir une valeur texte"
+                )
+            result[key] = value
+        return result
 
     def save(self, data: dict[str, str]) -> None:
         try:

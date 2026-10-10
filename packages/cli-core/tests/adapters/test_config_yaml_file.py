@@ -54,3 +54,21 @@ def test_save_io_error_raises_config_error(tmp_path):
     blocker.write_text("", encoding="utf-8")
     with pytest.raises(ConfigError):
         YamlFileConfigStore("x", blocker / "sub").save({"llm": "a"})
+
+
+def test_load_non_utf8_raises(tmp_path):
+    (tmp_path / "config.yaml").write_bytes(b"llm: caf\xe9\n")
+    with pytest.raises(ConfigError):
+        YamlFileConfigStore("x", tmp_path).load()
+
+
+@pytest.mark.parametrize("content", ["llm: 2024-01-01\n", "llm: 1\n"])
+def test_load_non_string_value_raises(tmp_path, content):
+    (tmp_path / "config.yaml").write_text(content, encoding="utf-8")
+    with pytest.raises(ConfigError):
+        YamlFileConfigStore("x", tmp_path).load()
+
+
+def test_load_drops_null_values(tmp_path):
+    (tmp_path / "config.yaml").write_text("llm:\nroot: file:///docs\n", encoding="utf-8")
+    assert YamlFileConfigStore("x", tmp_path).load() == {"root": "file:///docs"}
