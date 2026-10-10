@@ -102,7 +102,7 @@ cli.py
 registry.py
 ```
 
-`LanguageModel`, `ClaudeCliLlm`, le registre et le config store proviennent de `packages/cli-core` (voir [ADR-013](adrs/2026-10-10-ADR-013-package-partage-cli-core.md)).
+`LanguageModel`, `ClaudeCliLlm`, le registre et le config store proviennent de `packages/cli-core`.
 
 ### Pourquoi ce layout sert l'évolutivité plugins
 - Les ABC du `domain` **sont le contrat public** que tout adaptateur — interne ou tiers — consommera.

@@ -1,6 +1,6 @@
 # cli-core
 
-Package Python partagé entre `archivist-cli` et `notes-cli` : ports, adaptateurs et registre communs (architecture hexagonale). Décision : [ADR-013](../../docs/architecture/adrs/2026-10-10-ADR-013-package-partage-cli-core.md).
+Package Python partagé entre `archivist-cli` et `notes-cli` : ports, adaptateurs et registre communs (architecture hexagonale).
 
 ## Stack
 

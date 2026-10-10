@@ -24,7 +24,7 @@ landing  (site vitrine, indépendant)
 | `referentiel` | Contenu documentaire (Markdown + YAML), pas de code | Arborescence de fiches avec frontmatter structuré → compilé en `referentiel.yaml` + `referentiel.pdf` |
 | `referentiel-cli` | CLI développeur TypeScript | Commandes : `export-frontmatters`, `generate-pdf`, `push` (sync Drive). Modules : `auth/`, `commands/`, `pdf/`, `sync/` |
 | `archivist-cli` | CLI moteur d'agent Python | [Architecture hexagonale en ports & adaptateurs](archivist-cli.md) — pipeline Ingest → OCR → Extraction → Classement → Apply |
-| `cli-core` | Package Python partagé (bibliothèque) | Socle hexagonal commun : registre, port `LanguageModel` + `ClaudeCliLlm`, port `ConfigStore` + adaptateur YAML, fakes et suites de contrat. Voir [ADR-013](adrs/2026-10-10-ADR-013-package-partage-cli-core.md) |
+| `cli-core` | Package Python partagé (bibliothèque) | Socle hexagonal commun : registre, port `LanguageModel` + `ClaudeCliLlm`, port `ConfigStore` + adaptateur YAML, fakes et suites de contrat. |
 | `notes-cli` | CLI Python réduite | `notes config set llm` / `notes config show`, branchée sur `cli-core` |
 | `landing` | Site vitrine React | Vite + React 19 + shadcn/ui + Tailwind — SPA statique |
 
@@ -124,5 +124,5 @@ Ne dupliquer aucune info de ces fichiers ici. Les charger uniquement quand on tr
 ## Ressources
 
 - [Architecture détaillée archivist-cli](archivist-cli.md)
-- [ADRs](adrs/) — décisions d'architecture ; package partagé : [ADR-013](adrs/2026-10-10-ADR-013-package-partage-cli-core.md)
+- [ADRs](adrs/) — décisions d'architecture
 - [Features](../features/) — comportement attendu (Gherkin)

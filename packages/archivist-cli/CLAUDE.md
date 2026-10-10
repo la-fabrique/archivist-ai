@@ -54,7 +54,7 @@ src/archivist_cli/
 
 ### Ports
 
-- `LanguageModel`/`LlmError` sont définis dans cli-core et ré-exportés par `domain/ports.py` ([ADR-013](../../docs/architecture/adrs/2026-10-10-ADR-013-package-partage-cli-core.md))
+- `LanguageModel`/`LlmError` sont définis dans cli-core et ré-exportés par `domain/ports.py`
 - Chaque port = ABC avec `VERSION: ClassVar[int]`
 - Erreurs propres par port (`FilesystemError`, `OcrError`, `LlmError`…), jamais d'exception générique
 - URI string partout dans le domain, jamais `pathlib.Path`
