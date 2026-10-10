@@ -1,11 +1,12 @@
 # notes-cli
 
 CLI Python — dialogue avec un vault de notes Markdown, architecture hexagonale.
+S'appuie sur le package partagé `cli-core` (ports, registre, adaptateurs communs) — voir ADR-013 (`docs/architecture/adrs/`).
 
 ## Stack
 
 - Python ≥ 3.12
-- Click (CLI), PyYAML (config)
+- Click (CLI), cli-core (ports `LanguageModel`/`ConfigStore`, registre, adaptateurs)
 - Build : hatchling
 - Tests : pytest
 
@@ -13,10 +14,6 @@ CLI Python — dialogue avec un vault de notes Markdown, architecture hexagonale
 
 ```bash
 uv run pytest tests/                    # tous les tests
-uv run pytest tests/domain/             # tests domain uniquement
-uv run pytest tests/adapters/           # tests adaptateurs + contrats
-uv run pytest tests/application/        # tests use cases
-uv run pytest tests/integration/        # tests intégration (I/O réel)
 uv run notes --help                     # CLI
 ```
 
@@ -24,15 +21,11 @@ uv run notes --help                     # CLI
 
 ```
 src/notes_cli/
-  domain/          models.py, ports.py
+  domain/          ports.py (ré-export LanguageModel, LlmError depuis cli_core)
   application/     (use cases à venir)
-  adapters/
-    fs/            local.py
-    vault/         local_markdown.py
-    llm/           (à venir)
+  config.py        AppConfig (llm)
+  registry.py      default_registry (llm/claude-cli, config/yaml_file)
   cli.py
-  config.py
-  registry.py
 ```
 
 ## Conventions (identiques à archivist-cli)
@@ -53,22 +46,15 @@ src/notes_cli/
 ### Ports
 
 - Chaque port = ABC avec `VERSION: ClassVar[int]`
-- Erreurs propres par port (`FilesystemError`, `VaultError`, `LlmError`…)
+- Erreurs propres par port (`LlmError`, `ConfigError`…)
 - URI string partout dans le domain, jamais `pathlib.Path`
 
 ### Tests
 
-- Fakes dans `tests/fakes.py`, un fake par port
+- Fakes importés depuis `cli_core.testing` (ex : `InMemoryConfigStore`)
 - Tests domain/application : uniquement des fakes, aucun I/O
-- Tests integration : I/O réel, fichiers séparés dans `tests/integration/`
 
 ### CLI
 
 - Aucune logique métier dans `cli.py`
 - Sortie structurée JSON sur stdout, logs sur stderr
-
-## Candidats à factorisation partagée avec archivist-cli
-
-- `AdapterRegistry` — identique dans les deux CLIs
-- `Filesystem` port + `LocalFilesystem` adapter — copie exacte
-- Pattern `config.py` (platformdirs + YAML)

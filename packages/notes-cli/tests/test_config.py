@@ -1,50 +1,24 @@
 from __future__ import annotations
 
-from pathlib import Path
-
-import yaml
-
-from notes_cli.config import AppConfig, load_config, save_config
+from notes_cli.config import AppConfig
 
 
-def test_load_config_returns_empty_when_no_file(tmp_path: Path):
-    cfg = load_config(data_dir=tmp_path)
-    assert cfg == AppConfig()
+def test_to_dict_omits_none():
+    assert AppConfig().to_dict() == {}
 
 
-def test_load_config_returns_all_fields(tmp_path: Path):
-    (tmp_path / "config.yaml").write_text(
-        "vault: file:///notes\nllm: claude-cli\n",
-        encoding="utf-8",
-    )
-    cfg = load_config(data_dir=tmp_path)
-    assert cfg.vault == "file:///notes"
-    assert cfg.llm == "claude-cli"
+def test_to_dict_with_llm():
+    assert AppConfig(llm="claude-cli").to_dict() == {"llm": "claude-cli"}
 
 
-def test_save_and_load_roundtrip(tmp_path: Path):
-    original = AppConfig(vault="file:///notes", llm="claude-cli")
-    save_config(original, data_dir=tmp_path)
-    loaded = load_config(data_dir=tmp_path)
-    assert loaded == original
+def test_from_dict_roundtrip():
+    assert AppConfig.from_dict({"llm": "claude-cli"}) == AppConfig(llm="claude-cli")
 
 
-def test_save_creates_directory(tmp_path: Path):
-    nested = tmp_path / "a" / "b"
-    save_config(AppConfig(llm="claude-cli"), data_dir=nested)
-    assert (nested / "config.yaml").exists()
+def test_from_dict_ignores_unknown_keys():
+    data = {"vault": "file:///notes", "llm": "claude-cli"}
+    assert AppConfig.from_dict(data) == AppConfig(llm="claude-cli")
 
 
-def test_save_omits_none_fields(tmp_path: Path):
-    save_config(AppConfig(llm="claude-cli"), data_dir=tmp_path)
-    raw = yaml.safe_load((tmp_path / "config.yaml").read_text(encoding="utf-8")) or {}
-    assert "vault" not in raw
-    assert raw["llm"] == "claude-cli"
-
-
-def test_save_overwrites_existing(tmp_path: Path):
-    save_config(AppConfig(vault="file:///v1", llm="claude-cli"), data_dir=tmp_path)
-    save_config(AppConfig(llm="openai"), data_dir=tmp_path)
-    loaded = load_config(data_dir=tmp_path)
-    assert loaded.llm == "openai"
-    assert loaded.vault is None  # doit disparaître, pas être fusionné
+def test_from_dict_empty():
+    assert AppConfig.from_dict({}) == AppConfig()

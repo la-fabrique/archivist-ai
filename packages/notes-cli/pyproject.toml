@@ -3,9 +3,8 @@ name = "notes-cli"
 version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
+    "cli-core",
     "click>=8.1.0",
-    "platformdirs>=4.0",
-    "pyyaml>=6.0",
 ]
 
 [project.scripts]
@@ -20,5 +19,9 @@ packages = ["src/notes_cli"]
 
 [dependency-groups]
 dev = [
+    "pyinstaller>=6.0.0",
     "pytest>=8.0.0",
 ]
+
+[tool.uv.sources]
+cli-core = { path = "../cli-core", editable = true }
