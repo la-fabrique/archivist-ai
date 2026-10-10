@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import pytest
 
+from cli_core.domain.ports import LanguageModel
+
 
 class ConfigStoreContractSuite:
     """Mixin pytest : la sous-classe fournit la fixture `store`."""
@@ -30,3 +32,23 @@ class ConfigStoreContractSuite:
         store.save({"llm": "claude-cli"})
         store.load()["llm"] = "mutated"
         assert store.load() == {"llm": "claude-cli"}
+
+
+class LanguageModelContractSuite:
+    """Mixin pytest : la sous-classe fournit la fixture `llm`."""
+
+    @pytest.fixture
+    def llm(self) -> LanguageModel:
+        raise NotImplementedError
+
+    @pytest.fixture
+    def simple_schema(self) -> dict:
+        return {
+            "type": "object",
+            "properties": {"answer": {"type": "string"}},
+            "required": ["answer"],
+        }
+
+    def test_complete_returns_dict(self, llm: LanguageModel, simple_schema: dict):
+        result = llm.complete("Réponds par {\"answer\": \"ok\"}", simple_schema)
+        assert isinstance(result, dict)
