@@ -4,15 +4,10 @@
   "service": "dev",
   "workspaceFolder": "/workspace",
   "remoteUser": "vscode",
-  "features": {
-    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {
-      "dangerouslySkipPermissions": true
-    }
-  },
   "postCreateCommand": "npm config set prefix ~/.npm-global && uv sync --directory packages/archivist-cli && npm install --prefix packages/referentiel-cli",
   "postStartCommand": "npm install -g @anthropic-ai/claude-code@latest 2>&1 | tail -1",
   "remoteEnv": {
-    "PATH": "${containerEnv:PATH}:/home/vscode/.npm-global/bin"
+    "PATH": "/home/vscode/.npm-global/bin:${containerEnv:PATH}"
   },
   "customizations": {
     "vscode": {
