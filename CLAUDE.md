@@ -5,7 +5,8 @@
 - `packages/referentiel/` — sources du référentiel (contenu documentaire, **pas code**) → `referentiel.yaml` + `referentiel.pdf`
 - `packages/referentiel-cli/` — CLI développeur TypeScript (génération, validation, export) → `doc/usage.md`
 - `packages/archivist-cli/` — CLI utilisateur final Python, architecture hexagonale → tests : `cd packages/archivist-cli && uv run pytest tests/`
-- `packages/cli-core/` — package Python partagé (ports, adaptateurs, registre) consommé par les CLIs → [ADR-013](docs/architecture/adrs/2026-10-10-ADR-013-package-partage-cli-core.md)
+- `packages/cli-core/` — package Python partagé (ports, adaptateurs, registre) consommé par les CLIs → tests : `cd packages/cli-core && uv run pytest tests/` — [ADR-013](docs/architecture/adrs/2026-10-10-ADR-013-package-partage-cli-core.md)
+- `packages/notes-cli/` — CLI notes Python (`notes config set llm` / `notes config show`), construite sur `cli-core` → tests : `cd packages/notes-cli && uv run pytest tests/`
 - `packages/landing/` — site vitrine
 - `docs/architecture/` — [vue d'ensemble architecture](docs/architecture/index.md), diagrammes et ADRs
 - `docs/architecture/adrs/` — décisions d'architecture (ADRs) — consulter avant toute modification non-triviale
