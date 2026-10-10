@@ -15,19 +15,19 @@
       "Read(/workspace/.claude/worktrees/**)",
       "Edit(/workspace/**)",
       "Edit(/workspace/.claude/worktrees/**)",
-      "Write(/workspace/**)",      
+      "Write(/workspace/**)",
       "Write(/workspace/.claude/worktrees/**)",
-      "Bash(xargs cat:*)",     
+      "Bash(xargs cat:*)",
       "Bash(npm *)",
       "Bash(npx *)",
       "Bash(uv *)",
       "Bash(echo *)",
-      "Bash(grep *)", 
+      "Bash(grep *)",
       "Bash(cd *)",
       "Bash(uv *)",
       "Bash(git checkout:*)",
       "Bash(git add:*)",
-      "Bash(git commit *)",      
+      "Bash(git commit *)",
       "Bash(git pull *)",
       "Bash(git merge *)",
       "Bash(git -C *)",
@@ -50,9 +50,9 @@
       "Bash(gh pr *)",
       "Bash(gh api *)",
       "Edit(.github/workflows/*)",
-      "Write(.github/workflows/*)"      
+      "Write(.github/workflows/*)"
     ],
-    "defaultMode": "dontAsk"
+    "defaultMode": "auto"
   },
   "model": "claude-sonnet-4-6",
   "hooks": {
@@ -130,11 +130,7 @@
     "refreshInterval": 10
   },
   "enabledPlugins": {
-    "superpowers@claude-plugins-official": false,
-    "code-simplifier@claude-plugins-official": true,
-    "superpowers@superpowers-dev": true,
-    "pm-product-strategy@pm-skills": true,
-    "pm-ai-shipping@pm-skills": true
+    "superpowers@anthropic-plugin-directory": true
   },
   "extraKnownMarketplaces": {
     "superpowers-dev": {
