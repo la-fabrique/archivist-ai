@@ -1,7 +1,7 @@
 # notes-cli
 
 CLI Python — dialogue avec un vault de notes Markdown, architecture hexagonale.
-S'appuie sur le package partagé `cli-core` (ports, registre, adaptateurs communs) — voir ADR-013 (`docs/architecture/adrs/`).
+S'appuie sur le package partagé `cli-core` (ports, registre, adaptateurs communs).
 
 ## Stack
 
@@ -38,7 +38,7 @@ src/notes_cli/
 
 ### Architecture hexagonale
 
-- **domain** ne dépend que de la stdlib et des ports stdlib ré-exportés depuis `cli_core.domain` (ADR-013)
+- **domain** ne dépend que de la stdlib et des ports stdlib ré-exportés depuis `cli_core.domain`
 - **application** dépend de domain uniquement
 - **adapters** implémentent les ABC de domain
 - **cli.py** câble adapters → application — seul point d'assemblage

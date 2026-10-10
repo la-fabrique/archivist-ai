@@ -24,8 +24,8 @@ landing  (site vitrine, indépendant)
 | `referentiel` | Contenu documentaire (Markdown + YAML), pas de code | Arborescence de fiches avec frontmatter structuré → compilé en `referentiel.yaml` + `referentiel.pdf` |
 | `referentiel-cli` | CLI développeur TypeScript | Commandes : `export-frontmatters`, `generate-pdf`, `push` (sync Drive). Modules : `auth/`, `commands/`, `pdf/`, `sync/` |
 | `archivist-cli` | CLI moteur d'agent Python | [Architecture hexagonale en ports & adaptateurs](archivist-cli.md) — pipeline Ingest → OCR → Extraction → Classement → Apply |
-| `cli-core` | Package Python partagé (bibliothèque) | Socle hexagonal commun : registre, port `LanguageModel` + `ClaudeCliLlm`, port `ConfigStore` + adaptateur YAML, fakes et suites de contrat. |
-| `notes-cli` | CLI Python réduite | `notes config set llm` / `notes config show`, branchée sur `cli-core` |
+| `cli-core` | Package Python partagé (bibliothèque) | [Socle hexagonal commun](cli-core.md) : registre, port `LanguageModel` + `ClaudeCliLlm`, port `ConfigStore` + adaptateur YAML, fakes et suites de contrat. |
+| `notes-cli` | CLI Python réduite | [Architecture hexagonale branchée sur `cli-core`](notes-cli.md) — `notes config set llm` / `notes config show` |
 | `landing` | Site vitrine React | Vite + React 19 + shadcn/ui + Tailwind — SPA statique |
 
 ## Commandes de développement
@@ -124,5 +124,7 @@ Ne dupliquer aucune info de ces fichiers ici. Les charger uniquement quand on tr
 ## Ressources
 
 - [Architecture détaillée archivist-cli](archivist-cli.md)
+- [Architecture détaillée cli-core](cli-core.md)
+- [Architecture détaillée notes-cli](notes-cli.md)
 - [ADRs](adrs/) — décisions d'architecture
 - [Features](../features/) — comportement attendu (Gherkin)
