@@ -15,7 +15,8 @@ Le dépôt est le marketplace `archivist` (`.claude-plugin/marketplace.json`). L
 
 ## Consequences
 - Seuls Linux x86_64 et macOS arm64 sont pris en charge.
-- Le hook est silencieux et ne bloque jamais le démarrage de la session.
+- Le hook est silencieux et n'empêche jamais le démarrage de la session ; il ajoute quelques secondes (vérification via l'API), plus le téléchargement quand une nouvelle version est sortie.
+- Le binaire est approuvé via HTTPS et le seul dépôt GitHub (aucune somme de contrôle n'est publiée).
 - Une CLI installée à la main ailleurs dans le PATH reste prioritaire sur le script relais `bin/notes`.
 - Un nouveau skill s'ajoute dans `packages/notes-plugin/skills/` sans toucher à `notes-cli`.
 - Le plugin dépend de la publication des assets `notes-linux` et `notes-macos-arm64` par `build-notes-cli.yml`.

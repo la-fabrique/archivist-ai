@@ -11,7 +11,7 @@ Dans Claude Code :
 /plugin install notes@archivist
 ```
 
-Redémarre ensuite la session : au démarrage, un hook silencieux (il ne bloque jamais le démarrage) télécharge la dernière version de la CLI `notes` (release `notes-cli/*`). Avant le prochain démarrage de session, la commande `notes` répond qu'elle n'est pas encore installée.
+Redémarre ensuite la session : au démarrage, un hook silencieux (il n'empêche jamais le démarrage ; il ajoute quelques secondes, le temps de la vérification auprès de l'API, plus le téléchargement quand une nouvelle version est sortie) télécharge la dernière version de la CLI `notes` (release `notes-cli/*`). Avant le prochain démarrage de session, la commande `notes` répond qu'elle n'est pas encore installée.
 
 ## Usage
 
