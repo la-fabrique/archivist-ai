@@ -60,15 +60,20 @@ Puis reprends à l'étape 2.
 
 Termine. Ne lance pas d'autre tour.
 
-## 6. Erreurs
+## 6. Abandon
+
+Si l'utilisateur demande explicitement d'arrêter pendant l'échange, n'appelle plus la CLI. Affiche la commande `suite` pour qu'il puisse reprendre plus tard.
+
+## 7. Erreurs
 
 En cas d'échec, le message est sur stderr. Après un `notes config set …`, ne relance le tour qu'une seule fois. Si la même erreur de configuration revient, affiche-la et arrête-toi.
 
 Selon le code de sortie et le message :
 
 - **Code 1, message contenant `notes config set agent`** : lance `notes config set agent claude-code` sans demander, puis relance le tour en cours.
-- **Code 1, message contenant `notes config set bloc-notes`, ou indiquant que le dossier du bloc-notes n'existe plus** : demande à l'utilisateur le chemin de son bloc-notes, lance `notes config set bloc-notes "<chemin>"`, puis relance le tour en cours. Si le chemin contient `"`, `$` ou un backtick, passe-le par un heredoc à délimiteur entre guillemets comme à l'étape 1.
+- **Code 1, message contenant `notes config set bloc-notes`, ou indiquant que le dossier du bloc-notes n'existe plus** : demande à l'utilisateur le chemin de son bloc-notes, lance `notes config set bloc-notes -- "<chemin>"`, puis relance le tour en cours. Si le chemin contient `"`, `$` ou un backtick, passe-le par un heredoc à délimiteur entre guillemets comme à l'étape 1, toujours après `--`.
+- **Code 2 de `notes config set bloc-notes`** (le dossier n'existe pas : « … n'est pas un dossier existant ») : affiche le message et redemande le chemin à l'utilisateur. Il peut renoncer ; dans ce cas, arrête-toi.
 - **Code 1, échec pendant l'appel à l'agent (le message contient `--session`)** : affiche l'erreur et propose à l'utilisateur de reprendre avec la commande indiquée. Ne relance pas tout seul : le bloc-notes a pu écrire avant l'interruption.
 - **Code 1, autre message** : affiche-le tel quel et arrête-toi.
 - **Code 127, « la CLI n'est pas encore installée »** : affiche le message tel quel et arrête-toi.
-- **Code 2 (usage)** : c'est un bug de ce skill. Affiche stderr et arrête-toi.
+- **Code 2 de `notes add idea` (usage)** : c'est un bug de ce skill. Affiche stderr et arrête-toi.

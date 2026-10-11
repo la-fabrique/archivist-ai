@@ -36,6 +36,7 @@ U
 out=""; prev=""; last=""
 for a in "$@"; do
   [ "$prev" = "-o" ] && out="$a"
+  case "$a" in --proto|--proto-redir) ;; esac
   prev="$a"; last="$a"
 done
 printf '%s\n' "$last" >> "$CALLS"
@@ -132,6 +133,17 @@ test_no_notes_release() {
   run
   assert_eq 0 "$RC" "sort en 0"
   assert_eq 0 "$(downloads)" "aucun téléchargement"
+  assert_eq "" "$(ls -A "$tmp/data")" "rien d'installé"
+  assert_silent
+}
+
+test_foreign_url() {
+  setup
+  FAKE_API_JSON='[{"assets":[{"browser_download_url": "https://github.com/autre-org/autre-repo/releases/download/notes-cli/0.20261012.1/notes-linux"}]}]'
+  export FAKE_API_JSON
+  run
+  assert_eq 0 "$RC" "sort en 0"
+  assert_eq 0 "$(downloads)" "aucun téléchargement hors du dépôt autorisé"
   assert_eq "" "$(ls -A "$tmp/data")" "rien d'installé"
   assert_silent
 }
