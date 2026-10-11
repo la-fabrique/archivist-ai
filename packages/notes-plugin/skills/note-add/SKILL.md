@@ -18,13 +18,13 @@ L'idée est `$ARGUMENTS`. Si elle est vide, demande-la à l'utilisateur et atten
 Passe le texte exact par un heredoc à délimiteur entre guillemets, pour que le shell n'interprète ni `$`, ni `"`, ni les backticks :
 
 ````
-notes add idea "$(cat <<'IDEE'
+notes add idea -- "$(cat <<'IDEE'
 <texte exact de l'idée>
 IDEE
 )"
 ````
 
-Ne reformule pas l'idée. Si le texte contient une ligne réduite à `IDEE`, choisis un autre délimiteur.
+Garde le `--` : sans lui, une idée qui commence par `-` serait prise pour une option. Ne reformule pas l'idée. Si le texte contient une ligne réduite à `IDEE`, choisis un autre délimiteur.
 
 ## 2. Lire le JSON
 
@@ -33,6 +33,13 @@ La sortie standard est un objet JSON : `session`, `reponse`, `suite`.
 ## 3. Montrer `reponse` telle quelle
 
 Affiche `reponse` à l'utilisateur mot pour mot, sans la reformuler, la résumer ni la commenter.
+
+`suite` est toujours présent : il ne dit pas si l'échange est fini. Juge à la lecture de `reponse` :
+
+- une **question** attend une réponse de l'utilisateur ;
+- une **confirmation** annonce que l'idée a été déposée ou rangée.
+
+En cas de doute, traite `reponse` comme une question et demande à l'utilisateur.
 
 ## 4. Si c'est une question du bloc-notes
 
@@ -55,7 +62,9 @@ Termine. Ne lance pas d'autre tour.
 
 ## 6. Erreurs
 
-En cas d'échec, le message est sur stderr. Selon le code de sortie et le message :
+En cas d'échec, le message est sur stderr. Après un `notes config set …`, ne relance le tour qu'une seule fois. Si la même erreur de configuration revient, affiche-la et arrête-toi.
+
+Selon le code de sortie et le message :
 
 - **Code 1, message contenant `notes config set agent`** : lance `notes config set agent claude-code` sans demander, puis relance le tour en cours.
 - **Code 1, message contenant `notes config set bloc-notes`, ou indiquant que le dossier du bloc-notes n'existe plus** : demande à l'utilisateur le chemin de son bloc-notes, lance `notes config set bloc-notes "<chemin>"`, puis relance le tour en cours. Si le chemin contient `"`, `$` ou un backtick, passe-le par un heredoc à délimiteur entre guillemets comme à l'étape 1.
