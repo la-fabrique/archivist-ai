@@ -54,7 +54,7 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "claude-sonnet-4-6",
+  "model": "claude-opus-5-5",
   "hooks": {
     "PreToolUse": [
       {
@@ -130,7 +130,7 @@
     "refreshInterval": 10
   },
   "enabledPlugins": {
-    "superpowers@anthropic-plugin-directory": true
+    "superpowers@superpowers-dev": true
   },
   "extraKnownMarketplaces": {
     "superpowers-dev": {
