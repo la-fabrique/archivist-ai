@@ -6,7 +6,7 @@
 - `packages/referentiel-cli/` — CLI développeur TypeScript (génération, validation, export) → `doc/usage.md`
 - `packages/archivist-cli/` — CLI utilisateur final Python, architecture hexagonale → tests : `cd packages/archivist-cli && uv run pytest tests/`
 - `packages/cli-core/` — package Python partagé (ports, adaptateurs, registre) consommé par les CLIs → tests : `cd packages/cli-core && uv run pytest tests/`
-- `packages/notes-cli/` — CLI notes Python (`notes config set llm` / `notes config show`), construite sur `cli-core` → tests : `cd packages/notes-cli && uv run pytest tests/`
+- `packages/notes-cli/` — CLI notes Python (`notes add idea`, `notes config set agent|bloc-notes` / `notes config show`), construite sur `cli-core` → tests : `cd packages/notes-cli && uv run pytest tests/`
 - `packages/landing/` — site vitrine
 - `docs/architecture/` — [vue d'ensemble architecture](docs/architecture/index.md), diagrammes et ADRs
 - `docs/architecture/adrs/` — décisions d'architecture (ADRs) — consulter avant toute modification non-triviale

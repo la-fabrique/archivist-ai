@@ -81,7 +81,7 @@ Chaque port est une ABC avec `VERSION: ClassVar[int]` et une erreur qui lui est 
 
 `AdapterRegistry` associe une clé `<port>/<nom>` (ex. `llm/claude-cli`) à une factory `dict -> adaptateur`.
 - `resolve(port, nom, config)` instancie l'adaptateur. Un nom inconnu lève `UnknownAdapterError`.
-- `names(port)` liste les noms enregistrés pour un port, triés. Les CLIs s'en servent pour valider une saisie utilisateur, comme `config set llm`.
+- `names(port)` liste les noms enregistrés pour un port, triés. Les CLIs s'en servent pour valider une saisie utilisateur, comme `archivist config set llm`.
 
 Le registre partagé est vide. Chaque CLI construit son `default_registry` dans `registry.py`, et c'est le seul endroit qui changera le jour où des plugins externes seront ouverts.
 

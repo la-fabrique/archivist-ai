@@ -11,36 +11,39 @@ Ce document décrit l'architecture de la CLI `notes-cli` : son périmètre actue
 ### Dans le périmètre actuel
 - Le squelette hexagonal de la CLI, branché sur [`cli-core`](cli-core.md).
 - La configuration persistante : `notes config set agent`, `notes config set bloc-notes` et `notes config show`.
+- Le premier cas d'usage métier, `notes add idea` : capturer une idée et la confier au **bloc-notes**, un dossier de l'utilisateur (réglages, skills, hooks, commande `/add`) qui la challenge et la range. La CLI sert de pont : elle sait où est le bloc-notes et comment y lancer l'agent, pas ce qu'il advient de l'idée. L'échange se fait par tours, une invocation par tour, pour qu'un agent appelant sans terminal interactif puisse le mener.
 
 ### Hors périmètre actuel (l'archi ne doit pas s'y opposer)
-- Toute commande métier : vault, lecture et écriture de notes, dialogue avec le LLM.
-- La notion de vault elle-même. Elle arrivera avec la première feature métier, avec ses ports (accès aux notes, par exemple) et sa clé de config.
+- Toute logique sur le contenu des idées (critères, catégories, format d'entrée d'inbox) : elle vit dans le bloc-notes.
+- La gestion de plusieurs bloc-notes, et les permissions Claude du bloc-notes (déclarées dans son `.claude/settings.json`).
+- La notion de vault elle-même. Elle arrivera avec une feature de lecture et écriture de notes, avec ses ports et sa clé de config.
 
 ---
 
 ## 2. Architecture en ports & adaptateurs
 
-Les cercles sont les mêmes que dans `archivist-cli`. Les ports et adaptateurs utilisés aujourd'hui viennent tous de `cli-core`.
+Les cercles sont les mêmes que dans `archivist-cli`. Le port `Agent` et son adaptateur sont propres à notes-cli ; le registre et le config store viennent de `cli-core`.
 
 ```
 ┌──────────────────────────────────────────────────────┐
 │  Frontière CLI  (Click)                              │
 │  ┌────────────────────────────────────────────────┐  │
-│  │  Application  (use cases — à venir)            │  │
+│  │  Application  (AddIdea)                        │  │
 │  │  ┌──────────────────────────────────────────┐  │  │
-│  │  │  Domain  (ports ré-exportés)             │  │  │
-│  │  │  LanguageModel, LlmError                 │  │  │
+│  │  │  Domain  (ports)                         │  │  │
+│  │  │  Agent, AgentReply, AgentError           │  │  │
 │  │  └──────────────────────────────────────────┘  │  │
 │  └────────────────────────────────────────────────┘  │
-│  Adapters  (fournis par cli-core)                    │
-│  agent/claude-code, config/yaml_file                    │
+│  Adapters                                            │
+│  agent/claude-code (notes-cli)                       │
+│  config/yaml_file (cli-core)                         │
 └──────────────────────────────────────────────────────┘
 ```
 
 ### Règles de dépendance
-- `domain` ne dépend que de la stdlib et des ports stdlib ré-exportés depuis `cli_core.domain`.
+- `domain` ne dépend que de la stdlib.
 - `application` dépend de `domain` uniquement.
-- Les adaptateurs propres à notes-cli, quand il y en aura, dépendront de `domain` pour implémenter ses ABC.
+- Les adaptateurs propres à notes-cli (`adapters/`) dépendent de `domain` pour implémenter ses ABC.
 - `registry.py` est le seul module qui importe des adaptateurs, ceux de `cli-core` compris.
 - `cli.py` câble registre → application. C'est le seul point d'assemblage.
 - **Aucune flèche inverse**, et `cli-core` n'importe jamais `notes_cli`.
@@ -48,14 +51,24 @@ Les cercles sont les mêmes que dans `archivist-cli`. Les ports et adaptateurs u
 ### Layout (`src/notes_cli/`)
 
 ```
-domain/          ports.py      ré-export LanguageModel, LlmError depuis cli_core
-application/                   use cases à venir
+domain/ports.py              Agent, AgentReply, AgentError
+application/add_idea.py      AddIdea : compose "/add <idée>", délègue à Agent
+adapters/agent/claude_code.py  ClaudeCodeAgent(workspace)
+testing/                     FakeAgent, AgentContractSuite
 config.py        AppConfig
 registry.py      default_registry
 cli.py           groupe Click `notes`
 ```
 
-Tant qu'aucune feature métier n'existe, le dossier `adapters/` n'existe pas non plus. Un port n'entre dans `cli-core` que s'il sert à au moins deux CLIs : les ports propres au vault vivront donc d'abord dans `notes_cli.domain`.
+Un port n'entre dans `cli-core` que s'il sert à au moins deux CLIs : `Agent` n'est utilisé que par notes-cli, il vit donc dans `notes_cli.domain`. `LanguageModel` (prompt + schéma, un seul appel) reste dans `cli-core` pour archivist-cli et n'est pas utilisé ici.
+
+### Port `Agent`
+
+`send(message, session_id=None) -> AgentReply` envoie un message à un agent installé dans un dossier. Sans `session_id`, une nouvelle session démarre ; avec, elle est reprise. `AgentReply` porte `session_id` et `text`. Toute erreur d'appel ou de réponse inexploitable lève `AgentError`, qui porte un `session_id` optionnel pour permettre de reprendre la conversation.
+
+Le dossier de travail est fixé à la construction de l'adaptateur (clé `workspace`), pas passé à chaque appel : le domaine ne connaît ni le chemin ni Claude. Le contrat « le bloc-notes expose `/add` » vit dans le use case `AddIdea`, pas dans le port : une future commande n'ajoute qu'un use case.
+
+`ClaudeCodeAgent` exécute `claude -p` avec le bloc-notes comme répertoire courant. Au premier tour il génère un UUID et le passe via `--session-id` ; aux tours suivants il utilise `--resume <id>`. Il retire `CLAUDECODE` de l'environnement transmis (un appelant Claude Code ne bloque pas le `claude` imbriqué), applique un délai de 600 s, et lit `result`, `session_id` et `is_error` dans le JSON renvoyé.
 
 ---
 
@@ -80,6 +93,7 @@ La liste des agents acceptés par `config set agent` vient de `default_registry.
 - `notes config set agent <nom>` valide le nom contre le registre, puis persiste la valeur. Sortie : `{"agent": "<nom>"}`.
 - `notes config set bloc-notes <chemin>` normalise le chemin (`expanduser` puis `abspath`), exige un dossier existant, puis persiste. Sortie : `{"bloc-notes": "<chemin absolu>"}`.
 - `notes config show` affiche la config persistée en JSON.
+- `notes add idea "<idée>"` (premier tour) et `notes add idea --session <id> --reply "<réponse>"` (tours suivants) construisent `AddIdea` avec l'agent résolu depuis la config, et affichent `{session, reponse, suite}`. La CLI ne cherche pas à savoir si l'idée a été déposée.
 
 ### Configuration persistante
 - **Schéma** : `AppConfig` (dataclass `frozen`), avec `agent: str | None` et `bloc_notes: str | None` (clés YAML `agent` et `bloc-notes`). `from_dict` et `to_dict` assurent la conversion avec le `dict[str, str]` opaque du `ConfigStore`.
@@ -88,17 +102,20 @@ La liste des agents acceptés par `config set agent` vient de `default_registry.
 
 ### Sortie et erreurs
 - Stdout : un objet JSON par commande.
-- Nom d'adaptateur inconnu : `click.BadParameter`, code de sortie 2, rien n'est écrit.
+- Nom d'adaptateur inconnu, ou chemin de bloc-notes qui n'est pas un dossier : `click.BadParameter`, code de sortie 2, rien n'est écrit.
+- Mauvaise combinaison d'arguments de `add idea` : `click.UsageError`, code de sortie 2.
+- Agent ou bloc-notes non configuré, dossier du bloc-notes disparu, `AgentError` : `click.ClickException`, code de sortie 1. Si l'`AgentError` porte un `session_id`, le message donne la commande pour reprendre la session.
 - `ConfigError` (config illisible ou invalide, écriture impossible) : convertie en `click.ClickException`, code de sortie 1, message sur stderr.
 
 ---
 
 ## 5. Tests
 
-- **Domain et application** : uniquement des fakes importés depuis `cli_core.testing` (`InMemoryConfigStore`, `FakeLlm`), sans aucune I/O.
+- **Domain et application** : uniquement des fakes, sans aucune I/O : `InMemoryConfigStore` depuis `cli_core.testing`, `FakeAgent` (réponses scriptées, appels enregistrés avec leur `session_id`) depuis `notes_cli.testing`.
+- **Contrat** : `AgentContractSuite` (`notes_cli.testing`) est un mixin pytest qui doit passer pour `FakeAgent` et pour `ClaudeCodeAgent`. Pour ce dernier, `subprocess.run` est remplacé (aucun vrai appel à `claude`) et les tests vérifient notamment `cwd` et l'absence de `CLAUDECODE` dans `env`.
 - **Config** : aller-retour `AppConfig.from_dict` / `to_dict`.
 - **CLI** : tests `CliRunner`, avec `_config_store` remplacé par un `InMemoryConfigStore`. Les cas d'erreur (YAML corrompu, valeur non textuelle) et le câblage du chemin passent par un `YamlFileConfigStore` sur un dossier temporaire.
-- Les contrats des adaptateurs sont vérifiés dans `cli-core`, pas ici.
+- Les contrats des adaptateurs de `cli-core` sont vérifiés dans `cli-core` ; celui de l'adaptateur d'agent l'est ici.
 
 ---
 
