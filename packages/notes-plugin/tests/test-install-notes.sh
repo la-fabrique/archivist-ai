@@ -36,7 +36,6 @@ U
 out=""; prev=""; last=""
 for a in "$@"; do
   [ "$prev" = "-o" ] && out="$a"
-  case "$a" in --proto|--proto-redir) ;; esac
   prev="$a"; last="$a"
 done
 printf '%s\n' "$last" >> "$CALLS"
@@ -139,7 +138,7 @@ test_no_notes_release() {
 
 test_foreign_url() {
   setup
-  FAKE_API_JSON='[{"assets":[{"browser_download_url": "https://github.com/autre-org/autre-repo/releases/download/notes-cli/0.20261012.1/notes-linux"}]}]'
+  FAKE_API_JSON=$(printf '%s' '[{"assets":[{"browser_download_url": "https://github.com/autre-org/autre-repo/releases/download/notes-cli/0.20261012.1/notes-linux"}]}]')
   export FAKE_API_JSON
   run
   assert_eq 0 "$RC" "sort en 0"
