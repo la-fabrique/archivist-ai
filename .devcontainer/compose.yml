@@ -5,6 +5,8 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ..:/workspace:cached
+      # Persiste plugins, auth et mémoire Claude Code entre les rebuilds
+      - claude-home:/home/vscode/.claude
     command: sleep infinity
     environment:
       - GH_TOKEN=${GH_TOKEN}
@@ -62,3 +64,5 @@ volumes:
     name: archivist-grafana-data
   tempo-data:
     name: archivist-tempo-data
+  claude-home:
+    name: archivist-claude-home

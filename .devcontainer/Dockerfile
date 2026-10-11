@@ -38,4 +38,6 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
 RUN userdel -r ubuntu 2>/dev/null || true && \
     useradd -m -s /bin/bash -u 1000 vscode
 USER vscode
+# Pré-crée ~/.claude pour que le volume nommé soit initialisé avec le bon propriétaire
+RUN mkdir -p /home/vscode/.claude
 WORKDIR /workspace
