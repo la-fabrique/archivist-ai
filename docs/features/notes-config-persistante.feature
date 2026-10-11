@@ -1,7 +1,8 @@
 Feature: Configuration persistante de la CLI notes
 
-  Pour ne pas répéter le choix de l'adaptateur LLM à chaque invocation,
-  l'utilisateur le persiste via "notes config set llm".
+  Pour ne pas répéter ses choix à chaque invocation, l'utilisateur persiste
+  l'agent via "notes config set agent" et le dossier du bloc-notes via
+  "notes config set bloc-notes".
   La configuration est stockée dans le dossier app data de l'utilisateur
   (platformdirs, application "notes") au format YAML et relue par "notes config show".
 
@@ -16,28 +17,53 @@ Feature: Configuration persistante de la CLI notes
     Then la sortie est l'objet JSON vide {}
     And le code de sortie est 0
 
-  Scenario: Enregistrer l'adaptateur LLM dans la config
-    When l'utilisateur lance "notes config set llm claude-cli"
-    Then la sortie est {"llm": "claude-cli"}
-    And la config persistée contient llm = "claude-cli"
+  Scenario: Enregistrer l'agent dans la config
+    When l'utilisateur lance "notes config set agent claude-code"
+    Then la sortie est {"agent": "claude-code"}
+    And la config persistée contient agent = "claude-code"
     And le code de sortie est 0
 
+  Scenario: Enregistrer le dossier bloc-notes
+    Given le dossier "/home/alice/bloc" existe
+    When l'utilisateur lance "notes config set bloc-notes /home/alice/bloc"
+    Then la sortie est {"bloc-notes": "/home/alice/bloc"}
+    And la config persistée contient bloc-notes = "/home/alice/bloc"
+    And le code de sortie est 0
+
+  Scenario: Un chemin bloc-notes relatif est enregistré en absolu
+    Given le dossier courant contient le sous-dossier "bloc"
+    When l'utilisateur lance "notes config set bloc-notes bloc"
+    Then la config persistée contient le chemin absolu du dossier "bloc"
+    And le code de sortie est 0
+
+  Scenario: Un chemin bloc-notes inexistant est refusé
+    When l'utilisateur lance "notes config set bloc-notes /chemin/inexistant"
+    Then un message d'erreur est affiché
+    And la config persistée n'est pas modifiée
+    And le code de sortie est 2
+
   Scenario: Afficher la configuration persistée
-    Given l'utilisateur a lancé "notes config set llm claude-cli"
+    Given l'utilisateur a lancé "notes config set agent claude-code"
     When l'utilisateur lance "notes config show"
-    Then la sortie est {"llm": "claude-cli"}
+    Then la sortie est {"agent": "claude-code"}
     And le code de sortie est 0
 
   Scenario: Config show ignore les clés inconnues
-    Given la config persistée contient llm = "claude-cli" et une clé inconnue
+    Given la config persistée contient agent = "claude-code" et une clé inconnue
     When l'utilisateur lance "notes config show"
-    Then la sortie JSON contient uniquement la clé llm
+    Then la sortie JSON contient uniquement la clé agent
     And le code de sortie est 0
 
-  Scenario: Un nom d'adaptateur LLM inconnu est refusé
+  Scenario: Une ancienne clé llm est ignorée
     Given la config persistée contient llm = "claude-cli"
-    When l'utilisateur lance "notes config set llm inconnu"
-    Then un message d'erreur liste les valeurs possibles dont "claude-cli"
+    When l'utilisateur lance "notes config show"
+    Then la sortie est l'objet JSON vide {}
+    And le code de sortie est 0
+
+  Scenario: Un nom d'agent inconnu est refusé
+    Given la config persistée contient agent = "claude-code"
+    When l'utilisateur lance "notes config set agent inconnu"
+    Then un message d'erreur liste les valeurs possibles dont "claude-code"
     And la config persistée n'est pas modifiée
     And le code de sortie est 2
 
@@ -54,7 +80,7 @@ Feature: Configuration persistante de la CLI notes
     And le code de sortie est 1
 
   Scenario: Une valeur non textuelle dans la config produit une erreur claire
-    Given le fichier de config contient llm: 2024-01-01
+    Given le fichier de config contient agent: 2024-01-01
     When l'utilisateur lance "notes config show"
     Then un message d'erreur est affiché sur stderr
     And le code de sortie est 1

@@ -36,33 +36,89 @@ def test_config_show_empty(store):
     assert json.loads(r.output) == {}
 
 
-def test_config_set_llm_then_show(store):
-    r = CliRunner().invoke(main, ["config", "set", "llm", "claude-cli"])
+def test_config_set_agent_then_show(store):
+    r = CliRunner().invoke(main, ["config", "set", "agent", "claude-code"])
     assert r.exit_code == 0
-    assert json.loads(r.output) == {"llm": "claude-cli"}
-    assert store.load() == {"llm": "claude-cli"}
+    assert json.loads(r.output) == {"agent": "claude-code"}
+    assert store.load() == {"agent": "claude-code"}
     r = CliRunner().invoke(main, ["config", "show"])
-    assert json.loads(r.output) == {"llm": "claude-cli"}
+    assert json.loads(r.output) == {"agent": "claude-code"}
 
 
-def test_config_set_llm_unknown_rejected(monkeypatch):
+def test_config_set_agent_unknown_rejected(monkeypatch):
+    store = InMemoryConfigStore({"agent": "claude-code"})
+    monkeypatch.setattr("notes_cli.cli._config_store", lambda: store)
+    r = CliRunner().invoke(main, ["config", "set", "agent", "inconnu"])
+    assert r.exit_code == 2
+    assert "claude-code" in r.output
+    assert store.load() == {"agent": "claude-code"}
+
+
+def test_config_set_bloc_notes_absolute(store, tmp_path):
+    r = CliRunner().invoke(main, ["config", "set", "bloc-notes", str(tmp_path)])
+    assert r.exit_code == 0
+    assert json.loads(r.output) == {"bloc-notes": str(tmp_path)}
+    assert store.load() == {"bloc-notes": str(tmp_path)}
+
+
+def test_config_set_bloc_notes_relative(store, tmp_path, monkeypatch):
+    (tmp_path / "sub").mkdir()
+    monkeypatch.chdir(tmp_path)
+    r = CliRunner().invoke(main, ["config", "set", "bloc-notes", "sub"])
+    assert r.exit_code == 0
+    assert store.load() == {"bloc-notes": str(tmp_path / "sub")}
+
+
+def test_config_set_bloc_notes_tilde(store, tmp_path, monkeypatch):
+    (tmp_path / "x").mkdir()
+    monkeypatch.setenv("HOME", str(tmp_path))
+    r = CliRunner().invoke(main, ["config", "set", "bloc-notes", "~/x"])
+    assert r.exit_code == 0
+    assert store.load() == {"bloc-notes": str(tmp_path / "x")}
+
+
+def test_config_set_bloc_notes_missing_rejected(store, tmp_path):
+    r = CliRunner().invoke(main, ["config", "set", "bloc-notes", str(tmp_path / "nope")])
+    assert r.exit_code == 2
+    assert store.load() == {}
+
+
+def test_config_set_bloc_notes_file_rejected(store, tmp_path):
+    f = tmp_path / "f.txt"
+    f.write_text("x", encoding="utf-8")
+    r = CliRunner().invoke(main, ["config", "set", "bloc-notes", str(f)])
+    assert r.exit_code == 2
+    assert store.load() == {}
+
+
+def test_config_set_both_keys_coexist(store, tmp_path):
+    runner = CliRunner()
+    assert runner.invoke(main, ["config", "set", "bloc-notes", str(tmp_path)]).exit_code == 0
+    assert runner.invoke(main, ["config", "set", "agent", "claude-code"]).exit_code == 0
+    assert store.load() == {"bloc-notes": str(tmp_path), "agent": "claude-code"}
+
+
+def test_config_set_llm_removed(store):
+    r = CliRunner().invoke(main, ["config", "set", "llm", "claude-cli"])
+    assert r.exit_code != 0
+
+
+def test_config_show_ignores_legacy_llm(monkeypatch):
     store = InMemoryConfigStore({"llm": "claude-cli"})
     monkeypatch.setattr("notes_cli.cli._config_store", lambda: store)
-    r = CliRunner().invoke(main, ["config", "set", "llm", "inconnu"])
-    assert r.exit_code != 0
-    assert "claude-cli" in r.output
-    assert store.load() == {"llm": "claude-cli"}
+    r = CliRunner().invoke(main, ["config", "show"])
+    assert json.loads(r.output) == {}
 
 
 def test_config_show_ignores_unknown_keys(monkeypatch):
-    store = InMemoryConfigStore({"vault": "file:///n", "llm": "claude-cli"})
+    store = InMemoryConfigStore({"vault": "file:///n", "agent": "claude-code"})
     monkeypatch.setattr("notes_cli.cli._config_store", lambda: store)
     r = CliRunner().invoke(main, ["config", "show"])
-    assert json.loads(r.output) == {"llm": "claude-cli"}
+    assert json.loads(r.output) == {"agent": "claude-code"}
 
 
 def test_config_show_corrupted_file_exits_1(tmp_path, monkeypatch):
-    (tmp_path / "config.yaml").write_text("llm: [\n", encoding="utf-8")
+    (tmp_path / "config.yaml").write_text("agent: [\n", encoding="utf-8")
     monkeypatch.setattr(
         "notes_cli.cli._config_store",
         lambda: YamlFileConfigStore("notes", tmp_path),
@@ -75,7 +131,7 @@ def test_config_show_corrupted_file_exits_1(tmp_path, monkeypatch):
 
 
 def test_config_show_non_string_value_exits_1(tmp_path, monkeypatch):
-    (tmp_path / "config.yaml").write_text("llm: 2024-01-01\n", encoding="utf-8")
+    (tmp_path / "config.yaml").write_text("agent: 2024-01-01\n", encoding="utf-8")
     monkeypatch.setattr(
         "notes_cli.cli._config_store",
         lambda: YamlFileConfigStore("notes", tmp_path),

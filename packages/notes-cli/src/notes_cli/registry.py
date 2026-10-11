@@ -7,10 +7,10 @@ __all__ = ["AdapterRegistry", "UnknownAdapterError", "default_registry"]
 
 def _build_default_registry() -> AdapterRegistry:
     from cli_core.adapters.config.yaml_file import YamlFileConfigStore
-    from cli_core.adapters.llm.claude_cli import ClaudeCliLlm
+    from notes_cli.adapters.agent.claude_code import ClaudeCodeAgent
 
     registry = AdapterRegistry()
-    registry.register("llm", "claude-cli", lambda config: ClaudeCliLlm())
+    registry.register("agent", "claude-code", lambda config: ClaudeCodeAgent(config["workspace"]))
     registry.register(
         "config", "yaml_file",
         lambda config: YamlFileConfigStore(config["app_name"], config.get("data_dir")),

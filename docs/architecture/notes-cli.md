@@ -10,7 +10,7 @@ Ce document décrit l'architecture de la CLI `notes-cli` : son périmètre actue
 
 ### Dans le périmètre actuel
 - Le squelette hexagonal de la CLI, branché sur [`cli-core`](cli-core.md).
-- La configuration persistante du LLM : `notes config set llm` et `notes config show`.
+- La configuration persistante : `notes config set agent`, `notes config set bloc-notes` et `notes config show`.
 
 ### Hors périmètre actuel (l'archi ne doit pas s'y opposer)
 - Toute commande métier : vault, lecture et écriture de notes, dialogue avec le LLM.
@@ -33,7 +33,7 @@ Les cercles sont les mêmes que dans `archivist-cli`. Les ports et adaptateurs u
 │  │  └──────────────────────────────────────────┘  │  │
 │  └────────────────────────────────────────────────┘  │
 │  Adapters  (fournis par cli-core)                    │
-│  llm/claude-cli, config/yaml_file                    │
+│  agent/claude-code, config/yaml_file                    │
 └──────────────────────────────────────────────────────┘
 ```
 
@@ -65,10 +65,10 @@ Tant qu'aucune feature métier n'existe, le dossier `adapters/` n'existe pas non
 
 | Clé | Adaptateur | Configuration de la factory |
 |---|---|---|
-| `llm/claude-cli` | `ClaudeCliLlm` | — |
+| `agent/claude-code` | `ClaudeCodeAgent` | `workspace` |
 | `config/yaml_file` | `YamlFileConfigStore` | `app_name` (`"notes"`), `data_dir` optionnel |
 
-La liste des LLM acceptés par `config set llm` vient de `default_registry.names("llm")`. Ajouter un adaptateur LLM au registre suffit à le rendre configurable.
+La liste des agents acceptés par `config set agent` vient de `default_registry.names("agent")`. Ajouter un adaptateur d'agent au registre suffit à le rendre configurable.
 
 ---
 
@@ -77,11 +77,12 @@ La liste des LLM acceptés par `config set llm` vient de `default_registry.names
 **Rôle de Click :** parser les arguments, résoudre les adaptateurs via le registre, exécuter, formater la sortie. **Aucune logique métier dans `cli.py`.**
 
 ### Commandes implémentées
-- `notes config set llm <nom>` valide le nom contre le registre, puis persiste la valeur. Sortie : `{"llm": "<nom>"}`.
+- `notes config set agent <nom>` valide le nom contre le registre, puis persiste la valeur. Sortie : `{"agent": "<nom>"}`.
+- `notes config set bloc-notes <chemin>` normalise le chemin (`expanduser` puis `abspath`), exige un dossier existant, puis persiste. Sortie : `{"bloc-notes": "<chemin absolu>"}`.
 - `notes config show` affiche la config persistée en JSON.
 
 ### Configuration persistante
-- **Schéma** : `AppConfig` (dataclass `frozen`), qui ne contient pour l'instant que `llm: str | None`. `from_dict` et `to_dict` assurent la conversion avec le `dict[str, str]` opaque du `ConfigStore`.
+- **Schéma** : `AppConfig` (dataclass `frozen`), avec `agent: str | None` et `bloc_notes: str | None` (clés YAML `agent` et `bloc-notes`). `from_dict` et `to_dict` assurent la conversion avec le `dict[str, str]` opaque du `ConfigStore`.
 - **Stockage** : `YamlFileConfigStore("notes")`, dans `<user_data_dir("notes", "notes")>/config.yaml`.
 - **Écriture** : lecture de la config → `dataclasses.replace` → `save`. Le store remplace la config entière, et les clés que `AppConfig` ignore ne sont pas conservées.
 

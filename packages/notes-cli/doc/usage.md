@@ -7,11 +7,13 @@ La CLI peut mémoriser les paramètres récurrents pour éviter de les passer à
 ### notes config set
 
 ```
-notes config set llm <nom>     # Mémorise l'adaptateur LLM
+notes config set agent <nom>         # Mémorise l'agent
+notes config set bloc-notes <chemin> # Mémorise le dossier du bloc-notes
 ```
 
-Un nom inconnu est refusé (code de sortie 2) avec la liste des valeurs possibles
-(ex : `claude-cli`). Rien n'est écrit dans ce cas.
+Un nom d'agent inconnu est refusé (code de sortie 2) avec la liste des valeurs possibles
+(ex : `claude-code`). Le chemin du bloc-notes est converti en chemin absolu (`~` développé) ;
+s'il n'est pas un dossier existant, il est refusé (code 2). Rien n'est écrit dans ces cas.
 
 ### notes config show
 
@@ -28,12 +30,13 @@ notes config show
 
 | Propriété | Type | Description |
 |-----------|------|-------------|
-| `llm`     | string | Nom de l'adaptateur LLM (ex : `claude-cli`) |
+| `agent`   | string | Nom de l'adaptateur d'agent (ex : `claude-code`) |
+| `bloc-notes` | string | Chemin absolu du dossier du bloc-notes |
 
 ### Exemple
 
 ```bash
-notes config set llm claude-cli
+notes config set agent claude-code
 notes config show
-# {"llm": "claude-cli"}
+# {"agent": "claude-code"}
 ```

@@ -23,8 +23,8 @@ uv run notes --help                     # CLI
 src/notes_cli/
   domain/          ports.py (ré-export LanguageModel, LlmError depuis cli_core)
   application/     (use cases à venir)
-  config.py        AppConfig (llm)
-  registry.py      default_registry (llm/claude-cli, config/yaml_file)
+  config.py        AppConfig (agent, bloc-notes)
+  registry.py      default_registry (agent/claude-code, config/yaml_file)
   cli.py
 ```
 
