@@ -3,7 +3,7 @@
 # Lancé par le hook SessionStart : silencieux et jamais bloquant (sort toujours 0).
 set -u
 
-API="https://api.github.com/repos/la-fabrique/archivist-ai/releases?per_page=100"
+API="https://api.github.com/repos/la-fabrique/marketplace-ai/releases?per_page=100"
 tmp=""
 trap 'rm -f "${tmp:-}"' EXIT
 trap 'exit 0' HUP INT TERM
@@ -23,7 +23,7 @@ install_latest() {
     | grep -o "\"browser_download_url\": *\"[^\"]*/releases/download/notes-cli/[^\"]*/$asset\"" \
     | head -n1 | sed 's/.*"\(https:[^"]*\)"$/\1/')
   case "$url" in
-    https://github.com/la-fabrique/archivist-ai/releases/download/notes-cli/*) ;;
+    https://github.com/la-fabrique/marketplace-ai/releases/download/notes-cli/*) ;;
     *) return 0 ;;
   esac
   tag=${url#*/releases/download/}

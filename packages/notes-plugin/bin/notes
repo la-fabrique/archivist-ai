@@ -12,7 +12,7 @@ notes : la CLI n'est pas encore installée.
 Redémarre ta session Claude Code : le plugin l'installe au démarrage.
 
 Installation manuelle : télécharge notes-linux ou notes-macos-arm64 depuis
-https://github.com/la-fabrique/archivist-ai/releases (tags notes-cli/*), puis :
+https://github.com/la-fabrique/marketplace-ai/releases (tags notes-cli/*), puis :
   mkdir -p "$DATA"
   mv <binaire téléchargé> "$DATA/notes" && chmod +x "$DATA/notes"
   echo notes-cli/<version> > "$DATA/version"

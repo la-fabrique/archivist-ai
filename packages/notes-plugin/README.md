@@ -7,7 +7,7 @@ Plugin Claude Code qui permet de confier une idée au bloc-notes depuis une sess
 Dans Claude Code :
 
 ```
-/plugin marketplace add la-fabrique/archivist-ai
+/plugin marketplace add la-fabrique/marketplace-ai
 /plugin install notes@archivist
 ```
 
