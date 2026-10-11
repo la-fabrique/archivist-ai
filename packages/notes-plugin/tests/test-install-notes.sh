@@ -14,7 +14,7 @@ assert_eq() { # attendu obtenu message
   if [ "$1" = "$2" ]; then echo "  ok   $3"; else fail "$3 (attendu: '$1', obtenu: '$2')"; fi
 }
 assert_file() { # test-flag chemin message
-  if [ "$1" "$2" ]; then echo "  ok   $3"; else fail "$3 ($1 $2)"; fi
+  if test "$1" "$2"; then echo "  ok   $3"; else fail "$3 ($1 $2)"; fi
 }
 
 # Prépare un test isolé : dossier temporaire, uname/curl simulés, environnement
@@ -107,7 +107,9 @@ test_download_fails() {
   assert_eq 0 "$RC" "sort en 0"
   assert_eq ANCIEN "$(cat "$tmp/data/notes")" "ancien binaire intact"
   assert_eq notes-cli/0.20261010.1 "$(cat "$tmp/data/version")" "ancienne version intacte"
+  # shellcheck disable=SC2012 # noms de fichiers connus et alphanumériques
   assert_eq "notes version" "$(ls "$tmp/data" | tr '\n' ' ' | sed 's/ $//')" "aucun fichier temporaire"
+  # shellcheck disable=SC2010 # ls -A sert justement à lister les fichiers cachés
   assert_eq "" "$(ls -A "$tmp/data" | grep '^\.' || true)" "aucun fichier caché"
   assert_silent
 }

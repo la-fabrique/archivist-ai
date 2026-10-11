@@ -11,7 +11,7 @@ Dans Claude Code :
 /plugin install notes@archivist
 ```
 
-Redémarre ensuite la session : au démarrage, le plugin télécharge la dernière version de la CLI `notes` (release `notes-cli/*`). Tant que la session n'a pas redémarré, la commande `notes` répond qu'elle n'est pas encore installée.
+Redémarre ensuite la session : au démarrage, un hook silencieux (il ne bloque jamais le démarrage) télécharge la dernière version de la CLI `notes` (release `notes-cli/*`). Avant le prochain démarrage de session, la commande `notes` répond qu'elle n'est pas encore installée.
 
 ## Usage
 
@@ -52,7 +52,7 @@ Sur les autres plateformes, aucune CLI n'est installée.
 
 ## Emplacement du binaire
 
-`~/.claude/plugins/data/notes-archivist/` (ou `$CLAUDE_CONFIG_DIR/plugins/data/notes-archivist/`). Ce dossier contient le binaire `notes` et un fichier `version` (tag de la release installée). Le script `bin/notes` du plugin relaie vers ce binaire.
+`~/.claude/plugins/data/notes-archivist/` (ou `$CLAUDE_CONFIG_DIR/plugins/data/notes-archivist/`). Ce dossier contient le binaire `notes` et un fichier `version` (tag de la release installée). Le script `bin/notes` du plugin relaie vers ce binaire. Il est ajouté au PATH après celui de l'utilisateur : une CLI `notes` installée à la main ailleurs sur le PATH est donc prioritaire sur celle du plugin.
 
 ## Tests
 
