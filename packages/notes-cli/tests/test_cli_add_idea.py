@@ -108,3 +108,35 @@ def test_agent_error(setup):
     assert "s9" in r.output
     assert "notes add idea --session s9 --reply" in r.output
     assert "Traceback" not in r.output
+
+
+def test_dash_reply_reaches_agent_verbatim(setup):
+    fake = setup(agent=FakeAgent(replies=["ok"]))
+    r = run(["--session", "s1", "--reply", "-x"])
+    assert r.exit_code == 0
+    assert fake.calls == [("-x", "s1")]
+
+
+@pytest.mark.parametrize(
+    "args",
+    [
+        ["--session", "s1", "--reply", ""],
+        ["--session", "s1", "--reply", "   "],
+        ["--session", "", "--reply", "oui"],
+        ["--session", "  ", "--reply", "oui"],
+    ],
+)
+def test_blank_session_or_reply_rejected(setup, args):
+    fake = setup()
+    r = run(args)
+    assert r.exit_code == 2
+    assert fake.calls == []
+
+
+def test_unknown_agent_in_config(monkeypatch, tmp_path):
+    cfg = {"agent": "foo", "bloc-notes": str(tmp_path)}
+    monkeypatch.setattr("notes_cli.cli._config_store", lambda: InMemoryConfigStore(cfg))
+    r = run(["x"])
+    assert r.exit_code == 1
+    assert "notes config set agent claude-code" in r.output
+    assert "Traceback" not in r.output

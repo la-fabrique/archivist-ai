@@ -35,7 +35,7 @@ def test_first_turn_argv_cwd_and_env(tmp_path, monkeypatch):
     with patch("subprocess.run", return_value=_completed(_fixture_stdout())) as run:
         ClaudeCodeAgent(workspace=str(tmp_path)).send("/add x")
     args, kwargs = run.call_args
-    assert args[0] == ["claude", "-p", "/add x", "--session-id", ANY, "--output-format", "json"]
+    assert args[0] == ["claude", "-p", "--session-id", ANY, "--output-format", "json", "--", "/add x"]
     assert kwargs["cwd"] == str(tmp_path)
     assert "CLAUDECODE" not in kwargs["env"]
     assert kwargs["env"]["KEEP_ME"] == "yes"
@@ -54,14 +54,46 @@ def test_next_turn_uses_resume(tmp_path):
     with patch("subprocess.run", return_value=_completed(_fixture_stdout())) as run:
         ClaudeCodeAgent(workspace=str(tmp_path)).send("oui", session_id="abc")
     argv = run.call_args.args[0]
-    assert argv == ["claude", "-p", "oui", "--resume", "abc", "--output-format", "json"]
+    assert argv == ["claude", "-p", "--resume", "abc", "--output-format", "json", "--", "oui"]
 
 
 def test_message_passed_verbatim(tmp_path):
     msg = '-x "y"\nzoé'
     with patch("subprocess.run", return_value=_completed(_fixture_stdout())) as run:
         ClaudeCodeAgent(workspace=str(tmp_path)).send(msg)
-    assert run.call_args.args[0][2] == msg
+    argv = run.call_args.args[0]
+    assert argv[-2:] == ["--", msg]
+
+
+@pytest.mark.parametrize("msg", ["- oui", "-1", "--help", "--model x"])
+def test_dash_message_after_double_dash(tmp_path, msg):
+    with patch("subprocess.run", return_value=_completed(_fixture_stdout())) as run:
+        ClaudeCodeAgent(workspace=str(tmp_path)).send(msg, session_id="abc")
+    argv = run.call_args.args[0]
+    assert argv[-2:] == ["--", msg]
+    assert msg not in argv[:-2]
+
+
+def test_stdin_is_devnull(tmp_path):
+    with patch("subprocess.run", return_value=_completed(_fixture_stdout())) as run:
+        ClaudeCodeAgent(workspace=str(tmp_path)).send("x")
+    assert run.call_args.kwargs["stdin"] == subprocess.DEVNULL
+
+
+def test_empty_stderr_falls_back_to_stdout_result(tmp_path):
+    out = json.dumps({"is_error": True, "result": "cause réelle"})
+    with patch("subprocess.run", return_value=_completed(out, 1, "")):
+        with pytest.raises(AgentError, match="cause réelle"):
+            ClaudeCodeAgent(workspace=str(tmp_path)).send("x")
+
+
+def test_empty_stderr_falls_back_to_stdout_excerpt(tmp_path):
+    out = "Z" * 800
+    with patch("subprocess.run", return_value=_completed(out, 1, "  ")) as _:
+        with pytest.raises(AgentError) as ei:
+            ClaudeCodeAgent(workspace=str(tmp_path)).send("x")
+    assert "Z" * 500 in str(ei.value)
+    assert "Z" * 501 not in str(ei.value)
 
 
 def test_timeout_message_states_delay(tmp_path):
@@ -84,7 +116,10 @@ _CASES = {
     "returncode": {"return_value": _completed("", 1, "err")},
     "timeout": {"side_effect": subprocess.TimeoutExpired("claude", 600)},
     "not-found": {"side_effect": FileNotFoundError("claude")},
+    "permission": {"side_effect": PermissionError("claude")},
 }
+
+_NEVER_STARTED = {"not-found", "permission"}
 
 
 @pytest.mark.parametrize("case", list(_CASES))
@@ -95,5 +130,10 @@ def test_error_carries_session_id(tmp_path, case, resumed):
         with pytest.raises(AgentError) as ei:
             agent.send("x", session_id="abc" if resumed else None)
     argv = run.call_args.args[0]
-    expected = "abc" if resumed else argv[argv.index("--session-id") + 1]
+    if resumed:
+        expected = "abc"
+    elif case in _NEVER_STARTED:
+        expected = None
+    else:
+        expected = argv[argv.index("--session-id") + 1]
     assert ei.value.session_id == expected

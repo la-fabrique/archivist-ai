@@ -8,6 +8,7 @@ import os
 import click
 
 from cli_core.domain.ports import ConfigError, ConfigStore
+from cli_core.registry import UnknownAdapterError
 from notes_cli.application.add_idea import AddIdea
 from notes_cli.config import AppConfig
 from notes_cli.domain.ports import Agent, AgentError
@@ -27,7 +28,7 @@ def _agent(cfg: AppConfig) -> Agent:
 @click.group(invoke_without_command=True)
 @click.pass_context
 def main(ctx: click.Context) -> None:
-    """notes — dialogue avec un vault de notes."""
+    """notes — passerelle vers ton bloc-notes : ajoute des notes via un agent."""
     if ctx.invoked_subcommand is None:
         click.echo(ctx.get_help())
 
@@ -105,6 +106,10 @@ def add_idea(idee: str | None, session_id: str | None, reply_text: str | None) -
         raise click.UsageError("--session et --reply vont ensemble.")
     if idee is None and reply_text is None:
         raise click.UsageError("Fournir IDEE, ou --session avec --reply.")
+    if session_id is not None and not session_id.strip():
+        raise click.UsageError("--session ne peut pas être vide.")
+    if reply_text is not None and not reply_text.strip():
+        raise click.UsageError("--reply ne peut pas être vide.")
     if idee is not None and not idee.strip():
         raise click.UsageError("IDEE ne peut pas être vide.")
 
@@ -126,7 +131,13 @@ def add_idea(idee: str | None, session_id: str | None, reply_text: str | None) -
             "Lance : notes config set bloc-notes <chemin>"
         )
 
-    use_case = AddIdea(_agent(cfg))
+    try:
+        agent = _agent(cfg)
+    except UnknownAdapterError as exc:
+        raise click.ClickException(
+            f"Agent {cfg.agent!r} inconnu. Lance : notes config set agent claude-code"
+        ) from exc
+    use_case = AddIdea(agent)
     try:
         if idee is not None:
             reply = use_case.start(idee)

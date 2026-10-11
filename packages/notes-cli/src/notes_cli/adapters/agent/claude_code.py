@@ -9,6 +9,16 @@ from typing import ClassVar
 from notes_cli.domain.ports import Agent, AgentError, AgentReply
 
 
+def _stdout_cause(stdout: str) -> str:
+    try:
+        data = json.loads(stdout)
+        if isinstance(data, dict) and isinstance(data.get("result"), str) and data["result"].strip():
+            return data["result"].strip()
+    except ValueError:
+        pass
+    return stdout.strip()[:500]
+
+
 class ClaudeCodeAgent(Agent):
     VERSION: ClassVar[int] = 1
 
@@ -23,7 +33,7 @@ class ClaudeCodeAgent(Agent):
         else:
             sid = session_id
             session_args = ["--resume", sid]
-        argv = ["claude", "-p", message, *session_args, "--output-format", "json"]
+        argv = ["claude", "-p", *session_args, "--output-format", "json", "--", message]
         env = {k: v for k, v in os.environ.items() if k != "CLAUDECODE"}
 
         try:
@@ -32,19 +42,27 @@ class ClaudeCodeAgent(Agent):
                 cwd=self._workspace,
                 env=env,
                 capture_output=True,
+                stdin=subprocess.DEVNULL,
                 text=True,
                 timeout=self._timeout,
             )
-        except FileNotFoundError as exc:
-            raise AgentError(f"claude introuvable dans le PATH : {exc}", session_id=sid) from exc
+        except OSError as exc:
+            # claude n'a pas démarré : au premier tour, aucune session n'existe.
+            known = session_id
+            if isinstance(exc, FileNotFoundError):
+                message_err = f"claude introuvable dans le PATH : {exc}"
+            else:
+                message_err = f"impossible de lancer claude : {exc}"
+            raise AgentError(message_err, session_id=known) from exc
         except subprocess.TimeoutExpired as exc:
             raise AgentError(
                 f"délai de {self._timeout} s dépassé", session_id=sid
             ) from exc
 
         if result.returncode != 0:
+            cause = result.stderr.strip() or _stdout_cause(result.stdout)
             raise AgentError(
-                f"claude a échoué (code {result.returncode}) : {result.stderr.strip()}",
+                f"claude a échoué (code {result.returncode}) : {cause}",
                 session_id=sid,
             )
 
