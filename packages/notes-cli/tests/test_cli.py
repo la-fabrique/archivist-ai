@@ -72,6 +72,7 @@ def test_config_set_bloc_notes_relative(store, tmp_path, monkeypatch):
 def test_config_set_bloc_notes_tilde(store, tmp_path, monkeypatch):
     (tmp_path / "x").mkdir()
     monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setenv("USERPROFILE", str(tmp_path))  # expanduser sous Windows
     r = CliRunner().invoke(main, ["config", "set", "bloc-notes", "~/x"])
     assert r.exit_code == 0
     assert store.load() == {"bloc-notes": str(tmp_path / "x")}
