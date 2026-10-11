@@ -1,0 +1,11 @@
+{
+  "name": "archivist",
+  "owner": { "name": "la-fabrique" },
+  "plugins": [
+    {
+      "name": "notes",
+      "source": "./packages/notes-plugin",
+      "description": "Confier une idée à son bloc-notes depuis Claude Code"
+    }
+  ]
+}
