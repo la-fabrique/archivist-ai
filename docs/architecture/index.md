@@ -26,6 +26,7 @@ landing  (site vitrine, indépendant)
 | `archivist-cli` | CLI moteur d'agent Python | [Architecture hexagonale en ports & adaptateurs](archivist-cli.md) — pipeline Ingest → OCR → Extraction → Classement → Apply |
 | `cli-core` | Package Python partagé (bibliothèque) | [Socle hexagonal commun](cli-core.md) : registre, port `LanguageModel` + `ClaudeCliLlm`, port `ConfigStore` + adaptateur YAML, fakes et suites de contrat. |
 | `notes-cli` | CLI Python réduite | [Architecture hexagonale branchée sur `cli-core`](notes-cli.md) — `notes add idea`, `notes config set agent` / `notes config set bloc-notes` / `notes config show` |
+| `notes-plugin` | Plugin Claude Code `notes` (marketplace `archivist`, déclaré dans `.claude-plugin/`) | Skill `/notes:note-add`, script relais `bin/notes` et hook SessionStart qui installe le binaire `notes-cli` depuis les releases GitHub |
 | `landing` | Site vitrine React | Vite + React 19 + shadcn/ui + Tailwind — SPA statique |
 
 ## Commandes de développement
@@ -117,6 +118,7 @@ Chaque package a son propre `CLAUDE.md` avec stack, commandes, layout et convent
 - [`packages/archivist-cli/CLAUDE.md`](../../packages/archivist-cli/CLAUDE.md)
 - [`packages/cli-core/CLAUDE.md`](../../packages/cli-core/CLAUDE.md)
 - [`packages/notes-cli/CLAUDE.md`](../../packages/notes-cli/CLAUDE.md)
+- [`packages/notes-plugin/CLAUDE.md`](../../packages/notes-plugin/CLAUDE.md)
 - [`packages/landing/CLAUDE.md`](../../packages/landing/CLAUDE.md)
 
 Ne dupliquer aucune info de ces fichiers ici. Les charger uniquement quand on travaille dans le package concerné.

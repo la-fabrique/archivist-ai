@@ -1,0 +1,27 @@
+name: CI — notes-plugin
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/notes-plugin/**'
+      - '.claude-plugin/**'
+      - '.github/workflows/ci-notes-plugin.yml'
+  pull_request:
+    paths:
+      - 'packages/notes-plugin/**'
+      - '.claude-plugin/**'
+      - '.github/workflows/ci-notes-plugin.yml'
+
+jobs:
+  tests:
+    name: Tests et shellcheck notes-plugin
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Shellcheck
+        run: shellcheck packages/notes-plugin/bin/notes packages/notes-plugin/hooks/install-notes.sh packages/notes-plugin/tests/*.sh
+
+      - name: Run tests
+        run: bash packages/notes-plugin/tests/run.sh
