@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Relais vers le binaire notes installé par le hook SessionStart du plugin.
+# L'outil Bash ne reçoit pas CLAUDE_PLUGIN_DATA : on recalcule le dossier de données.
+DATA="${CLAUDE_PLUGIN_DATA:-${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/data/notes-archivist}"
+
+if [ -x "$DATA/notes" ]; then
+  exec "$DATA/notes" "$@"
+fi
+
+cat >&2 <<EOF
+notes : la CLI n'est pas encore installée.
+Redémarre ta session Claude Code : le plugin l'installe au démarrage.
+
+Installation manuelle : télécharge notes-linux ou notes-macos-arm64 depuis
+https://github.com/la-fabrique/archivist-ai/releases (tags notes-cli/*), puis :
+  mkdir -p "$DATA"
+  mv <binaire téléchargé> "$DATA/notes" && chmod +x "$DATA/notes"
+  echo notes-cli/<version> > "$DATA/version"
+EOF
+exit 127
