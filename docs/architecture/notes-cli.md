@@ -68,7 +68,7 @@ Un port n'entre dans `cli-core` que s'il sert à au moins deux CLIs : `Agent` n'
 
 Le dossier de travail est fixé à la construction de l'adaptateur (clé `workspace`), pas passé à chaque appel : le domaine ne connaît ni le chemin ni Claude. Le contrat « le bloc-notes expose `/add` » vit dans le use case `AddIdea`, pas dans le port : une future commande n'ajoute qu'un use case.
 
-`ClaudeCodeAgent` exécute `claude -p` avec le bloc-notes comme répertoire courant. Au premier tour il génère un UUID et le passe via `--session-id` ; aux tours suivants il utilise `--resume <id>`. Il retire `CLAUDECODE` de l'environnement transmis (un appelant Claude Code ne bloque pas le `claude` imbriqué), applique un délai de 600 s, et lit `result`, `session_id` et `is_error` dans le JSON renvoyé.
+`ClaudeCodeAgent` exécute `claude -p` avec le bloc-notes comme répertoire courant. Au premier tour il génère un UUID et le passe via `--session-id` ; aux tours suivants il utilise `--resume <id>`. Le message est placé en dernier, après `--`, pour qu'un texte commençant par `-` ne soit pas lu comme une option ; stdin du sous-process est fermé (`DEVNULL`). Il retire `CLAUDECODE` de l'environnement transmis (un appelant Claude Code ne bloque pas le `claude` imbriqué), applique un délai de 600 s, et lit `result`, `session_id` et `is_error` dans le JSON renvoyé.
 
 ---
 

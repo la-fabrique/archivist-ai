@@ -15,10 +15,10 @@ notes add idea "<texte de l'idée>"
 La CLI lance, avec le dossier du bloc-notes comme répertoire courant :
 
 ```
-claude -p "/add <idée>" --session-id <uuid> --output-format json
+claude -p --session-id <uuid> --output-format json -- "/add <idée>"
 ```
 
-L'identifiant de session est généré par la CLI avant l'appel.
+L'identifiant de session est généré par la CLI avant l'appel. Le message passe après `--` : une réponse qui commence par `-` n'est jamais prise pour une option de `claude`.
 
 ### Tours suivants
 
@@ -29,7 +29,7 @@ notes add idea --session <id> --reply "<réponse>"
 La CLI lance, toujours dans le dossier du bloc-notes :
 
 ```
-claude -p "<réponse>" --resume <id> --output-format json
+claude -p --resume <id> --output-format json -- "<réponse>"
 ```
 
 `--session` et `--reply` vont ensemble. On fournit soit le texte de l'idée, soit `--session` avec `--reply`, jamais les deux.
@@ -76,7 +76,7 @@ Les erreurs sont écrites sur stderr, sans trace d'exécution.
 | `claude` absent du PATH, code retour non nul, délai dépassé (600 s), JSON illisible, `is_error` vrai | 1 |
 | Ni texte d'idée ni `--reply` ; texte d'idée et `--reply` ensemble ; `--reply` sans `--session` (ou inversement) ; texte d'idée vide | 2 |
 
-Quand l'échec survient pendant l'appel à `claude` (délai dépassé, code retour non nul…), le message d'erreur donne l'identifiant de session et la commande `notes add idea --session <id> --reply "<ta réponse>"` pour reprendre la conversation, car `/add` a pu écrire dans `inbox/` avant l'interruption.
+Quand l'échec survient pendant l'appel à `claude` (délai dépassé, code retour non nul…), le message d'erreur donne l'identifiant de session et la commande `notes add idea --session <id> --reply "<ta réponse>"` pour reprendre la conversation, car `/add` a pu écrire dans `inbox/` avant l'interruption. Ce rappel n'apparaît que si `claude` a démarré ; s'il est absent (`claude` introuvable, non exécutable), aucune session n'existe : recommencer avec un nouveau `notes add idea`.
 
 > **Permissions d'écriture.** Les autorisations d'écriture dans `inbox/` relèvent du bloc-notes, dans son `.claude/settings.json`. Or `claude -p` n'applique ce fichier que si le dossier est approuvé (« trusted ») : lancer une fois `claude` en interactif dans le dossier du bloc-notes et accepter l'invite de confiance. La CLI ne passe aucun drapeau de permission. Sans cela, `/add` peut échouer à écrire et ne le signaler que dans `reponse`.
 
