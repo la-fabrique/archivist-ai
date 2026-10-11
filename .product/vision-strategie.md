@@ -28,7 +28,7 @@ Ce positionnement implique :
 
 ## Stratégie
 
-**Open source comme levier de confiance et de distribution.** La CLI et le référentiel sont publiés sous licence Apache 2.0 sur [GitHub](https://github.com/la-fabrique/archivist-ai). L'open source n'est pas un sacrifice commercial : c'est le mécanisme de distribution. Les développeurs et intégrateurs d'agents peuvent l'embarquer librement ; la communauté contribue et enrichit le référentiel ; la confiance vient de la lisibilité totale du code et des règles.
+**Open source comme levier de confiance et de distribution.** La CLI et le référentiel sont publiés sous licence Apache 2.0 sur [GitHub](https://github.com/la-fabrique/marketplace-ai). L'open source n'est pas un sacrifice commercial : c'est le mécanisme de distribution. Les développeurs et intégrateurs d'agents peuvent l'embarquer librement ; la communauté contribue et enrichit le référentiel ; la confiance vient de la lisibilité totale du code et des règles.
 
 **Modèle open-core à venir.** Une offre avec support dédié, SLA et accompagnement est prévue pour les organisations qui souhaitent déléguer l'opérationnel. Les détails restent à définir. Les early adopters ("fondateurs") auront un accès prioritaire.
 

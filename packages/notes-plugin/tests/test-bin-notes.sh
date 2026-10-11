@@ -48,7 +48,7 @@ test_binary_absent() {
   assert_contains "$err" "Redémarre ta session Claude Code" "message de redémarrage"
   assert_contains "$err" "$tmp/data/notes" "chemin data/notes"
   assert_contains "$err" "$tmp/data/version" "chemin data/version"
-  assert_contains "$err" "https://github.com/la-fabrique/archivist-ai/releases" "URL des releases"
+  assert_contains "$err" "https://github.com/la-fabrique/marketplace-ai/releases" "URL des releases"
 }
 
 test_default_data_dir_home() {

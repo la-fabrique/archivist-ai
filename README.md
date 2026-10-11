@@ -1,7 +1,7 @@
 # Archivist AI
 
 [![Licence Apache 2.0](https://img.shields.io/badge/licence-Apache%202.0-blue.svg)](LICENCE.md)
-[![GitHub](https://img.shields.io/badge/GitHub-la--fabrique%2Farchivist--ai-black?logo=github)](https://github.com/la-fabrique/archivist-ai)
+[![GitHub](https://img.shields.io/badge/GitHub-la--fabrique%2Fmarketplace--ai-black?logo=github)](https://github.com/la-fabrique/marketplace-ai)
 
 Un archiviste professionnel pour votre agent IA — classement automatique de documents pour TPE et indépendants français.
 
@@ -11,13 +11,13 @@ Archivist applique un [référentiel de règles professionnelles](packages/refer
 
 ## Installation
 
-Téléchargez le binaire compilé depuis la [page des releases](https://github.com/la-fabrique/archivist-ai/releases) — aucun prérequis Python.
+Téléchargez le binaire compilé depuis la [page des releases](https://github.com/la-fabrique/marketplace-ai/releases) — aucun prérequis Python.
 
 ### Linux
 
 ```bash
 # Télécharger le dernier binaire
-curl -L https://github.com/la-fabrique/archivist-ai/releases/latest/download/archivist-linux -o archivist
+curl -L https://github.com/la-fabrique/marketplace-ai/releases/latest/download/archivist-linux -o archivist
 
 # Placer dans un dossier de votre PATH (ex : ~/.local/bin/)
 mkdir -p ~/.local/bin
@@ -35,7 +35,7 @@ archivist --help
 
 ### macOS
 
-Même procédure, en téléchargeant `archivist-macos` depuis la [page des releases](https://github.com/la-fabrique/archivist-ai/releases).
+Même procédure, en téléchargeant `archivist-macos` depuis la [page des releases](https://github.com/la-fabrique/marketplace-ai/releases).
 
 ## Première configuration
 

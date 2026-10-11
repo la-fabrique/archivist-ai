@@ -35,7 +35,7 @@ jobs:
       - name: Build
         working-directory: packages/landing
         env:
-          BASE_URL: /archivist-ai/
+          BASE_URL: /marketplace-ai/
         run: npm run build
 
       - name: Add 404.html for SPA routing
