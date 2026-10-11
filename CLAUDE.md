@@ -7,6 +7,8 @@
 - `packages/archivist-cli/` — CLI utilisateur final Python, architecture hexagonale → tests : `cd packages/archivist-cli && uv run pytest tests/`
 - `packages/cli-core/` — package Python partagé (ports, adaptateurs, registre) consommé par les CLIs → tests : `cd packages/cli-core && uv run pytest tests/`
 - `packages/notes-cli/` — CLI notes Python (`notes add idea`, `notes config set agent|bloc-notes` / `notes config show`), construite sur `cli-core` → tests : `cd packages/notes-cli && uv run pytest tests/`
+- `.claude-plugin/` — marketplace Claude Code `archivist` (`marketplace.json`)
+- `packages/notes-plugin/` — plugin Claude `notes` (skill `/notes:note-add`, installe la CLI notes) → tests : `bash packages/notes-plugin/tests/run.sh`
 - `packages/landing/` — site vitrine
 - `docs/architecture/` — [vue d'ensemble architecture](docs/architecture/index.md), diagrammes et ADRs
 - `docs/architecture/adrs/` — décisions d'architecture (ADRs) — consulter avant toute modification non-triviale
